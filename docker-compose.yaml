@@ -1,0 +1,25 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: 'find_work'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'superPassword_12344321'
+
+
+  backend:
+    image:  find_work
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      EMAIL_HOST_PASSWORD: faptdjelufrbysib
+      POSTGRES_NAME: 'find_work'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'superPassword_12344321'
+    depends_on:
+      - db
