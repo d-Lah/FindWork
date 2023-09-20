@@ -1,2 +1,6 @@
 __pycache__
 data
+db_for_test.sqlite3
+.DS_Store
+.idea
+

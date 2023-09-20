@@ -26,6 +26,14 @@ SECRET_KEY = 'django-insecure-561p51@n8_mo5^67k&n17$m$8g32q5#%$n7@%t^syjef$wl86l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'testSenderEmail21@gmail.com'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
 ALLOWED_HOSTS = []
 
 
@@ -139,7 +147,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-ALLOWED_FILE_EXT = ["png","jpg","jpeg","gif",]
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
+
+ALLOWED_FILE_EXT = [
+    "png",
+    "jpg",
+    "jpeg",
+    "gif",
+]
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / '/static/'

@@ -7,14 +7,35 @@ from django.contrib.auth.models import (
     BaseUserManager
 )
 
+
+def user_avatar_url(
+        instance,
+        file):
+    file_name, file_ext = file.split(".")
+    dir_path = f"user_avatar/user_{instance.profile.id}"
+    file_path = f"{dir_path}/{file_name}-{uuid4()}.{file_ext}"
+    return file_path
+
+
 class Profile(models.Model):
     first_name = models.CharField(max_length=150)
     second_name = models.CharField(max_length=150)
+    employer_profile = models.OneToOneField(
+        "EmployerProfile",
+        on_delete=models.CASCADE,
+        null=True
+    )
     employee_profile = models.OneToOneField(
         "EmployeeProfile",
         on_delete=models.CASCADE,
         null=True
     )
+    user_avatar = models.OneToOneField(
+        "UserAvatar",
+        on_delete=models.CASCADE,
+        null=True
+    )
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password):
@@ -31,7 +52,7 @@ class UserManager(BaseUserManager):
 
         last_digits = str(random.random())[-10:]
 
-        phone_number = f"super_user_{last_digits}"
+        phone_number = f"000{last_digits}"
 
         user = self.model(
             email=self.normalize_email(email),
@@ -60,7 +81,10 @@ class UserManager(BaseUserManager):
 
         return user
 
-class User(AbstractBaseUser,PermissionsMixin):
+
+class User(
+        AbstractBaseUser,
+        PermissionsMixin):
     email = models.EmailField(
         verbose_name="email",
         max_length=150,
@@ -69,14 +93,14 @@ class User(AbstractBaseUser,PermissionsMixin):
     phone_number = models.TextField(unique=True)
 
     user_activation_uuid = models.TextField()
-    reset_passwor_uuid_hash = models.TextField(null=True)
+    reset_password_uuid_hash = models.TextField(null=True)
     two_factor_auth_hash = models.TextField(null=True)
 
     profile = models.OneToOneField(
         "Profile",
         on_delete=models.CASCADE
     )
-    date_joinded = models.DateTimeField(
+    date_joined = models.DateTimeField(
         verbose_name="date joined",
         auto_now_add=True
     )
@@ -84,29 +108,23 @@ class User(AbstractBaseUser,PermissionsMixin):
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    is_employer = models.BooleanField(default=False)
-    is_employee = models.BooleanField(default=False)
+    is_employer = models.BooleanField()
+    is_employee = models.BooleanField()
     is_two_factor_auth = models.BooleanField(default=False)
 
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
 
+
+class EmployerProfile(models.Model):
+    projects_total = models.IntegerField(default=0)
+
+
 class EmployeeProfile(models.Model):
-    work_experience = models.ManyToManyField("WorkExperience")
-    knowledge_of_programming_language = models.ManyToManyField(
-        "KnowledgeOfProgrammingLanguage"
-    )
+    projects_compleat = models.IntegerField(default=0)
 
-class WorkExperience(models.Model):
-    experience = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.experience
-
-class KnowledgeOfProgrammingLanguage(models.Model):
-    programming_language = models.CharField(max_length=150)
-
-    def __str__(self):
-        return self.programming_language
+class UserAvatar(models.Model):
+    user_avatar_url = models.FileField(upload_to=user_avatar_url)
 # Create your models here.
