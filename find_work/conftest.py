@@ -1,15 +1,25 @@
 import pytest
-from uuid import uuid4
-from django.urls import reverse
-from find_work.settings import BASE_DIR
-from rest_framework.test import APIClient
-from django.contrib.auth.hashers import make_password
+from uuid import (
+    uuid4,
+)
+from django.urls import (
+    reverse,
+)
+from find_work.settings import (
+    BASE_DIR,
+)
+from rest_framework.test import (
+    APIClient,
+)
+from django.contrib.auth.hashers import (
+    make_password,
+)
 from user.models import (
     User,
     Profile,
     UserAvatar,
     EmployerProfile,
-    EmployeeProfile
+    EmployeeProfile,
 )
 
 
@@ -17,6 +27,7 @@ from user.models import (
 def client():
     client = APIClient()
     return client
+
 
 # Fixtures for register api
 
@@ -32,7 +43,6 @@ def data_for_test_register_user():
         "first_name": "Mykola",
         "second_name": "Mleko",
     }
-
     return data
 
 
@@ -47,7 +57,6 @@ def data_for_test_user_field_empty_error():
         "first_name": "Mykola",
         "second_name": "Mleko",
     }
-
     return data
 
 
@@ -62,7 +71,6 @@ def data_for_test_profile_field_empty_error():
         "first_name": "",
         "second_name": "",
     }
-
     return data
 
 
@@ -75,9 +83,8 @@ def create_new_user():
         first_name="Ran",
         second_name="Goose",
         employee_profile=employee_profile,
-        employer_profile=None
+        employer_profile=None,
     )
-
     profile.save()
 
     user = User(
@@ -89,7 +96,6 @@ def create_new_user():
         is_employee=True,
         password=make_password("password"),
     )
-
     user.save()
 
     return user
@@ -97,8 +103,8 @@ def create_new_user():
 
 @pytest.fixture()
 def data_for_test_email_already_exists_error(
-        create_new_user):
-
+    create_new_user,
+):
     data = {
         "email": create_new_user.email,
         "phone_number": "12344321",
@@ -108,14 +114,13 @@ def data_for_test_email_already_exists_error(
         "first_name": "Mykola",
         "second_name": "Mleko",
     }
-
     return data
 
 
 @pytest.fixture()
 def data_for_test_phone_number_already_exists_error(
-        create_new_user):
-
+    create_new_user,
+):
     data = {
         "email": "RangoosE@email.com",
         "phone_number": create_new_user.phone_number,
@@ -125,5 +130,17 @@ def data_for_test_phone_number_already_exists_error(
         "first_name": "Mykola",
         "second_name": "Mleko",
     }
-
     return data
+
+
+@pytest.fixture()
+def data_for_test_activate_user(create_new_user):
+    return create_new_user.user_activation_uuid
+
+
+@pytest.fixture()
+def data_for_test_user_already_active(create_new_user):
+    create_new_user.is_active = True
+    create_new_user.save()
+
+    return create_new_user.user_activation_uuid
