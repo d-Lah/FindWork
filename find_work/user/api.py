@@ -45,8 +45,8 @@ from rest_framework_simplejwt.authentication import (
 
 class Register(APIView):
     def post(
-        self,
-        request,
+            self,
+            request,
     ):
         user_serializer = UserSerializer(data=request.data)
         user_serializer.is_valid()
@@ -139,9 +139,9 @@ class Register(APIView):
 
 class ActivateUser(APIView):
     def put(
-        self,
-        request,
-        user_activation_uuid,
+            self,
+            request,
+            user_activation_uuid,
     ):
         user = User.objects.filter(
             user_activation_uuid=user_activation_uuid,

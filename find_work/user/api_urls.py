@@ -23,4 +23,9 @@ urlpatterns = [
         api.ActivateUser.as_view(),
         name="activate_user",
     ),
+    path(
+        "login",
+        TokenObtainPairView.as_view(),
+        name="login"
+    ),
 ]

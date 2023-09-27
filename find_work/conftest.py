@@ -103,7 +103,7 @@ def create_new_user():
 
 @pytest.fixture()
 def data_for_test_email_already_exists_error(
-    create_new_user,
+        create_new_user,
 ):
     data = {
         "email": create_new_user.email,
@@ -119,7 +119,7 @@ def data_for_test_email_already_exists_error(
 
 @pytest.fixture()
 def data_for_test_phone_number_already_exists_error(
-    create_new_user,
+        create_new_user,
 ):
     data = {
         "email": "RangoosE@email.com",
@@ -133,14 +133,50 @@ def data_for_test_phone_number_already_exists_error(
     return data
 
 
+# Fixtures for activate user api
+
+
 @pytest.fixture()
 def data_for_test_activate_user(create_new_user):
     return create_new_user.user_activation_uuid
 
 
 @pytest.fixture()
-def data_for_test_user_already_active(create_new_user):
+def data_for_test_user_already_active_error(create_new_user):
     create_new_user.is_active = True
     create_new_user.save()
 
     return create_new_user.user_activation_uuid
+
+
+# Fixtures for login api
+
+
+@pytest.fixture()
+def data_for_test_login_user(create_new_user):
+    create_new_user.is_active = True
+    create_new_user.save()
+
+    data = {
+        "email": create_new_user.email,
+        "password": "password"
+    }
+    return data
+
+
+@pytest.fixture()
+def data_for_test_response_user_not_active_error(create_new_user):
+    data = {
+        "email": create_new_user.email,
+        "password": "password"
+    }
+    return data
+
+
+@pytest.fixture()
+def data_for_test_response_field_empty_error():
+    data = {
+        "email": "",
+        "password": ""
+    }
+    return data
