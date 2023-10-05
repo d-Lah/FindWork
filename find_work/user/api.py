@@ -1,3 +1,24 @@
+from uuid import uuid4
+
+import pyotp
+
+from django.core.mail import send_mail
+from django.contrib.auth.hashers import (
+    make_password,
+    check_password,
+)
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+from find_work.settings import (
+    EMAIL_HOST_USER,
+    ALLOWED_FILE_EXT,
+    FILE_UPLOAD_MAX_MEMORY_SIZE,
+)
 from .models import (
     User,
     Profile,
@@ -11,39 +32,11 @@ from .serializer import (
     EmployerProfileSerializer,
     EmployeeProfileSerializer,
 )
-from uuid import (
-    uuid4,
-)
-from find_work.settings import (
-    EMAIL_HOST_USER,
-    ALLOWED_FILE_EXT,
-    FILE_UPLOAD_MAX_MEMORY_SIZE,
-)
-from django.core.mail import (
-    send_mail,
-)
-from rest_framework.views import (
-    APIView,
-)
-from django.contrib.auth.hashers import (
-    make_password,
-    check_password,
-)
-from rest_framework.response import (
-    Response,
-)
-from rest_framework.parsers import (
-    MultiPartParser,
-)
-from rest_framework.permissions import (
-    IsAuthenticated,
-)
-from rest_framework_simplejwt.authentication import (
-    JWTAuthentication,
-)
 
 
 class Register(APIView):
+    """API class for register new user"""
+
     def post(
             self,
             request,
@@ -138,6 +131,8 @@ class Register(APIView):
 
 
 class ActivateUser(APIView):
+    """API class for activate new user"""
+
     def put(
             self,
             request,
@@ -147,6 +142,7 @@ class ActivateUser(APIView):
             user_activation_uuid=user_activation_uuid,
             is_active=False,
         ).first()
+
         if not user:
             return Response(
                 {"error": "UserAlreadyActiveError"},
@@ -157,4 +153,82 @@ class ActivateUser(APIView):
         return Response(
             {"status": "Update"},
             status=200,
+        )
+
+
+class CreateTwoFactorAuthQRCode(APIView):
+    """API class for create base32 and qr code for authenticator app"""
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(
+            self,
+            request
+    ):
+        user_id = request.user.id
+        user = User.objects.filter(pk=user_id).first()
+
+        otp_base32 = pyotp.random_base32()
+        otp_auth_url = pyotp.TOTP(
+            otp_base32
+        ).provisioning_uri(
+            name=user.email,
+            issuer_name="FindWork"
+        )
+        user.otp_base32 = otp_base32
+        user.save()
+
+        data = {
+            "otp_auth_url": otp_auth_url
+        }
+
+        return Response(
+            {
+                "status": "Create",
+                "data": data
+            },
+            status=200
+        )
+
+
+class ValidationTOTPToken(APIView):
+    """API class for validation totp token from authenticator app"""
+
+    def post(
+            self,
+            request
+    ):
+        user_id = request.data.get("user_id")
+        totp_token = request.data.get("totp_token")
+
+        if not totp_token:
+            return Response(
+                {"error": "FieldEmptyError"},
+                status=400
+            )
+
+        user = User.objects.filter(pk=user_id).first()
+
+        if not user:
+            return Response(
+                {"error": "NotFoundUserWithThisCredentialsError"},
+                status=404
+            )
+
+        user_otp_base32 = user.otp_base32
+
+        totp = pyotp.TOTP(user_otp_base32)
+        if not totp.verify(totp_token):
+            return Response(
+                {"error": "WrongTOTPTokenError"},
+                status=401
+            )
+
+        if not user.is_two_factor_auth:
+            user.is_two_factor_auth = True
+
+        return Response(
+            {"status": "Valid"},
+            status=200
         )

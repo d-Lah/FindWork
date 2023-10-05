@@ -1,19 +1,13 @@
+from uuid import uuid4
+
+import pyotp
 import pytest
-from uuid import (
-    uuid4,
-)
-from django.urls import (
-    reverse,
-)
-from find_work.settings import (
-    BASE_DIR,
-)
-from rest_framework.test import (
-    APIClient,
-)
-from django.contrib.auth.hashers import (
-    make_password,
-)
+
+from django.urls import reverse
+from django.contrib.auth.hashers import make_password
+
+from rest_framework.test import APIClient
+
 from user.models import (
     User,
     Profile,
@@ -21,6 +15,7 @@ from user.models import (
     EmployerProfile,
     EmployeeProfile,
 )
+from find_work.settings import BASE_DIR
 
 
 @pytest.fixture
@@ -178,5 +173,93 @@ def data_for_test_response_field_empty_error():
     data = {
         "email": "",
         "password": ""
+    }
+    return data
+
+
+@pytest.fixture
+def user_obtain_token(
+    client,
+    data_for_test_login_user
+):
+    responce = client.post(
+        reverse("user_api:login"),
+        data_for_test_login_user
+    )
+
+    return responce.data
+
+
+@pytest.fixture
+def user_auth_headers(user_obtain_token):
+
+    access_token = user_obtain_token["access"]
+
+    authorization = {"Authorization": f"Bearer {access_token}"}
+
+    return authorization
+
+
+@pytest.fixture()
+def data_for_test_should_create_two_factor_auth_qr_code(create_new_user):
+    create_new_user.is_active = True
+    create_new_user.save()
+
+    data = {
+        "user_id": create_new_user.id,
+    }
+    return data
+
+
+@pytest.fixture()
+def set_base32_for_user(create_new_user):
+    otp_base32 = pyotp.random_base32()
+    create_new_user.otp_base32 = otp_base32
+    create_new_user.save()
+
+    return create_new_user
+
+
+@pytest.fixture()
+def data_for_test_validate_totp_token(
+    set_base32_for_user
+):
+    user = set_base32_for_user
+
+    totp = pyotp.TOTP(user.otp_base32)
+
+    data = {
+        "user_id": user.id,
+        "totp_token": totp.now()
+    }
+    return data
+
+
+@pytest.fixture()
+def data_for_test_should_response_user_not_found_error(
+    set_base32_for_user
+):
+    user = set_base32_for_user
+
+    totp = pyotp.TOTP(user.otp_base32)
+
+    data = {
+        "totp_token": totp.now()
+    }
+    return data
+
+
+@pytest.fixture()
+def data_for_test_should_response_wrong_totp_token_error(
+    set_base32_for_user
+):
+    user = set_base32_for_user
+
+    totp = pyotp.TOTP(user.otp_base32)
+    wrong_totp_token = int(totp.now()) - 1
+
+    data = {
+        "user_id": user.id,
+        "totp_token": wrong_totp_token
     }
     return data

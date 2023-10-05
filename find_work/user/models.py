@@ -1,10 +1,8 @@
 import random
-from uuid import (
-    uuid4,
-)
-from django.db import (
-    models,
-)
+
+from uuid import uuid4
+
+from django.db import models
 from django.contrib.auth.models import (
     PermissionsMixin,
     AbstractBaseUser,
@@ -13,13 +11,10 @@ from django.contrib.auth.models import (
 
 
 def user_avatar_url(
-    instance,
-    file,
+        instance,
+        file,
 ):
-    (
-        file_name,
-        file_ext,
-    ) = file.split(".")
+    file_name, file_ext = file.split(".")
     dir_path = f"user_avatar/user_{instance.profile.id}"
     file_path = f"{dir_path}/{file_name}-{uuid4()}.{file_ext}"
     return file_path
@@ -111,9 +106,12 @@ class User(
     )
     phone_number = models.TextField(unique=True)
 
+    otp_base32 = models.CharField(
+        max_length=200,
+        null=True
+    )
     user_activation_uuid = models.TextField()
     reset_password_uuid_hash = models.TextField(null=True)
-    two_factor_auth_hash = models.TextField(null=True)
 
     profile = models.OneToOneField(
         "Profile",

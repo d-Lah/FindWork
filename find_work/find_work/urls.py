@@ -40,6 +40,10 @@ urlpatterns = [
         "api/v1/user/",
         include("user.api_urls"),
     ),
+    path(
+        "api/v1/user1/",
+        include("user.view_urls"),
+    ),
 ] + static(
     settings.MEDIA_URL,
     document_root=settings.MEDIA_ROOT,
