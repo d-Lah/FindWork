@@ -263,3 +263,38 @@ def data_for_test_should_response_wrong_totp_token_error(
         "totp_token": wrong_totp_token
     }
     return data
+
+
+@pytest.fixture()
+def data_for_test_should_edit_profile_info():
+    data = {
+        "first_name": "Lui",
+        "second_name": "Onir"
+    }
+    return data
+
+
+@pytest.fixture()
+def data_for_test_should_check_user_password():
+    data = {
+        "password": "password"
+    }
+    return data
+
+
+@pytest.fixture()
+def data_for_test_should_response_wrong_password_error():
+    data = {
+        "password": "wrong_password"
+    }
+
+    return data
+
+
+@pytest.fixture()
+def data_for_test_should_update_user_password():
+    data = {
+        "password": "new_password"
+    }
+
+    return data
