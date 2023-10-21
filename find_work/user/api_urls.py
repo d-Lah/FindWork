@@ -37,6 +37,11 @@ urlpatterns = [
         name="validation_totp_token"
     ),
     path(
+        "activate_two_factor_auth",
+        api.ActivateTwoFactorAuth.as_view(),
+        name="activate_two_factor_auth"
+    ),
+    path(
         "info",
         api.UserInfo.as_view(),
         name="user_info"
@@ -55,5 +60,15 @@ urlpatterns = [
         "update-user-password",
         api.UpdateUserPassword.as_view(),
         name="update_user_password"
-    )
+    ),
+    path(
+        "update-user-email",
+        api.UpdateUserEmail.as_view(),
+        name="update_user_email"
+    ),
+    path(
+        "update-user-phone-number",
+        api.UpdateUserPhoneNumber.as_view(),
+        name="update_user_phone_number"
+    ),
 ]

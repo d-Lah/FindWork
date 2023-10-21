@@ -73,5 +73,17 @@ class UserAvatarSerializer(serializers.ModelSerializer):
     user_avatar_url = serializers.FileField(write_only=True)
 
 
+class TOTPTokenSerializer(serializers.Serializer):
+    totp_token = serializers.CharField()
+
+
 class PasswordFieldSerializer(serializers.Serializer):
     password = serializers.CharField()
+
+
+class EmailFieldSerializer(serializers.Serializer):
+    email = serializers.CharField()
+
+
+class PhoneNumberFieldSerializer(serializers.Serializer):
+    phone_number = serializers.CharField()

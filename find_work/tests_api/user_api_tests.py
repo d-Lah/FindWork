@@ -5,23 +5,24 @@ from django.urls import reverse
 from rest_framework import status
 
 from apps.response_error import (
-    ResponseUserNotFoundError,
     ResponseWrongPasswordError,
     ResponseUserFieldEmptyError,
     ResponseWrongTOTPTokenError,
+    ResponseEmailFieldEmptyError,
     ResponseProfileFieldEmptyError,
     ResponseUserAlreadyActiveError,
     ResponsePasswordFieldEmptyError,
     ResponseEmailAlreadyExistsError,
     ResponseTOTPTokenFieldEmptyError,
-    ResponsePhoneNumberAlreadyExistsError
+    ResponsePhoneNumberFieldEmptyError,
+    ResponsePhoneNumberAlreadyExistsError,
+    ResponseTwoFactorAuthAlreadyActiveError,
 )
 from apps.response_success import (
     ResponseGet,
     ResponseValid,
     ResponseCreate,
     ResponseUpdate,
-    ResponseSuccess,
 )
 
 
@@ -199,53 +200,94 @@ class TestClassUser:
     def test_should_validate_totp_token(
             self,
             client,
+            user_auth_headers,
             data_for_test_validate_totp_token
     ):
         request = client.post(
             reverse("user_api:validation_totp_token"),
+            headers=user_auth_headers,
             data=data_for_test_validate_totp_token
         )
         assert request.status_code == status.HTTP_200_OK
         assert request.data.get("status") == ResponseValid.response_data["status"]
 
-    def test_should_response_totp_token_field_empty_error_in_validate_totp_token(
+    def test_should_response_auth_headers_error_in_validate_totp_token(
             self,
             client,
+            data_for_test_validate_totp_token,
     ):
         request = client.post(
             reverse("user_api:validation_totp_token"),
+            data=data_for_test_validate_totp_token
+        )
+        assert request.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_should_response_totp_token_field_empty_error_in_validate_totp_token(
+            self,
+            client,
+            user_auth_headers
+    ):
+        request = client.post(
+            reverse("user_api:validation_totp_token"),
+            headers=user_auth_headers,
         )
         assert request.status_code == status.HTTP_400_BAD_REQUEST
         assert request.data.get("error") == (
             ResponseTOTPTokenFieldEmptyError.response_data["error"]
         )
 
-    def test_should_response_user_not_found_error(
-            self,
-            client,
-            data_for_test_should_response_user_not_found_error
-    ):
-        request = client.post(
-            reverse("user_api:validation_totp_token"),
-            data=data_for_test_should_response_user_not_found_error
-        )
-        assert request.status_code == status.HTTP_404_NOT_FOUND
-        assert request.data.get("error") == (
-            ResponseUserNotFoundError.response_data["error"]
-        )
-
     def test_should_response_wrong_totp_token_error(
             self,
             client,
+            user_auth_headers,
             data_for_test_should_response_wrong_totp_token_error
     ):
         request = client.post(
             reverse("user_api:validation_totp_token"),
+            headers=user_auth_headers,
             data=data_for_test_should_response_wrong_totp_token_error
         )
         assert request.status_code == status.HTTP_401_UNAUTHORIZED
         assert request.data.get("error") == (
             ResponseWrongTOTPTokenError.response_data["error"]
+        )
+
+    def test_should_activate_two_factor_auth(
+            self,
+            client,
+            user_auth_headers
+    ):
+        request = client.put(
+            reverse("user_api:activate_two_factor_auth"),
+            headers=user_auth_headers
+        )
+
+        assert request.status_code == status.HTTP_200_OK
+        assert request.data.get("status") == ResponseUpdate.response_data["status"]
+
+    def test_should_response_auth_headers_error_activate_two_factor_auth(
+            self,
+            client,
+    ):
+        request = client.put(
+            reverse("user_api:activate_two_factor_auth"),
+        )
+
+        assert request.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_should_response_two_factor_auth_already_active_error(
+            self,
+            client,
+            user_auth_headers_with_already_active_two_factor_auth
+    ):
+        request = client.put(
+            reverse("user_api:activate_two_factor_auth"),
+            headers=user_auth_headers_with_already_active_two_factor_auth
+        )
+
+        assert request.status_code == status.HTTP_409_CONFLICT
+        assert request.data.get("error") == (
+            ResponseTwoFactorAuthAlreadyActiveError.response_data["error"]
         )
 
     def test_should_get_user_info(
@@ -388,7 +430,7 @@ class TestClassUser:
         )
         assert request.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_should_response_password_field_empty_in_update_user_password(
+    def test_should_response_password_field_empty_error_in_update_user_password(
             self,
             client,
             user_auth_headers
@@ -400,4 +442,82 @@ class TestClassUser:
         assert request.status_code == status.HTTP_400_BAD_REQUEST
         assert request.data.get("error") == (
             ResponsePasswordFieldEmptyError.response_data["error"]
+        )
+
+    def test_should_update_user_email(
+            self,
+            client,
+            user_auth_headers,
+            data_for_test_should_update_user_email
+    ):
+        request = client.put(
+            reverse("user_api:update_user_email"),
+            headers=user_auth_headers,
+            data=data_for_test_should_update_user_email
+        )
+        assert request.status_code == status.HTTP_200_OK
+        assert request.data.get("status") == ResponseUpdate.response_data["status"]
+
+    def test_should_response_auth_headers_error_in_update_user_email(
+            self,
+            client,
+            data_for_test_should_update_user_email
+    ):
+        request = client.put(
+            reverse("user_api:update_user_email"),
+            data=data_for_test_should_update_user_email
+        )
+        assert request.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_should_response_email_field_empty_error_in_update_user_email(
+            self,
+            client,
+            user_auth_headers,
+    ):
+        request = client.put(
+            reverse("user_api:update_user_email"),
+            headers=user_auth_headers
+        )
+        assert request.status_code == status.HTTP_400_BAD_REQUEST
+        assert request.data.get("error") == (
+            ResponseEmailFieldEmptyError.response_data["error"]
+        )
+
+    def test_should_update_user_phone_number(
+            self,
+            client,
+            user_auth_headers,
+            data_for_test_should_update_user_phone_number
+    ):
+        request = client.put(
+            reverse("user_api:update_user_phone_number"),
+            headers=user_auth_headers,
+            data=data_for_test_should_update_user_phone_number
+        )
+        assert request.status_code == status.HTTP_200_OK
+        assert request.data.get("status") == ResponseUpdate.response_data["status"]
+
+    def test_should_response_auth_headers_error_in_update_user_phone_number(
+            self,
+            client,
+            data_for_test_should_update_user_phone_number
+    ):
+        request = client.put(
+            reverse("user_api:update_user_phone_number"),
+            data=data_for_test_should_update_user_phone_number
+        )
+        assert request.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_should_response_phone_number_field_empty_error_update_user_phone_number(
+            self,
+            client,
+            user_auth_headers,
+    ):
+        request = client.put(
+            reverse("user_api:update_user_phone_number"),
+            headers=user_auth_headers,
+        )
+        assert request.status_code == status.HTTP_400_BAD_REQUEST
+        assert request.data.get("error") == (
+            ResponsePhoneNumberFieldEmptyError.response_data["error"]
         )

@@ -22,7 +22,10 @@ from .models import (
 from .serializer import (
     UserSerializer,
     ProfileSerializer,
+    TOTPTokenSerializer,
     UserAvatarSerializer,
+    EmailFieldSerializer,
+    PhoneNumberFieldSerializer,
     PasswordFieldSerializer,
     EmployerProfileSerializer,
     EmployeeProfileSerializer,
@@ -48,16 +51,18 @@ from apps.mail_data_manager import (
 )
 from apps.mail_sender import MailSender
 from apps.response_error import (
-    ResponseUserNotFoundError,
     ResponseWrongPasswordError,
     ResponseWrongTOTPTokenError,
     ResponseUserFieldEmptyError,
+    ResponseEmailFieldEmptyError,
     ResponseProfileFieldEmptyError,
     ResponseUserAlreadyActiveError,
     ResponseEmailAlreadyExistsError,
     ResponsePasswordFieldEmptyError,
     ResponseTOTPTokenFieldEmptyError,
+    ResponsePhoneNumberFieldEmptyError,
     ResponsePhoneNumberAlreadyExistsError,
+    ResponseTwoFactorAuthAlreadyActiveError,
 )
 from .apps_for_user.user_data_validators import (
     ValidateEmailAndPhoneNumberOnExists
@@ -212,25 +217,29 @@ class CreateTwoFactorAuthQRCode(APIView):
 class ValidateTOTPToken(APIView):
     """API class for validation totp token from authenticator app"""
 
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(
             self,
             request
     ):
-        user_id = request.data.get("user_id")
-        totp_token = request.data.get("totp_token")
+        user_id = request.user.id
 
-        if not totp_token:
+        totp_token_serializer = TOTPTokenSerializer(data=request.data)
+        totp_token_serializer.is_valid()
+
+        if totp_token_serializer.errors:
             return ResponseTOTPTokenFieldEmptyError().get_response()
 
-        user = User.objects.filter(pk=user_id).first()
+        deserialized_data = totp_token_serializer.validated_data
 
-        if not user:
-            return ResponseUserNotFoundError().get_response()
+        user = User.objects.filter(pk=user_id).first()
 
         user_otp_base32 = user.otp_base32
 
         totp = pyotp.TOTP(user_otp_base32)
-        if not totp.verify(totp_token):
+        if not totp.verify(deserialized_data["totp_token"]):
             return ResponseWrongTOTPTokenError().get_response()
 
         if not user.is_two_factor_auth:
@@ -238,6 +247,32 @@ class ValidateTOTPToken(APIView):
             user.save()
 
         return ResponseValid().get_response()
+
+
+class ActivateTwoFactorAuth(APIView):
+    """API change is_two_factor_auth on true"""
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def put(
+            self,
+            request
+    ):
+        user_id = request.user.id
+
+        user = User.objects.filter(
+            pk=user_id,
+            is_two_factor_auth=False
+        ).first()
+
+        if not user:
+            return ResponseTwoFactorAuthAlreadyActiveError().get_response()
+
+        user.is_two_factor_auth = True
+        user.save()
+
+        return ResponseUpdate().get_response()
 
 
 class UserInfo(APIView):
@@ -353,6 +388,58 @@ class UpdateUserPassword(APIView):
         user = User.objects.filter(pk=user_id).first()
 
         user.password = make_password(deserialized_data["password"])
+        user.save()
+
+        return ResponseUpdate().get_response()
+
+
+class UpdateUserEmail(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def put(
+            self,
+            request
+    ):
+        email_serializer = EmailFieldSerializer(data=request.data)
+
+        email_serializer.is_valid()
+        if email_serializer.errors:
+            return ResponseEmailFieldEmptyError().get_response()
+
+        deserializer_data = email_serializer.validated_data
+
+        user_id = request.user.id
+        user = User.objects.filter(pk=user_id).first()
+
+        user.email = deserializer_data["email"]
+        user.save()
+
+        return ResponseUpdate().get_response()
+
+
+class UpdateUserPhoneNumber(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def put(
+            self,
+            request
+    ):
+        phone_number_serializer = PhoneNumberFieldSerializer(data=request.data)
+
+        phone_number_serializer.is_valid()
+        if phone_number_serializer.errors:
+            return ResponsePhoneNumberFieldEmptyError().get_response()
+
+        deserializer_data = phone_number_serializer.validated_data
+
+        user_id = request.user.id
+        user = User.objects.filter(pk=user_id).first()
+
+        user.phone_number = deserializer_data["phone_number"]
         user.save()
 
         return ResponseUpdate().get_response()

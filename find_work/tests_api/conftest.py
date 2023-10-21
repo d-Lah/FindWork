@@ -24,9 +24,6 @@ def client():
     return client
 
 
-# Fixtures for register api
-
-
 @pytest.fixture()
 def data_for_test_register_user():
     data = {
@@ -128,9 +125,6 @@ def data_for_test_phone_number_already_exists_error(
     return data
 
 
-# Fixtures for activate user api
-
-
 @pytest.fixture()
 def data_for_test_activate_user(create_new_user):
     return create_new_user.user_activation_uuid
@@ -142,9 +136,6 @@ def data_for_test_user_already_active_error(create_new_user):
     create_new_user.save()
 
     return create_new_user.user_activation_uuid
-
-
-# Fixtures for login api
 
 
 @pytest.fixture()
@@ -182,12 +173,12 @@ def user_obtain_token(
     client,
     data_for_test_login_user
 ):
-    responce = client.post(
+    request = client.post(
         reverse("user_api:login"),
         data_for_test_login_user
     )
 
-    return responce.data
+    return request.data
 
 
 @pytest.fixture
@@ -236,20 +227,6 @@ def data_for_test_validate_totp_token(
 
 
 @pytest.fixture()
-def data_for_test_should_response_user_not_found_error(
-    set_base32_for_user
-):
-    user = set_base32_for_user
-
-    totp = pyotp.TOTP(user.otp_base32)
-
-    data = {
-        "totp_token": totp.now()
-    }
-    return data
-
-
-@pytest.fixture()
 def data_for_test_should_response_wrong_totp_token_error(
     set_base32_for_user
 ):
@@ -263,6 +240,42 @@ def data_for_test_should_response_wrong_totp_token_error(
         "totp_token": wrong_totp_token
     }
     return data
+
+
+@pytest.fixture()
+def user_with_already_active_two_factor_auth(create_new_user):
+    create_new_user.is_two_factor_auth = True
+    create_new_user.is_active = True
+    create_new_user.save()
+
+    data = {
+        "email": create_new_user.email,
+        "password": "password"
+    }
+    return data
+
+
+@pytest.fixture()
+def obtain_token_with_already_active_two_factor_auth(
+    client,
+    user_with_already_active_two_factor_auth
+):
+    request = client.post(
+        reverse("user_api:login"),
+        user_with_already_active_two_factor_auth
+    )
+    return request.data
+
+
+@pytest.fixture()
+def user_auth_headers_with_already_active_two_factor_auth(
+    obtain_token_with_already_active_two_factor_auth
+):
+    access_token = obtain_token_with_already_active_two_factor_auth["access"]
+
+    authorization = {"Authorization": f"Bearer {access_token}"}
+
+    return authorization
 
 
 @pytest.fixture()
@@ -295,6 +308,24 @@ def data_for_test_should_response_wrong_password_error():
 def data_for_test_should_update_user_password():
     data = {
         "password": "new_password"
+    }
+
+    return data
+
+
+@pytest.fixture()
+def data_for_test_should_update_user_email():
+    data = {
+        "email": "new_email@email.com"
+    }
+
+    return data
+
+
+@pytest.fixture()
+def data_for_test_should_update_user_phone_number():
+    data = {
+        "phone_number": "1234554321"
     }
 
     return data

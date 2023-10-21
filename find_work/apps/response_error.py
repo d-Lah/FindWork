@@ -108,15 +108,15 @@ class ResponseTOTPTokenFieldEmptyError(ResponseError):
         pass
 
 
-class ResponseUserNotFoundError(ResponseError):
+class ResponseTwoFactorAuthAlreadyActiveError(ResponseError):
     response_data = {
-        "error": "UserNotFoundError"
+        "error": "TwoFactorAlreadyActiveError"
     }
 
     def get_response(self):
         return Response(
             self.response_data,
-            status=status.HTTP_404_NOT_FOUND
+            status=status.HTTP_409_CONFLICT
         )
 
     def add_data_for_response_data(self, key, value):
@@ -162,6 +162,36 @@ class ResponseWrongPasswordError(ResponseError):
         return Response(
             self.response_data,
             status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    def add_data_for_response_data(self, key, value):
+        pass
+
+
+class ResponseEmailFieldEmptyError(ResponseError):
+    response_data = {
+        "error": "EmailFieldEmpty"
+    }
+
+    def get_response(self):
+        return Response(
+            self.response_data,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def add_data_for_response_data(self, key, value):
+        pass
+
+
+class ResponsePhoneNumberFieldEmptyError(ResponseError):
+    response_data = {
+        "error": "PhoneNumberFieldEmpty"
+    }
+
+    def get_response(self):
+        return Response(
+            self.response_data,
+            status=status.HTTP_400_BAD_REQUEST
         )
 
     def add_data_for_response_data(self, key, value):
