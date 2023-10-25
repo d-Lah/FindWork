@@ -25,3 +25,5 @@ services:
       - POSTGRES_PASSWORD
     depends_on:
       - db
+    volumes:
+      - ./find_work/media:/find_work/media

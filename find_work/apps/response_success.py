@@ -76,3 +76,18 @@ class ResponseGet(ResponseSuccess):
 
     def add_data_for_response_data(self, key, value):
         self.response_data[key] = value
+
+
+class ResponseUpload(ResponseSuccess):
+    response_data = {
+        "status": "Upload"
+    }
+
+    def get_response(self):
+        return Response(
+            self.response_data,
+            status=status.HTTP_201_CREATED
+        )
+
+    def add_data_for_response_data(self, key, value):
+        self.response_data[key] = value

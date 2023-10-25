@@ -4,3 +4,11 @@ class EmailAlreadyExistsError(Exception):
 
 class PhoneNuberAlreadyExistsError(Exception):
     pass
+
+
+class ImageSizeToLargeError(Exception):
+    pass
+
+
+class InvalidImageExtError(Exception):
+    pass

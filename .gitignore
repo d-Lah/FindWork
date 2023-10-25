@@ -3,4 +3,5 @@ data
 .DS_Store
 __pycache__
 db_for_test.sqlite3
-*env
+.env
+*/user_*

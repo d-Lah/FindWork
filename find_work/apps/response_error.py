@@ -170,7 +170,7 @@ class ResponseWrongPasswordError(ResponseError):
 
 class ResponseEmailFieldEmptyError(ResponseError):
     response_data = {
-        "error": "EmailFieldEmpty"
+        "error": "EmailFieldEmptyError"
     }
 
     def get_response(self):
@@ -185,13 +185,58 @@ class ResponseEmailFieldEmptyError(ResponseError):
 
 class ResponsePhoneNumberFieldEmptyError(ResponseError):
     response_data = {
-        "error": "PhoneNumberFieldEmpty"
+        "error": "PhoneNumberFieldEmptyError"
     }
 
     def get_response(self):
         return Response(
             self.response_data,
             status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def add_data_for_response_data(self, key, value):
+        pass
+
+
+class ResponseUserAvatarFieldEmptyError(ResponseError):
+    response_data = {
+        "error": "UserAvatarFieldEmptyError"
+    }
+
+    def get_response(self):
+        return Response(
+            self.response_data,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def add_data_for_response_data(self, key, value):
+        pass
+
+
+class ResponseImageSizeTooLargeError(ResponseError):
+    response_data = {
+        "error": "ImageSizeTooLargeError"
+    }
+
+    def get_response(self):
+        return Response(
+            self.response_data,
+            status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+        )
+
+    def add_data_for_response_data(self, key, value):
+        pass
+
+
+class ResponseInvalidImageExtError(ResponseError):
+    response_data = {
+        "error": "InvalidImageExtError"
+    }
+
+    def get_response(self):
+        return Response(
+            self.response_data,
+            status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
         )
 
     def add_data_for_response_data(self, key, value):

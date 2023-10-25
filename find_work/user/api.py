@@ -16,6 +16,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import (
     User,
     Profile,
+    UserAvatar,
     EmployerProfile,
     EmployeeProfile,
 )
@@ -25,25 +26,23 @@ from .serializer import (
     TOTPTokenSerializer,
     UserAvatarSerializer,
     EmailFieldSerializer,
-    PhoneNumberFieldSerializer,
     PasswordFieldSerializer,
+    PhoneNumberFieldSerializer,
     EmployerProfileSerializer,
     EmployeeProfileSerializer,
 )
-from find_work.settings import (
-    HTTP_LOCALHOST,
-    ALLOWED_FILE_EXT,
-    FILE_UPLOAD_MAX_MEMORY_SIZE,
-)
 from apps.object_exception import (
+    InvalidImageExtError,
+    ImageSizeToLargeError,
     EmailAlreadyExistsError,
-    PhoneNuberAlreadyExistsError
+    PhoneNuberAlreadyExistsError,
 )
 from apps.response_success import (
     ResponseGet,
     ResponseValid,
     ResponseCreate,
     ResponseUpdate,
+    ResponseUpload,
 )
 from apps.mail_data_manager import (
     MailSubjectInRegisterNewUser,
@@ -54,18 +53,23 @@ from apps.response_error import (
     ResponseWrongPasswordError,
     ResponseWrongTOTPTokenError,
     ResponseUserFieldEmptyError,
+    ResponseInvalidImageExtError,
     ResponseEmailFieldEmptyError,
+    ResponseImageSizeTooLargeError,
     ResponseProfileFieldEmptyError,
     ResponseUserAlreadyActiveError,
     ResponseEmailAlreadyExistsError,
     ResponsePasswordFieldEmptyError,
     ResponseTOTPTokenFieldEmptyError,
+    ResponseUserAvatarFieldEmptyError,
     ResponsePhoneNumberFieldEmptyError,
     ResponsePhoneNumberAlreadyExistsError,
     ResponseTwoFactorAuthAlreadyActiveError,
 )
+from find_work.settings import HTTP_LOCALHOST
 from .apps_for_user.user_data_validators import (
-    ValidateEmailAndPhoneNumberOnExists
+    ValidateImageSizeAndExt,
+    ValidateEmailAndPhoneNumberOnExists,
 )
 
 
@@ -89,8 +93,10 @@ class RegisterNewUser(APIView):
         try:
             user_data_validators.is_email_exists()
             user_data_validators.is_phone_number_exists()
+
         except EmailAlreadyExistsError:
             return ResponseEmailAlreadyExistsError().get_response()
+
         except PhoneNuberAlreadyExistsError:
             return ResponsePhoneNumberAlreadyExistsError().get_response()
 
@@ -443,3 +449,52 @@ class UpdateUserPhoneNumber(APIView):
         user.save()
 
         return ResponseUpdate().get_response()
+
+
+class UploadUserAvatar(APIView):
+
+    parser_classes = [MultiPartParser]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(
+            self,
+            request
+    ):
+        user_avatar_serializer = UserAvatarSerializer(data=request.FILES)
+
+        user_avatar_serializer.is_valid()
+        if user_avatar_serializer.errors:
+            return ResponseUserAvatarFieldEmptyError().get_response()
+
+        deserialized_data = user_avatar_serializer.validated_data
+
+        image_validator = ValidateImageSizeAndExt(
+            deserialized_data["user_avatar_url"]
+        )
+
+        try:
+            image_validator.is_image_size_too_large()
+            image_validator.is_valid_image_ext()
+
+        except ImageSizeToLargeError:
+            return ResponseImageSizeTooLargeError().get_response()
+
+        except InvalidImageExtError:
+            return ResponseInvalidImageExtError().get_response()
+
+        new_user_avatar = UserAvatar(
+            user_avatar_url=deserialized_data.get("user_avatar_url")
+        )
+
+        user_id = request.user.id
+        profile = Profile.objects.filter(user__id=user_id).first()
+
+        new_user_avatar.for_profile = profile
+        new_user_avatar.user_avatar_url = deserialized_data["user_avatar_url"]
+        new_user_avatar.save()
+
+        profile.user_avatar = new_user_avatar
+        profile.save()
+
+        return ResponseUpload().get_response()

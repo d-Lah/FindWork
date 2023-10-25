@@ -14,9 +14,13 @@ def user_avatar_url(
         instance,
         file,
 ):
-    file_name, file_ext = file.split(".")
-    dir_path = f"user_avatar/user_{instance.profile.id}"
-    file_path = f"{dir_path}/{file_name}-{uuid4()}.{file_ext}"
+    for_profile = f"user_{instance.for_profile.id}"
+    dir_path = f"user_avatar/{for_profile}"
+
+    image_name, image_ext = file.split(".")
+    unique_image_name = f"{image_name}-{uuid4()}.{image_ext}"
+
+    file_path = f"{dir_path}/{unique_image_name}"
     return file_path
 
 
@@ -143,6 +147,10 @@ class EmployeeProfile(models.Model):
 
 
 class UserAvatar(models.Model):
+    for_profile = models.ForeignKey(
+        "Profile",
+        on_delete=models.CASCADE
+    )
     user_avatar_url = models.FileField(upload_to=user_avatar_url)
 
 

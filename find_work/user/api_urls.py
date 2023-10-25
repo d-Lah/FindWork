@@ -71,4 +71,9 @@ urlpatterns = [
         api.UpdateUserPhoneNumber.as_view(),
         name="update_user_phone_number"
     ),
+    path(
+        "upload-user-avatar",
+        api.UploadUserAvatar.as_view(),
+        name="upload_user_avatar"
+    )
 ]
