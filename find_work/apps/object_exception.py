@@ -12,3 +12,15 @@ class ImageSizeToLargeError(Exception):
 
 class InvalidImageExtError(Exception):
     pass
+
+
+class EmailFieldEmptyError(Exception):
+    pass
+
+
+class PasswordFieldEmptyError(Exception):
+    pass
+
+
+class ResetPasswordPasswordTOTPFieldEmptyError(Exception):
+    pass

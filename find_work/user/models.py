@@ -115,7 +115,7 @@ class User(
         null=True
     )
     user_activation_uuid = models.TextField()
-    reset_password_uuid_hash = models.TextField(null=True)
+    # reset_password_totp = models.TextField(null=True)
 
     profile = models.OneToOneField(
         "Profile",

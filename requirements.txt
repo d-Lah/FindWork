@@ -1,8 +1,10 @@
 anyio==3.7.1
 asgiref==3.7.1
 certifi==2023.5.7
+cffi==1.16.0
 cfgv==3.4.0
 charset-normalizer==3.1.0
+cryptography==41.0.7
 distlib==0.3.7
 Django==4.2.1
 django-filter==23.2
@@ -25,6 +27,7 @@ pluggy==1.0.0
 pre-commit==3.4.0
 psycopg2-binary==2.9.6
 pycodestyle==2.11.0
+pycparser==2.21
 pyflakes==3.1.0
 PyJWT==2.7.0
 pyotp==2.9.0

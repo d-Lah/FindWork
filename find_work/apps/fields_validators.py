@@ -57,24 +57,6 @@ class ValidateImageSizeAndExt:
             raise InvalidImageExtError()
 
 
-class ValidateEmailAndPasswordOnEmpty:
-    def __init__(
-            self,
-            email_serializer_errors,
-            password_serializer_errors
-    ):
-        self.email_serializer_errors = email_serializer_errors
-        self.password_serializer_errors = password_serializer_errors
-
-    def is_email_field_empty(self):
-        if self.email_serializer_errors:
-            raise EmailFieldEmptyError()
-
-    def is_password_field_empty(self):
-        if self.email_serializer_errors:
-            raise PasswordFieldEmptyError()
-
-
 class ValidateFieldsOnEmpty:
     def __init__(
             self,
@@ -92,4 +74,4 @@ class ValidateFieldsOnEmpty:
 
     def is_reset_password_totp_field_empty(self):
         if self.fields.get("reset_password_totp"):
-            raise PasswordFieldEmptyError()
+            raise ResetPasswordPasswordTOTPFieldEmptyError()

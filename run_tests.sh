@@ -4,5 +4,6 @@
 source .env
 
 export SECRET_KEY=$SECRET_KEY
+export CRYPTOGRAPHY_FERNET_KEY=$CRYPTOGRAPHY_FERNET_KEY
 
-pytest find_work/tests_api
+pytest find_work/tests

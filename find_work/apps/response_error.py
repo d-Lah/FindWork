@@ -241,3 +241,49 @@ class ResponseInvalidImageExtError(ResponseError):
 
     def add_data_for_response_data(self, key, value):
         pass
+
+
+class ResponseUserNotFoundError(ResponseError):
+    response_data = {
+        "error": "UserNotFoundError"
+    }
+
+    def get_response(self):
+        return Response(
+            self.response_data,
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    def add_data_for_response_data(self, key, value):
+        pass
+
+
+class ResponseUUIDFieldEmptyError(ResponseError):
+    response_data = {
+        "error": "UUIDFieldEmptyError"
+    }
+
+    def get_response(self):
+        return Response(
+            self.response_data,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def add_data_for_response_data(self, key, value):
+        pass
+
+
+# incapacitated
+class ResponseResetPasswordTOTPIncapacitatedError(ResponseError):
+    response_data = {
+        "error": "ResetPasswordTOTPIncapacitatedError"
+    }
+
+    def get_response(self):
+        return Response(
+            self.response_data,
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    def add_data_for_response_data(self, key, value):
+        pass

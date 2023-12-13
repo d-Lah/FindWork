@@ -77,6 +77,10 @@ class TOTPTokenSerializer(serializers.Serializer):
     totp_token = serializers.CharField()
 
 
+class ResetPasswordTOTPSerializer(serializers.Serializer):
+    reset_password_totp = serializers.CharField()
+
+
 class PasswordFieldSerializer(serializers.Serializer):
     password = serializers.CharField()
 
