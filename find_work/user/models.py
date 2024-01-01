@@ -115,7 +115,6 @@ class User(
         null=True
     )
     user_activation_uuid = models.TextField()
-    # reset_password_totp = models.TextField(null=True)
 
     profile = models.OneToOneField(
         "Profile",
@@ -152,6 +151,3 @@ class UserAvatar(models.Model):
         on_delete=models.CASCADE
     )
     user_avatar_url = models.FileField(upload_to=user_avatar_url)
-
-
-# Create your models here.

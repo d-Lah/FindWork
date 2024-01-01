@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from rest_framework import status
 
-from apps.response_success import ResponseGet
+from util.user_api_resp.user_info_resp import UserInfoResp
 
 
 @pytest.mark.django_db
@@ -19,11 +19,11 @@ class TestUserInfo:
             headers=user_auth_headers
         )
         assert request.status_code == status.HTTP_200_OK
-        assert request.data.get("status") == (
-            ResponseGet.response_data["status"]
+        assert request.data["success"] == (
+            UserInfoResp.resp_data["successes"][0]["success"]
         )
 
-    def test_should_response_auth_headers_error_in_user_info(
+    def test_should_response_auth_headers_error(
             self,
             client
     ):

@@ -4,7 +4,7 @@ from django.urls import reverse
 
 
 @pytest.fixture()
-def data_for_response_two_factor_auth_already_active_error(
+def data_to_activate_two_factor_auth_w_already_activated_user(
         client,
         create_new_user,
 ):

@@ -4,8 +4,9 @@ from django.urls import reverse
 
 from rest_framework import status
 
-from apps.response_success import ResponseUpdate
-from apps.response_error import ResponseTwoFactorAuthAlreadyActiveError
+from util.user_api_resp.activate_two_factor_auth_resp import (
+    ActivateTwoFactorAuthResp
+)
 
 
 @pytest.mark.django_db
@@ -21,11 +22,11 @@ class TestActivateTwoFactorAuth:
         )
 
         assert request.status_code == status.HTTP_200_OK
-        assert request.data.get("status") == (
-            ResponseUpdate.response_data["status"]
+        assert request.data["success"] == (
+            ActivateTwoFactorAuthResp.resp_data["successes"][0]["success"]
         )
 
-    def test_should_response_auth_headers_error_in_activate_two_factor_auth(
+    def test_should_response_auth_headers_error(
             self,
             client,
     ):
@@ -38,14 +39,14 @@ class TestActivateTwoFactorAuth:
     def test_should_response_two_factor_auth_already_active_error(
             self,
             client,
-            data_for_response_two_factor_auth_already_active_error
+            data_to_activate_two_factor_auth_w_already_activated_user
     ):
         request = client.put(
             reverse("user_api:activate_two_factor_auth"),
-            headers=data_for_response_two_factor_auth_already_active_error
+            headers=data_to_activate_two_factor_auth_w_already_activated_user
         )
 
         assert request.status_code == status.HTTP_409_CONFLICT
-        assert request.data.get("error") == (
-            ResponseTwoFactorAuthAlreadyActiveError.response_data["error"]
+        assert request.data["error"] == (
+            ActivateTwoFactorAuthResp.resp_data["errors"][0]["error"]
         )

@@ -10,11 +10,11 @@ class TestLoginUser:
     def test_should_login_user(
             self,
             client,
-            data_for_login_user
+            data_to_login_user
     ):
         response = client.post(
             reverse("user_api:login_user"),
-            data=data_for_login_user
+            data=data_to_login_user
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.data["refresh"]
@@ -23,11 +23,11 @@ class TestLoginUser:
     def test_should_response_user_not_active_error(
             self,
             client,
-            login_user_data_for_response_user_not_active_error
+            data_to_login_user_w_not_active_user
     ):
         response = client.post(
             reverse("user_api:login_user"),
-            data=login_user_data_for_response_user_not_active_error,
+            data=data_to_login_user_w_not_active_user,
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.data["detail"] == (
@@ -37,11 +37,11 @@ class TestLoginUser:
     def test_should_response_email_field_empty_error(
             self,
             client,
-            login_user_data_for_response_email_field_empty_error
+            data_to_login_user_wo_email
     ):
         response = client.post(
             reverse("user_api:login_user"),
-            data=login_user_data_for_response_email_field_empty_error,
+            data=data_to_login_user_wo_email,
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["email"][0] == "This field may not be blank."
@@ -49,11 +49,11 @@ class TestLoginUser:
     def test_should_response_password_field_empty_error(
             self,
             client,
-            login_user_data_for_response_password_field_empty_error
+            data_to_login_user_wo_password
     ):
         response = client.post(
             reverse("user_api:login_user"),
-            data=login_user_data_for_response_password_field_empty_error,
+            data=data_to_login_user_wo_password,
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["password"][0] == "This field may not be blank."
@@ -61,14 +61,11 @@ class TestLoginUser:
     def test_should_response_user_not_found_cause_wrong_email(
             self,
             client,
-            login_user_data_for_response_user_not_found_error_cause_wrong_email,
+            data_to_login_user_w_wrong_email,
     ):
-        data = (
-            login_user_data_for_response_user_not_found_error_cause_wrong_email
-        )
         response = client.post(
             reverse("user_api:login_user"),
-            data=data
+            data=data_to_login_user_w_wrong_email
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.data["detail"] == (
@@ -78,14 +75,11 @@ class TestLoginUser:
     def test_should_response_user_not_found_cause_wrong_password(
             self,
             client,
-            login_user_data_for_response_user_not_found_error_cause_wrong_password,
+            data_to_login_user_w_wrong_password
     ):
-        data = (
-            login_user_data_for_response_user_not_found_error_cause_wrong_password
-        )
         response = client.post(
             reverse("user_api:login_user"),
-            data=data
+            data=data_to_login_user_w_wrong_password
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.data["detail"] == (

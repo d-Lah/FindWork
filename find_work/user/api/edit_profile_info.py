@@ -3,15 +3,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from user.models import Profile
-from user.serializer import ProfileSerializer
+from user.serializer import EditProfileInfoSerializer
 
-from apps.response_success import ResponseUpdate
-from apps.response_error import ResponseProfileFieldEmptyError
+from util.user_api_resp.edit_profile_info_resp import EditProfileInfoResp
 
 
 class EditProfileInfo(APIView):
-    """API will edit first name and second name"""
-
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -19,20 +16,20 @@ class EditProfileInfo(APIView):
             self,
             request
     ):
-        profile_serializer = ProfileSerializer(data=request.data)
+        serializer = EditProfileInfoSerializer(data=request.data)
 
-        profile_serializer.is_valid()
-        if profile_serializer.errors:
-            return ResponseProfileFieldEmptyError().get_response()
+        serializer.is_valid()
+        if serializer.errors:
+            return EditProfileInfoResp().resp_fields_empty_error()
 
         user_id = request.user.id
         profile = Profile.objects.filter(user__id=user_id).first()
 
-        deserialized_data = profile_serializer.validated_data
+        serializer_data = serializer.validated_data
 
-        profile.first_name = deserialized_data["first_name"]
-        profile.second_name = deserialized_data["second_name"]
+        profile.first_name = serializer_data["first_name"]
+        profile.second_name = serializer_data["second_name"]
 
         profile.save()
 
-        return ResponseUpdate().get_response()
+        return EditProfileInfoResp().resp_update()

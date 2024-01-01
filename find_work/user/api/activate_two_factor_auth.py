@@ -4,13 +4,12 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from user.models import User
 
-from apps.response_success import ResponseUpdate
-from apps.response_error import ResponseTwoFactorAuthAlreadyActiveError
+from util.user_api_resp.activate_two_factor_auth_resp import (
+    ActivateTwoFactorAuthResp
+)
 
 
 class ActivateTwoFactorAuth(APIView):
-    """API change is_two_factor_auth on true"""
-
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -26,9 +25,10 @@ class ActivateTwoFactorAuth(APIView):
         ).first()
 
         if not user:
-            return ResponseTwoFactorAuthAlreadyActiveError().get_response()
+            return ActivateTwoFactorAuthResp(
+            ).resp_two_factor_auth_already_active_error()
 
         user.is_two_factor_auth = True
         user.save()
 
-        return ResponseUpdate().get_response()
+        return ActivateTwoFactorAuthResp().resp_update()

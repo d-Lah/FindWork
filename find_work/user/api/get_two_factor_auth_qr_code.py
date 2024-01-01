@@ -10,12 +10,12 @@ from find_work.settings import CRYPTOGRAPHY_FERNET_KEY
 
 from user.models import User
 
-from apps.response_success import ResponseGet
+from util.user_api_resp.get_two_factor_auth_qr_code_resp import (
+    GetTwoFacteorAuthQRCodeResp
+)
 
 
 class GetTwoFactorAuthQRCode(APIView):
-    """API class for create base32 and qr code for authenticator app"""
-
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -36,10 +36,4 @@ class GetTwoFactorAuthQRCode(APIView):
             issuer_name="FindWork"
         )
 
-        response_data = ResponseGet()
-        response_data.add_data_for_response_data(
-            "otp_auth_url",
-            otp_auth_url
-        )
-
-        return response_data.get_response()
+        return GetTwoFacteorAuthQRCodeResp().resp_get(otp_auth_url)

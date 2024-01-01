@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.fixture()
-def data_for_activate_new_user(create_new_user):
+def data_to_activate_new_user(create_new_user):
     kwargs = {
         "user_activation_uuid": create_new_user.user_activation_uuid
     }
@@ -10,7 +10,7 @@ def data_for_activate_new_user(create_new_user):
 
 
 @pytest.fixture()
-def activate_new_user_data_for_response_user_already_active_error(
+def data_to_activate_new_user_w_already_activate_user(
         create_new_user
 ):
     create_new_user.is_active = True

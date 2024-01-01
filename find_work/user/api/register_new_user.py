@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 
 from cryptography.fernet import Fernet
 
+from find_work.settings import HTTP_LOCALHOST
 from find_work.settings import CRYPTOGRAPHY_FERNET_KEY
 
 from user.models import (
@@ -17,89 +18,97 @@ from user.models import (
     EmployerProfile,
     EmployeeProfile,
 )
-from user.serializer import (
-    UserSerializer,
-    ProfileSerializer,
-)
+from user.serializer import RegisterNewUserSerializer
 
-from apps.object_exception import (
-    EmailAlreadyExistsError,
-    PhoneNuberAlreadyExistsError,
-)
-from apps.response_success import (
-    ResponseCreate,
-)
-from apps.mail_data_manager import (
+from util.mail_data_manager import (
     MailSubjectInRegisterNewUser,
     MailMessageInRegisterNewUser,
 )
-from apps.mail_sender import MailSender
-from apps.response_error import (
-    ResponseUserFieldEmptyError,
-    ResponseProfileFieldEmptyError,
-    ResponseEmailAlreadyExistsError,
-    ResponsePhoneNumberAlreadyExistsError,
-)
-from find_work.settings import HTTP_LOCALHOST
+from util.mail_sender import MailSender
+from util.user_api_resp.register_new_user_resp import RegisterNewUserResp
 
-from user.apps_for_user.user_data_validators import (
-    ValidateEmailAndPhoneNumberOnExists
-)
+
+def is_fields_empty(errors):
+    if not errors:
+        return False
+
+    for field in errors:
+        if "blank" in errors[field][0]:
+            return True
+    return False
+
+
+def is_invalid_email(errors):
+    if not errors.get("email"):
+        return False
+
+    if "valid email address" in errors["email"][0]:
+        return True
+
+    return False
+
+
+def is_email_already_exists(errors):
+    if not errors.get("email"):
+        return False
+
+    if errors["email"][0] == "This field must be unique.":
+        return True
+
+    return False
+
+
+def is_phone_number_already_exists(errors):
+    if not errors.get("phone_number"):
+        return False
+
+    if errors["phone_number"][0] == "This field must be unique.":
+        return True
+
+    return False
 
 
 class RegisterNewUser(APIView):
-    """Class for register new user"""
-
     def post(
             self,
             request,
     ):
-        user_serializer = UserSerializer(data=request.data)
-        user_serializer.is_valid()
+        serializer = RegisterNewUserSerializer(data=request.data)
 
-        deserialized_user_data = user_serializer.validated_data
+        serializer.is_valid()
 
-        user_data_validators = ValidateEmailAndPhoneNumberOnExists(
-            deserialized_user_data.get("email"),
-            deserialized_user_data.get("phone_number"),
-        )
+        if is_fields_empty(serializer.errors):
+            return RegisterNewUserResp().resp_fields_empty_error()
 
-        try:
-            user_data_validators.is_email_exists()
-            user_data_validators.is_phone_number_exists()
+        if is_invalid_email(serializer.errors):
+            return RegisterNewUserResp().resp_invalid_email_address_error()
 
-        except EmailAlreadyExistsError:
-            return ResponseEmailAlreadyExistsError().get_response()
+        if is_email_already_exists(serializer.errors):
+            return RegisterNewUserResp().resp_fields_already_exists_error(
+                serializer.errors
+            )
+        elif is_phone_number_already_exists(serializer.errors):
+            return RegisterNewUserResp().resp_fields_already_exists_error(
+                serializer.errors
+            )
 
-        except PhoneNuberAlreadyExistsError:
-            return ResponsePhoneNumberAlreadyExistsError().get_response()
+        serializer_data = serializer.validated_data
 
-        if user_serializer.errors:
-            return ResponseUserFieldEmptyError().get_response()
-
-        profile_serializer = ProfileSerializer(data=request.data)
-        profile_serializer.is_valid()
-
-        if profile_serializer.errors:
-            return ResponseProfileFieldEmptyError().get_response()
-
-        deserialized_profile_data = profile_serializer.validated_data
-
-        if deserialized_user_data.get("is_employer"):
+        if serializer_data.get("is_employer"):
             new_employer_profile = EmployerProfile()
             new_employer_profile.save()
         else:
             new_employer_profile = None
 
-        if deserialized_user_data.get("is_employee"):
+        if serializer_data.get("is_employee"):
             new_employee_profile = EmployeeProfile()
             new_employee_profile.save()
         else:
             new_employee_profile = None
 
         new_profile = Profile(
-            first_name=deserialized_profile_data["first_name"],
-            second_name=deserialized_profile_data["second_name"],
+            first_name=serializer_data["first_name"],
+            second_name=serializer_data["second_name"],
             employer_profile=new_employer_profile,
             employee_profile=new_employee_profile,
         )
@@ -110,13 +119,13 @@ class RegisterNewUser(APIView):
         user_encrypted_opt_base32 = fernet.encrypt(user_otp_base32.encode())
 
         new_user = User(
-            email=deserialized_user_data["email"],
-            phone_number=deserialized_user_data["phone_number"],
+            email=serializer_data["email"],
+            phone_number=serializer_data["phone_number"],
             user_activation_uuid=uuid4(),
             profile=new_profile,
-            is_employer=deserialized_user_data["is_employer"],
-            is_employee=deserialized_user_data["is_employee"],
-            password=make_password(deserialized_user_data["password"]),
+            is_employer=serializer_data["is_employer"],
+            is_employee=serializer_data["is_employee"],
+            password=make_password(serializer_data["password"]),
             otp_base32=user_encrypted_opt_base32.decode()
         )
         new_user.save()
@@ -141,4 +150,5 @@ class RegisterNewUser(APIView):
             mail_message=mail_message,
             for_user=new_user.email
         ).send_mail_to_user()
-        return ResponseCreate().get_response()
+
+        return RegisterNewUserResp().resp_create()

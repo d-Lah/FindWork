@@ -1,7 +1,11 @@
 from rest_framework import serializers
-from rest_framework.response import Response
+from rest_framework.validators import UniqueValidator
 
-from .models import (
+from find_work.settings import (
+    ALLOWED_IMAGE_EXT,
+    IMAGE_MAX_MEMORY_SIZE
+)
+from user.models import (
     User,
     Profile,
     UserAvatar,
@@ -10,84 +14,172 @@ from .models import (
 )
 
 
-class EmployerProfileSerializer(serializers.ModelSerializer):
+class EditProfileInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = [
+            "first_name",
+            "second_name",
+        ]
+
+
+class GenerateResetPasswordTOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=150)
+
+    def validate_email(self, value):
+        user = User.objects.filter(email=value).first()
+
+        if not user:
+            raise serializers.ValidationError(
+                "User with given email not found"
+            )
+
+        return value
+
+
+class RegisterNewUserSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        max_length=150,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    phone_number = serializers.CharField(
+        style={'base_template': 'textarea.html'},
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    password = serializers.CharField(max_length=128)
+    is_employer = serializers.BooleanField()
+    is_employee = serializers.BooleanField()
+    first_name = serializers.CharField(max_length=150)
+    second_name = serializers.CharField(max_length=150)
+
+
+class ResetPasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "email",
+            "password"
+        ]
+    email = serializers.EmailField(max_length=150)
+
+    def validate_email(self, value):
+        user = User.objects.filter(email=value).first()
+
+        if not user:
+            raise serializers.ValidationError(
+                "User with given email not found"
+            )
+        return value
+
+
+class UpdateEmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "email",
+        ]
+
+
+class UpdatePasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "password"
+        ]
+
+
+class UploadAvatarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserAvatar
+        fields = ["user_avatar_url"]
+
+    user_avatar_url = serializers.FileField(write_only=True)
+
+    def validate_user_avatar_url(self, value):
+        image_ext = value.name.split(".")[1]
+        if image_ext not in ALLOWED_IMAGE_EXT:
+            raise serializers.ValidationError("Invalid image extension")
+
+        if value.size > IMAGE_MAX_MEMORY_SIZE:
+            raise serializers.ValidationError("Image size to large")
+
+
+class UpdatePhoneNumberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "phone_number"
+        ]
+
+
+class UserInfoEmployerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployerProfile
         fields = ["projects_total"]
-    projects_total = serializers.IntegerField(required=False)
 
 
-class EmployeeProfileSerializer(serializers.ModelSerializer):
+class UserInfoEmployeeProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeProfile
         fields = ["projects_compleat"]
-    projects_compleat = serializers.IntegerField(required=False)
 
 
-class ProfileSerializer(serializers.ModelSerializer):
+class UserInfoProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = [
             "first_name",
             "second_name",
             "employee_profile",
+            "employer_profile",
             "user_avatar",
         ]
-    first_name = serializers.CharField()
-    second_name = serializers.CharField()
-    employee_profile = EmployeeProfileSerializer(required=False)
+
+    employee_profile = UserInfoEmployeeProfileSerializer()
+    employer_profile = UserInfoEmployerProfileSerializer()
     user_avatar = serializers.URLField(
         source="user_avatar.user_avatar_url",
-        required=False,
+        required=False
     )
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
             "id",
             "email",
             "phone_number",
-            "password",
             "profile",
             "date_joined",
             "is_employer",
             "is_employee",
             "is_two_factor_auth",
         ]
-    id = serializers.IntegerField(required=False)
-    email = serializers.CharField()
-    phone_number = serializers.CharField()
-    profile = ProfileSerializer(required=False)
-    is_employer = serializers.BooleanField()
-    is_employee = serializers.BooleanField()
-    date_joined = serializers.DateTimeField(required=False)
-    is_two_factor_auth = serializers.BooleanField(required=False)
+
+    profile = UserInfoProfileSerializer()
 
 
-class UserAvatarSerializer(serializers.ModelSerializer):
+class ValidatePasswordSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserAvatar
-        fields = ["user_avatar_url"]
-    user_avatar_url = serializers.FileField(write_only=True)
+        model = User
+        fields = ["password"]
 
 
-class TOTPTokenSerializer(serializers.Serializer):
-    totp_token = serializers.CharField()
-
-
-class ResetPasswordTOTPSerializer(serializers.Serializer):
+class ValidateResetPasswordTOTPSerializer(serializers.Serializer):
     reset_password_totp = serializers.CharField()
+    email = serializers.EmailField(max_length=150)
+
+    def validate_email(self, value):
+        user = User.objects.filter(email=value).first()
+
+        if not user:
+            raise serializers.ValidationError(
+                "User with given email not found"
+            )
+
+        return value
 
 
-class PasswordFieldSerializer(serializers.Serializer):
-    password = serializers.CharField()
-
-
-class EmailFieldSerializer(serializers.Serializer):
-    email = serializers.CharField()
-
-
-class PhoneNumberFieldSerializer(serializers.Serializer):
-    phone_number = serializers.CharField()
+class ValidateTOTPTokenSerializer(serializers.Serializer):
+    totp_token = serializers.CharField()

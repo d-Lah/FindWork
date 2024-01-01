@@ -4,13 +4,7 @@ from django.urls import reverse
 
 from rest_framework import status
 
-from apps.response_error import (
-    ResponseWrongTOTPTokenError,
-    ResponseTOTPTokenFieldEmptyError,
-)
-from apps.response_success import (
-    ResponseValid,
-)
+from util.user_api_resp.validate_totp_token_resp import ValidateTOTPTokenResp
 
 
 @pytest.mark.django_db
@@ -27,8 +21,9 @@ class TestValidateTOTPToken:
             data=data_to_validate_totp_token
         )
         assert request.status_code == status.HTTP_200_OK
-        assert request.data.get(
-            "status") == ResponseValid.response_data["status"]
+        assert request.data["success"] == (
+            ValidateTOTPTokenResp.resp_data["successes"][0]["success"]
+        )
 
     def test_should_response_auth_headers_error(
             self,
@@ -39,7 +34,7 @@ class TestValidateTOTPToken:
         )
         assert request.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_should_response_totp_token_field_empty_error(
+    def test_should_response_fields_empty_error(
             self,
             client,
             user_auth_headers
@@ -49,22 +44,22 @@ class TestValidateTOTPToken:
             headers=user_auth_headers,
         )
         assert request.status_code == status.HTTP_400_BAD_REQUEST
-        assert request.data.get("error") == (
-            ResponseTOTPTokenFieldEmptyError.response_data["error"]
+        assert request.data["error"] == (
+            ValidateTOTPTokenResp.resp_data["errors"][0]["error"]
         )
 
     def test_should_response_wrong_totp_token_error(
             self,
             client,
             user_auth_headers,
-            validate_totp_token_data_to_response_wrong_totp_token_error
+            data_to_validate_totp_token_w_wrong_totp_token
     ):
         request = client.post(
             reverse("user_api:validation_totp_token"),
             headers=user_auth_headers,
-            data=validate_totp_token_data_to_response_wrong_totp_token_error
+            data=data_to_validate_totp_token_w_wrong_totp_token
         )
-        assert request.status_code == status.HTTP_401_UNAUTHORIZED
-        assert request.data.get("error") == (
-            ResponseWrongTOTPTokenError.response_data["error"]
+        assert request.status_code == status.HTTP_403_FORBIDDEN
+        assert request.data["error"] == (
+            ValidateTOTPTokenResp.resp_data["errors"][1]["error"]
         )

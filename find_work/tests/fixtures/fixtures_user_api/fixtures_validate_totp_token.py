@@ -24,7 +24,7 @@ def data_to_validate_totp_token(create_new_user):
 
 
 @pytest.fixture()
-def validate_totp_token_data_to_response_wrong_totp_token_error(
+def data_to_validate_totp_token_w_wrong_totp_token(
         create_new_user
 ):
     fernet = Fernet(CRYPTOGRAPHY_FERNET_KEY.encode())

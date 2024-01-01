@@ -2,13 +2,10 @@ from rest_framework.views import APIView
 
 from user.models import User
 
-from apps.response_success import ResponseUpdate
-from apps.response_error import ResponseUserAlreadyActiveError
+from util.user_api_resp.activate_new_user_resp import ActivateNewUserResp
 
 
-class ActivateUser(APIView):
-    """API class for activate new user"""
-
+class ActivateNewUser(APIView):
     def put(
             self,
             request,
@@ -20,8 +17,8 @@ class ActivateUser(APIView):
         ).first()
 
         if not user:
-            return ResponseUserAlreadyActiveError().get_response()
+            return ActivateNewUserResp().resp_user_already_active_error()
 
         user.is_active = True
         user.save()
-        return ResponseUpdate().get_response()
+        return ActivateNewUserResp().resp_update()

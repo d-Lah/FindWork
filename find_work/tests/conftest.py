@@ -23,18 +23,18 @@ from user.models import (
 pytest_plugins = [
     "tests.fixtures.fixtures_user_api.fixtures_activate_new_user",
     "tests.fixtures.fixtures_user_api.fixtures_activate_two_factor_auth",
-    "tests.fixtures.fixtures_user_api.fixtures_check_user_password",
+    "tests.fixtures.fixtures_user_api.fixtures_validate_password",
     "tests.fixtures.fixtures_user_api.fixtures_edit_profile_info",
-    "tests.fixtures.fixtures_user_api.fixtures_generate_user_reset_password_totp",
+    "tests.fixtures.fixtures_user_api.fixtures_generate_reset_password_totp",
     "tests.fixtures.fixtures_user_api.fixtures_login_user",
     "tests.fixtures.fixtures_user_api.fixtures_register_new_user",
-    "tests.fixtures.fixtures_user_api.fixtures_update_user_email",
-    "tests.fixtures.fixtures_user_api.fixtures_update_user_password",
-    "tests.fixtures.fixtures_user_api.fixtures_update_user_phone_number",
-    "tests.fixtures.fixtures_user_api.fixtures_upload_user_avatar",
+    "tests.fixtures.fixtures_user_api.fixtures_update_email",
+    "tests.fixtures.fixtures_user_api.fixtures_update_password",
+    "tests.fixtures.fixtures_user_api.fixtures_update_phone_number",
+    "tests.fixtures.fixtures_user_api.fixtures_upload_avatar",
     "tests.fixtures.fixtures_user_api.fixtures_validate_totp_token",
-    "tests.fixtures.fixtures_user_api.fixtures_validate_user_reset_password_totp",
-    "tests.fixtures.fixtures_user_api.fixtures_reset_user_password"
+    "tests.fixtures.fixtures_user_api.fixtures_validate_reset_password_totp",
+    "tests.fixtures.fixtures_user_api.fixtures_reset_password"
 ]
 
 

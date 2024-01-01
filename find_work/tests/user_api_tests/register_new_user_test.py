@@ -4,13 +4,7 @@ from django.urls import reverse
 
 from rest_framework import status
 
-from apps.response_error import (
-    ResponseUserFieldEmptyError,
-    ResponseProfileFieldEmptyError,
-    ResponseEmailAlreadyExistsError,
-    ResponsePhoneNumberAlreadyExistsError,
-)
-from apps.response_success import ResponseCreate
+from util.user_api_resp.register_new_user_resp import RegisterNewUserResp
 
 
 @pytest.mark.django_db
@@ -19,144 +13,73 @@ class TestRegisterNewUser:
             self,
             mocker,
             client,
-            data_for_test_register_user,
+            data_to_register_new_user
     ):
         mocker.patch(
-            "apps.mail_sender.send_mail",
+            "util.mail_sender.send_mail",
             return_value=True
         )
-
         response = client.post(
             reverse("user_api:register_new_user"),
-            data=data_for_test_register_user
+            data=data_to_register_new_user
         )
         assert response.status_code == status.HTTP_201_CREATED
-        assert response.data.get("status") == (
-            ResponseCreate.response_data["status"]
+        assert response.data["success"] == (
+            RegisterNewUserResp.resp_data["successes"][0]["success"]
         )
 
-    def test_should_response_email_field_empty_error(
+    def test_should_response_fields_empty_error(
             self,
             client,
-            register_new_user_data_for_response_email_field_empty_error,
+            data_to_register_new_user_wo_data
     ):
         response = client.post(
             reverse("user_api:register_new_user"),
-            data=register_new_user_data_for_response_email_field_empty_error,
+            data=data_to_register_new_user_wo_data
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data.get("error") == (
-            ResponseUserFieldEmptyError.response_data["error"]
+        assert response.data["error"] == (
+            RegisterNewUserResp.resp_data["errors"][0]["error"]
         )
 
-    def test_should_response_phone_number_field_empty_error(
+    def test_should_response_invalid_email_error(
             self,
             client,
-            register_new_user_data_for_response_phone_number_field_empty_error,
+            data_to_register_new_user_w_invalid_email
     ):
         response = client.post(
             reverse("user_api:register_new_user"),
-            data=register_new_user_data_for_response_phone_number_field_empty_error,
+            data=data_to_register_new_user_w_invalid_email
         )
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data.get("error") == (
-            ResponseUserFieldEmptyError.response_data["error"]
-        )
-
-    def test_should_response_password_field_empty_error(
-            self,
-            client,
-            register_new_user_data_for_response_password_field_empty_error,
-    ):
-        response = client.post(
-            reverse("user_api:register_new_user"),
-            data=register_new_user_data_for_response_password_field_empty_error,
-        )
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data.get("error") == (
-            ResponseUserFieldEmptyError.response_data["error"]
-        )
-
-    def test_should_response_is_employer_field_empty_error(
-            self,
-            client,
-            register_new_user_data_for_response_is_employer_field_empty_error,
-    ):
-        response = client.post(
-            reverse("user_api:register_new_user"),
-            data=register_new_user_data_for_response_is_employer_field_empty_error,
-        )
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data.get("error") == (
-            ResponseUserFieldEmptyError.response_data["error"]
-        )
-
-    def test_should_response_is_employee_field_empty_error(
-            self,
-            client,
-            register_new_user_data_for_response_is_employee_field_empty_error,
-    ):
-        response = client.post(
-            reverse("user_api:register_new_user"),
-            data=register_new_user_data_for_response_is_employee_field_empty_error,
-        )
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data.get("error") == (
-            ResponseUserFieldEmptyError.response_data["error"]
-        )
-
-    def test_should_response_first_name_field_empty_error(
-            self,
-            client,
-            register_new_user_data_for_response_first_name_field_empty_error,
-    ):
-        response = client.post(
-            reverse("user_api:register_new_user"),
-            data=register_new_user_data_for_response_first_name_field_empty_error,
-        )
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data.get("error") == (
-            ResponseProfileFieldEmptyError.response_data["error"]
-        )
-
-    def test_should_response_second_name_field_empty_error(
-            self,
-            client,
-            register_new_user_data_for_response_second_name_field_empty_error,
-    ):
-        response = client.post(
-            reverse("user_api:register_new_user"),
-            data=register_new_user_data_for_response_second_name_field_empty_error,
-        )
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data.get("error") == (
-            ResponseProfileFieldEmptyError.response_data["error"]
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.data["error"] == (
+            RegisterNewUserResp.resp_data["errors"][1]["error"]
         )
 
     def test_should_response_email_already_exists_error(
             self,
             client,
-            data_for_test_email_already_exists_error,
+            data_to_register_new_user_w_already_exists_email
     ):
         response = client.post(
             reverse("user_api:register_new_user"),
-            data=data_for_test_email_already_exists_error,
+            data=data_to_register_new_user_w_already_exists_email
         )
         assert response.status_code == status.HTTP_409_CONFLICT
-        assert response.data.get("error") == (
-            ResponseEmailAlreadyExistsError.response_data["error"]
+        assert response.data["error"][0] == (
+            RegisterNewUserResp.resp_data["errors"][2]["error"][0]
         )
 
     def test_should_response_phone_number_already_exists_error(
             self,
             client,
-            data_for_test_phone_number_already_exists_error,
+            data_to_register_new_user_w_already_exists_phone_number
     ):
         response = client.post(
             reverse("user_api:register_new_user"),
-            data=data_for_test_phone_number_already_exists_error,
+            data=data_to_register_new_user_w_already_exists_phone_number
         )
         assert response.status_code == status.HTTP_409_CONFLICT
-        assert response.data.get("error") == (
-            ResponsePhoneNumberAlreadyExistsError.response_data["error"]
+        assert response.data["error"][0] == (
+            RegisterNewUserResp.resp_data["errors"][2]["error"][0]
         )

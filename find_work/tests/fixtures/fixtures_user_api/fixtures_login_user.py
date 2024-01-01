@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.fixture()
-def data_for_login_user(create_new_user):
+def data_to_login_user(create_new_user):
     create_new_user.is_active = True
     create_new_user.save()
 
@@ -14,7 +14,7 @@ def data_for_login_user(create_new_user):
 
 
 @pytest.fixture()
-def login_user_data_for_response_user_not_active_error(create_new_user):
+def data_to_login_user_w_not_active_user(create_new_user):
     data = {
         "email": create_new_user.email,
         "password": "password"
@@ -23,7 +23,7 @@ def login_user_data_for_response_user_not_active_error(create_new_user):
 
 
 @pytest.fixture()
-def login_user_data_for_response_email_field_empty_error(
+def data_to_login_user_wo_email(
 ):
     data = {
         "email": "",
@@ -34,7 +34,7 @@ def login_user_data_for_response_email_field_empty_error(
 
 
 @pytest.fixture()
-def login_user_data_for_response_password_field_empty_error(
+def data_to_login_user_wo_password(
         create_new_user,
 ):
     data = {
@@ -46,7 +46,7 @@ def login_user_data_for_response_password_field_empty_error(
 
 
 @pytest.fixture()
-def login_user_data_for_response_user_not_found_error_cause_wrong_email():
+def data_to_login_user_w_wrong_email():
     data = {
         "email": "wrong_email@email.com",
         "password": "password"
@@ -56,7 +56,7 @@ def login_user_data_for_response_user_not_found_error_cause_wrong_email():
 
 
 @pytest.fixture()
-def login_user_data_for_response_user_not_found_error_cause_wrong_password(
+def data_to_login_user_w_wrong_password(
         create_new_user,
 ):
     create_new_user.is_active = True
