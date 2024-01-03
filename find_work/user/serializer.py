@@ -37,6 +37,38 @@ class GenerateResetPasswordTOTPSerializer(serializers.Serializer):
         return value
 
 
+class EmployerProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployerProfile
+        fields = ["projects_total"]
+
+
+class EmployeeProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeProfile
+        fields = ["projects_compleat"]
+
+
+class ProfileInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = [
+            "id",
+            "first_name",
+            "second_name",
+            "employee_profile",
+            "employer_profile",
+            "user_avatar",
+        ]
+
+    employee_profile = EmployeeProfileSerializer()
+    employer_profile = EmployerProfileSerializer()
+    user_avatar = serializers.URLField(
+        source="user_avatar.user_avatar_url",
+        required=False
+    )
+
+
 class RegisterNewUserSerializer(serializers.Serializer):
     email = serializers.EmailField(
         max_length=150,
@@ -112,37 +144,6 @@ class UpdatePhoneNumberSerializer(serializers.ModelSerializer):
         ]
 
 
-class UserInfoEmployerProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EmployerProfile
-        fields = ["projects_total"]
-
-
-class UserInfoEmployeeProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EmployeeProfile
-        fields = ["projects_compleat"]
-
-
-class UserInfoProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = [
-            "first_name",
-            "second_name",
-            "employee_profile",
-            "employer_profile",
-            "user_avatar",
-        ]
-
-    employee_profile = UserInfoEmployeeProfileSerializer()
-    employer_profile = UserInfoEmployerProfileSerializer()
-    user_avatar = serializers.URLField(
-        source="user_avatar.user_avatar_url",
-        required=False
-    )
-
-
 class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -150,14 +151,11 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "id",
             "email",
             "phone_number",
-            "profile",
             "date_joined",
             "is_employer",
             "is_employee",
             "is_two_factor_auth",
         ]
-
-    profile = UserInfoProfileSerializer()
 
 
 class ValidatePasswordSerializer(serializers.ModelSerializer):

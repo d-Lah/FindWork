@@ -4,8 +4,10 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenObtainPairView,
 )
+
 from .api.user_info import UserInfo
 from .api.update_email import UpdateEmail
+from .api.profile_info import ProfileInfo
 from .api.upload_avatar import UploadAvatar
 from .api.reset_password import ResetPassword
 from .api.update_password import UpdatePassword
@@ -19,6 +21,7 @@ from .api.activate_two_factor_auth import ActivateTwoFactorAuth
 from .api.get_two_factor_auth_qr_code import GetTwoFactorAuthQRCode
 from .api.generate_reset_password_totp import GenerateResetPasswordTOTP
 from .api.validate_reset_password_totp import ValidateResetPasswordTOTP
+
 app_name = "user_api"
 
 urlpatterns = [
@@ -101,5 +104,10 @@ urlpatterns = [
         "reset-password",
         ResetPassword.as_view(),
         name="reset_password"
+    ),
+    path(
+        "profile-info",
+        ProfileInfo.as_view(),
+        name="profile_info"
     ),
 ]
