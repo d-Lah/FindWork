@@ -34,7 +34,8 @@ pytest_plugins = [
     "tests.fixtures.fixtures_user_api.fixtures_upload_avatar",
     "tests.fixtures.fixtures_user_api.fixtures_validate_totp_token",
     "tests.fixtures.fixtures_user_api.fixtures_validate_reset_password_totp",
-    "tests.fixtures.fixtures_user_api.fixtures_reset_password"
+    "tests.fixtures.fixtures_user_api.fixtures_reset_password",
+    "tests.fixtures.fixtures_user_api.fixtures_deactivate_two_factor_auth",
 ]
 
 

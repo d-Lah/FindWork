@@ -26,7 +26,7 @@ class TestActivateNewUser:
             ActivateNewUserResp.resp_data["successes"][0]["success"]
         )
 
-    def test_should_response_user_already_active_error(
+    def test_should_response_user_already_activated_error(
             self,
             client,
             data_to_activate_new_user_w_already_activate_user,

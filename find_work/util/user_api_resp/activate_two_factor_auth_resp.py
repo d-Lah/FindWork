@@ -12,7 +12,7 @@ class ActivateTwoFactorAuthResp:
         ]
     }
 
-    def resp_two_factor_auth_already_active_error(self):
+    def resp_two_factor_auth_already_activated_error(self):
         return Response(
             self.resp_data["errors"][0],
             status=status.HTTP_409_CONFLICT

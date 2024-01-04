@@ -18,6 +18,7 @@ from .api.validate_password import ValidatePassword
 from .api.update_phone_number import UpdatePhoneNumber
 from .api.validate_totp_token import ValidateTOTPToken
 from .api.activate_two_factor_auth import ActivateTwoFactorAuth
+from .api.deactivate_two_factor_auth import DeactivateTwoFactorAuth
 from .api.get_two_factor_auth_qr_code import GetTwoFactorAuthQRCode
 from .api.generate_reset_password_totp import GenerateResetPasswordTOTP
 from .api.validate_reset_password_totp import ValidateResetPasswordTOTP
@@ -51,7 +52,7 @@ urlpatterns = [
         name="validation_totp_token"
     ),
     path(
-        "activate_two_factor_auth",
+        "activate-two-factor-auth",
         ActivateTwoFactorAuth.as_view(),
         name="activate_two_factor_auth"
     ),
@@ -109,5 +110,10 @@ urlpatterns = [
         "profile-info",
         ProfileInfo.as_view(),
         name="profile_info"
+    ),
+    path(
+        "deactivate-two-factor-auth",
+        DeactivateTwoFactorAuth.as_view(),
+        name="deactivate_two_factor_auth"
     ),
 ]

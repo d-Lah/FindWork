@@ -36,7 +36,7 @@ class TestActivateTwoFactorAuth:
 
         assert request.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_should_response_two_factor_auth_already_active_error(
+    def test_should_response_two_factor_auth_already_activated_error(
             self,
             client,
             data_to_activate_two_factor_auth_w_already_activated_user

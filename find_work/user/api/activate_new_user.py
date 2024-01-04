@@ -17,7 +17,7 @@ class ActivateNewUser(APIView):
         ).first()
 
         if not user:
-            return ActivateNewUserResp().resp_user_already_active_error()
+            return ActivateNewUserResp().resp_user_already_activated_error()
 
         user.is_active = True
         user.save()
