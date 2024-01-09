@@ -36,6 +36,7 @@ pytest_plugins = [
     "tests.fixtures.fixtures_user_api.fixtures_validate_reset_password_totp",
     "tests.fixtures.fixtures_user_api.fixtures_reset_password",
     "tests.fixtures.fixtures_user_api.fixtures_deactivate_two_factor_auth",
+    "tests.fixtures.fixtures_user_api.fixtures_edit_employee_profile_specialization",
 ]
 
 

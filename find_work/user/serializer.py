@@ -11,7 +11,17 @@ from user.models import (
     UserAvatar,
     EmployerProfile,
     EmployeeProfile,
+    EmployeeSpecialization
 )
+
+
+class EditEmployeeProfileSpecializationSerializer(serializers.Serializer):
+    id = serializers.ListField(
+        child=serializers.IntegerField()
+    )
+    name = serializers.ListField(
+        child=serializers.CharField()
+    )
 
 
 class EditProfileInfoSerializer(serializers.ModelSerializer):
@@ -43,10 +53,25 @@ class EmployerProfileSerializer(serializers.ModelSerializer):
         fields = ["projects_total"]
 
 
+class EmployeeSpecializationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeSpecialization
+        fields = [
+            "id",
+            "name",
+        ]
+
+
 class EmployeeProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeProfile
-        fields = ["projects_compleat"]
+        fields = [
+            "projects_compleat",
+            "specialization",
+        ]
+        specialization = EmployeeSpecializationSerializer(
+            many=True,
+        )
 
 
 class ProfileInfoSerializer(serializers.ModelSerializer):

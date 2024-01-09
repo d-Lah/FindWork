@@ -143,6 +143,17 @@ class EmployerProfile(models.Model):
 
 class EmployeeProfile(models.Model):
     projects_compleat = models.IntegerField(default=0)
+    specialization = models.ManyToManyField("EmployeeSpecialization")
+
+
+class EmployeeSpecialization(models.Model):
+    name = models.CharField(
+        max_length=150,
+        unique=True
+    )
+
+    def __str__(self):
+        return self.name
 
 
 class UserAvatar(models.Model):
