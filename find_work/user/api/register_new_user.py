@@ -15,8 +15,6 @@ from find_work.settings import CRYPTOGRAPHY_FERNET_KEY
 from user.models import (
     User,
     Profile,
-    EmployerProfile,
-    EmployeeProfile,
 )
 from user.serializer import RegisterNewUserSerializer
 
@@ -58,16 +56,6 @@ def is_email_already_exists(errors):
     return False
 
 
-def is_phone_number_already_exists(errors):
-    if not errors.get("phone_number"):
-        return False
-
-    if errors["phone_number"][0] == "This field must be unique.":
-        return True
-
-    return False
-
-
 class RegisterNewUser(APIView):
     def post(
             self,
@@ -87,30 +75,12 @@ class RegisterNewUser(APIView):
             return RegisterNewUserResp().resp_fields_already_exists_error(
                 serializer.errors
             )
-        elif is_phone_number_already_exists(serializer.errors):
-            return RegisterNewUserResp().resp_fields_already_exists_error(
-                serializer.errors
-            )
 
         serializer_data = serializer.validated_data
-
-        if serializer_data.get("is_employer"):
-            new_employer_profile = EmployerProfile()
-            new_employer_profile.save()
-        else:
-            new_employer_profile = None
-
-        if serializer_data.get("is_employee"):
-            new_employee_profile = EmployeeProfile()
-            new_employee_profile.save()
-        else:
-            new_employee_profile = None
 
         new_profile = Profile(
             first_name=serializer_data["first_name"],
             second_name=serializer_data["second_name"],
-            employer_profile=new_employer_profile,
-            employee_profile=new_employee_profile,
         )
         new_profile.save()
 
@@ -120,7 +90,6 @@ class RegisterNewUser(APIView):
 
         new_user = User(
             email=serializer_data["email"],
-            phone_number=serializer_data["phone_number"],
             user_activation_uuid=uuid4(),
             profile=new_profile,
             is_employer=serializer_data["is_employer"],

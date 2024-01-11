@@ -5,23 +5,12 @@ from find_work.settings import (
     ALLOWED_IMAGE_EXT,
     IMAGE_MAX_MEMORY_SIZE
 )
+
 from user.models import (
     User,
     Profile,
     UserAvatar,
-    EmployerProfile,
-    EmployeeProfile,
-    EmployeeSpecialization
 )
-
-
-class EditEmployeeProfileSpecializationSerializer(serializers.Serializer):
-    id = serializers.ListField(
-        child=serializers.IntegerField()
-    )
-    name = serializers.ListField(
-        child=serializers.CharField()
-    )
 
 
 class EditProfileInfoSerializer(serializers.ModelSerializer):
@@ -47,33 +36,6 @@ class GenerateResetPasswordTOTPSerializer(serializers.Serializer):
         return value
 
 
-class EmployerProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EmployerProfile
-        fields = ["projects_total"]
-
-
-class EmployeeSpecializationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EmployeeSpecialization
-        fields = [
-            "id",
-            "name",
-        ]
-
-
-class EmployeeProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EmployeeProfile
-        fields = [
-            "projects_compleat",
-            "specialization",
-        ]
-        specialization = EmployeeSpecializationSerializer(
-            many=True,
-        )
-
-
 class ProfileInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
@@ -81,13 +43,8 @@ class ProfileInfoSerializer(serializers.ModelSerializer):
             "id",
             "first_name",
             "second_name",
-            "employee_profile",
-            "employer_profile",
             "user_avatar",
         ]
-
-    employee_profile = EmployeeProfileSerializer()
-    employer_profile = EmployerProfileSerializer()
     user_avatar = serializers.URLField(
         source="user_avatar.user_avatar_url",
         required=False
@@ -97,10 +54,6 @@ class ProfileInfoSerializer(serializers.ModelSerializer):
 class RegisterNewUserSerializer(serializers.Serializer):
     email = serializers.EmailField(
         max_length=150,
-        validators=[UniqueValidator(queryset=User.objects.all())]
-    )
-    phone_number = serializers.CharField(
-        style={'base_template': 'textarea.html'},
         validators=[UniqueValidator(queryset=User.objects.all())]
     )
     password = serializers.CharField(max_length=128)
@@ -161,21 +114,12 @@ class UploadAvatarSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Image size to large")
 
 
-class UpdatePhoneNumberSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = [
-            "phone_number"
-        ]
-
-
 class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
             "id",
             "email",
-            "phone_number",
             "date_joined",
             "is_employer",
             "is_employee",

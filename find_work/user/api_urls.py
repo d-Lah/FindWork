@@ -15,15 +15,10 @@ from .api.activate_new_user import ActivateNewUser
 from .api.register_new_user import RegisterNewUser
 from .api.edit_profile_info import EditProfileInfo
 from .api.validate_password import ValidatePassword
-from .api.update_phone_number import UpdatePhoneNumber
 from .api.validate_totp_token import ValidateTOTPToken
-from .api.edit_employee_profile_specialization import (
-    EditEmployeeProfileSpecialization
-)
 from .api.activate_two_factor_auth import ActivateTwoFactorAuth
 from .api.deactivate_two_factor_auth import DeactivateTwoFactorAuth
 from .api.get_two_factor_auth_qr_code import GetTwoFactorAuthQRCode
-from .api.get_employee_specialization import GetEmployeeSpecialization
 from .api.generate_reset_password_totp import GenerateResetPasswordTOTP
 from .api.validate_reset_password_totp import ValidateResetPasswordTOTP
 
@@ -86,11 +81,6 @@ urlpatterns = [
         name="update_email"
     ),
     path(
-        "update-phone-number",
-        UpdatePhoneNumber.as_view(),
-        name="update_phone_number"
-    ),
-    path(
         "upload-avatar",
         UploadAvatar.as_view(),
         name="upload_avatar"
@@ -119,15 +109,5 @@ urlpatterns = [
         "deactivate-two-factor-auth",
         DeactivateTwoFactorAuth.as_view(),
         name="deactivate_two_factor_auth"
-    ),
-    path(
-        "edit-employee-profile-specialization",
-        EditEmployeeProfileSpecialization.as_view(),
-        name="edit_employee_profile_specialization"
-    ),
-    path(
-        "get-employee-specialization",
-        GetEmployeeSpecialization.as_view(),
-        name="get_employee_specialization"
     ),
 ]

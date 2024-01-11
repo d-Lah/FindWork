@@ -69,17 +69,3 @@ class TestRegisterNewUser:
         assert response.data["error"][0] == (
             RegisterNewUserResp.resp_data["errors"][2]["error"][0]
         )
-
-    def test_should_response_phone_number_already_exists_error(
-            self,
-            client,
-            data_to_register_new_user_w_already_exists_phone_number
-    ):
-        response = client.post(
-            reverse("user_api:register_new_user"),
-            data=data_to_register_new_user_w_already_exists_phone_number
-        )
-        assert response.status_code == status.HTTP_409_CONFLICT
-        assert response.data["error"][0] == (
-            RegisterNewUserResp.resp_data["errors"][2]["error"][0]
-        )

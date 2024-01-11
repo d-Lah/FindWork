@@ -18,7 +18,6 @@ from find_work.settings import (
 from user.models import (
     User,
     Profile,
-    EmployeeProfile,
 )
 pytest_plugins = [
     "tests.fixtures.fixtures_user_api.fixtures_activate_new_user",
@@ -30,13 +29,11 @@ pytest_plugins = [
     "tests.fixtures.fixtures_user_api.fixtures_register_new_user",
     "tests.fixtures.fixtures_user_api.fixtures_update_email",
     "tests.fixtures.fixtures_user_api.fixtures_update_password",
-    "tests.fixtures.fixtures_user_api.fixtures_update_phone_number",
     "tests.fixtures.fixtures_user_api.fixtures_upload_avatar",
     "tests.fixtures.fixtures_user_api.fixtures_validate_totp_token",
     "tests.fixtures.fixtures_user_api.fixtures_validate_reset_password_totp",
     "tests.fixtures.fixtures_user_api.fixtures_reset_password",
     "tests.fixtures.fixtures_user_api.fixtures_deactivate_two_factor_auth",
-    "tests.fixtures.fixtures_user_api.fixtures_edit_employee_profile_specialization",
 ]
 
 
@@ -48,14 +45,9 @@ def client():
 
 @pytest.fixture()
 def create_new_user():
-    employee_profile = EmployeeProfile()
-    employee_profile.save()
-
     profile = Profile(
         first_name="Ran",
         second_name="Goose",
-        employee_profile=employee_profile,
-        employer_profile=None,
     )
     profile.save()
 
@@ -65,7 +57,6 @@ def create_new_user():
 
     user = User(
         email="raNGoose@email.com",
-        phone_number="380321124353",
         user_activation_uuid=uuid4(),
         profile=profile,
         is_employer=False,

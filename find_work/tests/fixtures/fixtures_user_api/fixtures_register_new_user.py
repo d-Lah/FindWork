@@ -59,19 +59,3 @@ def data_to_register_new_user_w_already_exists_email(
         "second_name": "Mleko",
     }
     return data
-
-
-@pytest.fixture()
-def data_to_register_new_user_w_already_exists_phone_number(
-        create_new_user,
-):
-    data = {
-        "email": "RangoosE@email.com",
-        "phone_number": create_new_user.phone_number,
-        "password": "password",
-        "is_employer": False,
-        "is_employee": True,
-        "first_name": "Mykola",
-        "second_name": "Mleko",
-    }
-    return data
