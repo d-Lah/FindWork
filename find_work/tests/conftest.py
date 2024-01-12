@@ -47,7 +47,7 @@ def client():
 def create_new_user():
     profile = Profile(
         first_name="Ran",
-        second_name="Goose",
+        last_name="Goose",
     )
     profile.save()
 

@@ -5,7 +5,7 @@ import pytest
 def data_to_edit_profile_info():
     data = {
         "first_name": "Lui",
-        "second_name": "Onir"
+        "last_name": "Onir"
     }
     return data
 
@@ -14,6 +14,6 @@ def data_to_edit_profile_info():
 def data_to_edit_profile_info_wo_data():
     data = {
         "first_name": "",
-        "second_name": ""
+        "last_name": ""
     }
     return data

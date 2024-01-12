@@ -28,7 +28,7 @@ class EditProfileInfo(APIView):
         serializer_data = serializer.validated_data
 
         profile.first_name = serializer_data["first_name"]
-        profile.second_name = serializer_data["second_name"]
+        profile.second_name = serializer_data["last_name"]
 
         profile.save()
 

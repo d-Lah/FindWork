@@ -26,7 +26,7 @@ def user_avatar_url(
 
 class Profile(models.Model):
     first_name = models.CharField(max_length=150)
-    second_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
     user_avatar = models.OneToOneField(
         "UserAvatar",
         on_delete=models.CASCADE,

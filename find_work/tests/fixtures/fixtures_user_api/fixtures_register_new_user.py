@@ -10,7 +10,7 @@ def data_to_register_new_user():
         "is_employer": False,
         "is_employee": True,
         "first_name": "Mykola",
-        "second_name": "Mleko",
+        "last_name": "Mleko",
     }
     return data
 
@@ -24,7 +24,7 @@ def data_to_register_new_user_wo_data():
         "is_employer": "",
         "is_employee": "",
         "first_name": "",
-        "second_name": "",
+        "last_name": "",
     }
     return data
 
@@ -40,7 +40,7 @@ def data_to_register_new_user_w_invalid_email(
         "is_employer": False,
         "is_employee": True,
         "first_name": "Mykola",
-        "second_name": "Mleko",
+        "last_name": "Mleko",
     }
     return data
 
@@ -56,6 +56,6 @@ def data_to_register_new_user_w_already_exists_email(
         "is_employer": False,
         "is_employee": True,
         "first_name": "Mykola",
-        "second_name": "Mleko",
+        "last_name": "Mleko",
     }
     return data

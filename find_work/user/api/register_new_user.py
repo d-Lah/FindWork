@@ -80,7 +80,7 @@ class RegisterNewUser(APIView):
 
         new_profile = Profile(
             first_name=serializer_data["first_name"],
-            second_name=serializer_data["second_name"],
+            last_name=serializer_data["last_name"],
         )
         new_profile.save()
 

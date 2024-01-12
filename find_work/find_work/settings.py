@@ -44,7 +44,7 @@ HTTP_LOCALHOST = "http://localhost:8000"
 
 INSTALLED_APPS = [
     "user.apps.UserConfig",
-    "project.apps.ProjectConfig",
+    "resume.apps.ResumeConfig",
     "django_filters",
     "rest_framework",
     "rest_framework_simplejwt",

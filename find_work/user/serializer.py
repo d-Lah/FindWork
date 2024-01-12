@@ -18,7 +18,7 @@ class EditProfileInfoSerializer(serializers.ModelSerializer):
         model = Profile
         fields = [
             "first_name",
-            "second_name",
+            "last_name",
         ]
 
 
@@ -42,7 +42,7 @@ class ProfileInfoSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "first_name",
-            "second_name",
+            "last_name",
             "user_avatar",
         ]
     user_avatar = serializers.URLField(
@@ -60,7 +60,7 @@ class RegisterNewUserSerializer(serializers.Serializer):
     is_employer = serializers.BooleanField()
     is_employee = serializers.BooleanField()
     first_name = serializers.CharField(max_length=150)
-    second_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150)
 
 
 class ResetPasswordSerializer(serializers.ModelSerializer):
