@@ -1,11 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.response import Response
 
 from user.models import Profile
 from user.serializer import EditProfileInfoSerializer
 
-from util.user_api_resp.edit_profile_info_resp import EditProfileInfoResp
+from util.success_resp_data import UpdateSuccess
+from util.error_resp_data import FieldsEmptyError
 
 
 class EditProfileInfo(APIView):
@@ -20,7 +22,10 @@ class EditProfileInfo(APIView):
 
         serializer.is_valid()
         if serializer.errors:
-            return EditProfileInfoResp().resp_fields_empty_error()
+            return Response(
+                status=FieldsEmptyError().get_status(),
+                data=FieldsEmptyError().get_data()
+            )
 
         user_id = request.user.id
         profile = Profile.objects.filter(user__id=user_id).first()
@@ -32,4 +37,7 @@ class EditProfileInfo(APIView):
 
         profile.save()
 
-        return EditProfileInfoResp().resp_update()
+        return Response(
+            status=UpdateSuccess().get_status(),
+            data=UpdateSuccess().get_data()
+        )

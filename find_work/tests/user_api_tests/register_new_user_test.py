@@ -2,9 +2,12 @@ import pytest
 
 from django.urls import reverse
 
-from rest_framework import status
-
-from util.user_api_resp.register_new_user_resp import RegisterNewUserResp
+from util.error_resp_data import (
+    FieldsEmptyError,
+    InvalidEmailAdressError,
+    EmailAlreadyExistsError,
+)
+from util.success_resp_data import CreateSuccess
 
 
 @pytest.mark.django_db
@@ -23,9 +26,9 @@ class TestRegisterNewUser:
             reverse("user_api:register_new_user"),
             data=data_to_register_new_user
         )
-        assert response.status_code == status.HTTP_201_CREATED
+        assert response.status_code == CreateSuccess().get_status()
         assert response.data["success"] == (
-            RegisterNewUserResp.resp_data["successes"][0]["success"]
+            CreateSuccess().get_data()["success"]
         )
 
     def test_should_response_fields_empty_error(
@@ -37,9 +40,9 @@ class TestRegisterNewUser:
             reverse("user_api:register_new_user"),
             data=data_to_register_new_user_wo_data
         )
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["error"] == (
-            RegisterNewUserResp.resp_data["errors"][0]["error"]
+        assert response.status_code == FieldsEmptyError().get_status()
+        assert response.data["fields"] == (
+            FieldsEmptyError().get_data()["fields"]
         )
 
     def test_should_response_invalid_email_error(
@@ -51,9 +54,9 @@ class TestRegisterNewUser:
             reverse("user_api:register_new_user"),
             data=data_to_register_new_user_w_invalid_email
         )
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert response.data["error"] == (
-            RegisterNewUserResp.resp_data["errors"][1]["error"]
+        assert response.status_code == InvalidEmailAdressError().get_status()
+        assert response.data["email"] == (
+            InvalidEmailAdressError().get_data()["email"]
         )
 
     def test_should_response_email_already_exists_error(
@@ -65,7 +68,7 @@ class TestRegisterNewUser:
             reverse("user_api:register_new_user"),
             data=data_to_register_new_user_w_already_exists_email
         )
-        assert response.status_code == status.HTTP_409_CONFLICT
-        assert response.data["error"][0] == (
-            RegisterNewUserResp.resp_data["errors"][2]["error"][0]
+        assert response.status_code == EmailAlreadyExistsError().get_status()
+        assert response.data["email"] == (
+            EmailAlreadyExistsError().get_data()["email"]
         )

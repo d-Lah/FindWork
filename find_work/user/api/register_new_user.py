@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.contrib.auth.hashers import make_password
 
 from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from cryptography.fernet import Fernet
 
@@ -18,12 +19,17 @@ from user.models import (
 )
 from user.serializer import RegisterNewUserSerializer
 
+from util.error_resp_data import (
+    FieldsEmptyError,
+    EmailAlreadyExistsError,
+    InvalidEmailAdressError,
+)
 from util.mail_data_manager import (
     MailSubjectInRegisterNewUser,
     MailMessageInRegisterNewUser,
 )
 from util.mail_sender import MailSender
-from util.user_api_resp.register_new_user_resp import RegisterNewUserResp
+from util.success_resp_data import CreateSuccess
 
 
 def is_fields_empty(errors):
@@ -66,14 +72,21 @@ class RegisterNewUser(APIView):
         serializer.is_valid()
 
         if is_fields_empty(serializer.errors):
-            return RegisterNewUserResp().resp_fields_empty_error()
+            return Response(
+                status=FieldsEmptyError().get_status(),
+                data=FieldsEmptyError().get_data()
+            )
 
         if is_invalid_email(serializer.errors):
-            return RegisterNewUserResp().resp_invalid_email_address_error()
+            return Response(
+                status=InvalidEmailAdressError().get_status(),
+                data=InvalidEmailAdressError().get_data()
+            )
 
         if is_email_already_exists(serializer.errors):
-            return RegisterNewUserResp().resp_fields_already_exists_error(
-                serializer.errors
+            return Response(
+                status=EmailAlreadyExistsError().get_status(),
+                data=EmailAlreadyExistsError().get_data()
             )
 
         serializer_data = serializer.validated_data
@@ -120,4 +133,7 @@ class RegisterNewUser(APIView):
             for_user=new_user.email
         ).send_mail_to_user()
 
-        return RegisterNewUserResp().resp_create()
+        return Response(
+            status=CreateSuccess().get_status(),
+            data=CreateSuccess().get_data()
+        )

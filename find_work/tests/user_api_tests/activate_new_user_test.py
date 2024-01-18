@@ -2,9 +2,8 @@ import pytest
 
 from django.urls import reverse
 
-from rest_framework import status
-
-from util.user_api_resp.activate_new_user_resp import ActivateNewUserResp
+from util.success_resp_data import UpdateSuccess
+from util.error_resp_data import UserActivateUUIDIncapError
 
 
 @pytest.mark.django_db
@@ -21,9 +20,9 @@ class TestActivateNewUser:
             )
         )
 
-        assert request.status_code == status.HTTP_200_OK
+        assert request.status_code == UpdateSuccess().get_status()
         assert request.data["success"] == (
-            ActivateNewUserResp.resp_data["successes"][0]["success"]
+            UpdateSuccess().get_data()["success"]
         )
 
     def test_should_response_user_already_activated_error(
@@ -38,7 +37,7 @@ class TestActivateNewUser:
             )
         )
 
-        assert request.status_code == status.HTTP_409_CONFLICT
-        assert request.data["error"] == (
-            ActivateNewUserResp.resp_data["errors"][0]["error"]
+        assert request.status_code == UserActivateUUIDIncapError().get_status()
+        assert request.data["user_activate_uuid"] == (
+            UserActivateUUIDIncapError().get_data()["user_activate_uuid"]
         )

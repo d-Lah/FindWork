@@ -4,7 +4,7 @@ from django.urls import reverse
 
 
 @pytest.fixture()
-def data_to_deactivate_two_factor_auth(
+def data_to_disable_two_factor_auth(
         client,
         create_new_user,
 ):
@@ -28,7 +28,7 @@ def data_to_deactivate_two_factor_auth(
 
 
 @pytest.fixture()
-def data_to_deactivate_two_factor_auth_w_already_deactivated_user(
+def data_to_disable_two_factor_auth_w_already_disabled_auth(
         client,
         create_new_user,
 ):

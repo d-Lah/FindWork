@@ -2,6 +2,7 @@ from django.urls import reverse
 from django.contrib.auth.hashers import make_password
 
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
@@ -15,7 +16,8 @@ from util.mail_data_manager import (
     MailMessageInUpdateUserPassword,
 )
 from util.mail_sender import MailSender
-from util.user_api_resp.update_password_resp import UpdatePasswordResp
+from util.success_resp_data import UpdateSuccess
+from util.error_resp_data import FieldsEmptyError
 
 
 class UpdatePassword(APIView):
@@ -32,7 +34,10 @@ class UpdatePassword(APIView):
         deserialized_data = serializer.validated_data
 
         if serializer.errors:
-            return UpdatePasswordResp().resp_fields_empty_error()
+            return Response(
+                status=FieldsEmptyError().get_status(),
+                data=FieldsEmptyError().get_data()
+            )
 
         user_id = request.user.id
         user = User.objects.filter(pk=user_id).first()
@@ -55,4 +60,7 @@ class UpdatePassword(APIView):
             for_user=user.email
         ).send_mail_to_user()
 
-        return UpdatePasswordResp().resp_update()
+        return Response(
+            status=UpdateSuccess().get_status(),
+            data=UpdateSuccess().get_data()
+        )

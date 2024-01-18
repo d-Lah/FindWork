@@ -4,7 +4,11 @@ from django.urls import reverse
 
 from rest_framework import status
 
-from util.user_api_resp.update_password_resp import UpdatePasswordResp
+from util.error_resp_data import (
+    FieldsEmptyError,
+    AuthHeadersError,
+)
+from util.success_resp_data import UpdateSuccess
 
 
 @pytest.mark.django_db
@@ -26,9 +30,9 @@ class TestUpdatePassword:
             headers=user_auth_headers,
             data=data_to_update_password
         )
-        assert request.status_code == status.HTTP_200_OK
+        assert request.status_code == UpdateSuccess().get_status()
         assert request.data["success"] == (
-            UpdatePasswordResp.resp_data["successes"][0]["success"]
+            UpdateSuccess().get_data()["success"]
         )
 
     def test_should_response_auth_headers_error(
@@ -38,7 +42,7 @@ class TestUpdatePassword:
         request = client.put(
             reverse("user_api:update_password"),
         )
-        assert request.status_code == status.HTTP_401_UNAUTHORIZED
+        assert request.status_code == AuthHeadersError().get_status()
 
     def test_should_response_fields_empty_error(
             self,
@@ -49,7 +53,7 @@ class TestUpdatePassword:
             reverse("user_api:update_password"),
             headers=user_auth_headers,
         )
-        assert request.status_code == status.HTTP_400_BAD_REQUEST
-        assert request.data["error"] == (
-            UpdatePasswordResp.resp_data["errors"][0]["error"]
+        assert request.status_code == FieldsEmptyError().get_status()
+        assert request.data["fields"] == (
+            FieldsEmptyError().get_data()["fields"]
         )

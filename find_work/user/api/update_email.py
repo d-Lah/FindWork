@@ -1,11 +1,17 @@
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from user.models import User
 from user.serializer import UpdateEmailSerializer
 
-from util.user_api_resp.update_email_resp import UpdateEmailResp
+from util.error_resp_data import (
+    FieldsEmptyError,
+    InvalidEmailAdressError,
+    EmailAlreadyExistsError,
+)
+from util.success_resp_data import UpdateSuccess
 
 
 def is_fields_empty(errors):
@@ -52,13 +58,22 @@ class UpdateEmail(APIView):
         serializer.is_valid()
 
         if is_fields_empty(serializer.errors):
-            return UpdateEmailResp().resp_fields_empty_error()
+            return Response(
+                status=FieldsEmptyError().get_status(),
+                data=FieldsEmptyError().get_data()
+            )
 
         if is_invalid_email(serializer.errors):
-            return UpdateEmailResp().resp_invalid_email_address_error()
+            return Response(
+                status=InvalidEmailAdressError().get_status(),
+                data=InvalidEmailAdressError().get_data()
+            )
 
         if is_email_already_exists(serializer.errors):
-            return UpdateEmailResp().resp_email_already_exists_error()
+            return Response(
+                status=EmailAlreadyExistsError().get_status(),
+                data=EmailAlreadyExistsError().get_data()
+            )
 
         serializer_data = serializer.validated_data
 
@@ -68,4 +83,7 @@ class UpdateEmail(APIView):
         user.email = serializer_data["email"]
         user.save()
 
-        return UpdateEmailResp().resp_update()
+        return Response(
+            status=UpdateSuccess().get_status(),
+            data=UpdateSuccess().get_data()
+        )

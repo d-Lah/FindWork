@@ -7,7 +7,7 @@ class Resume(models.Model):
         User,
         on_delete=models.CASCADE
     )
-    about = models.CharField(max_length=3000)
+    about = models.TextField()
     specialization = models.ForeignKey(
         "Specialization",
         on_delete=models.CASCADE
@@ -26,15 +26,23 @@ class Resume(models.Model):
 
 
 class Specialization(models.Model):
-    specialization_name = models.CharField(max_length=150)
+    specialization_name = models.CharField(
+        max_length=150,
+        unique=True
+    )
 
 
 class Skill(models.Model):
-    skill_name = models.CharField(max_length=150)
+    skill_name = models.CharField(
+        max_length=150,
+        unique=True
+    )
 
 
 class WorkExperience(models.Model):
-    work_experience_name = models.CharField(max_length=150)
+    work_experience_name = models.CharField(
+        max_length=150,
+    )
 
 
 class TypeOfEmployment(models.Model):

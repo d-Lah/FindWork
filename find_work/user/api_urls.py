@@ -4,35 +4,36 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenObtainPairView,
 )
-
-from .api.user_info import UserInfo
-from .api.update_email import UpdateEmail
-from .api.profile_info import ProfileInfo
-from .api.upload_avatar import UploadAvatar
-from .api.reset_password import ResetPassword
-from .api.update_password import UpdatePassword
-from .api.activate_new_user import ActivateNewUser
-from .api.register_new_user import RegisterNewUser
-from .api.edit_profile_info import EditProfileInfo
-from .api.validate_password import ValidatePassword
-from .api.validate_totp_token import ValidateTOTPToken
-from .api.activate_two_factor_auth import ActivateTwoFactorAuth
-from .api.deactivate_two_factor_auth import DeactivateTwoFactorAuth
-from .api.get_two_factor_auth_qr_code import GetTwoFactorAuthQRCode
-from .api.generate_reset_password_totp import GenerateResetPasswordTOTP
-from .api.validate_reset_password_totp import ValidateResetPasswordTOTP
+from user.api import (
+    user_info,
+    update_email,
+    profile_info,
+    upload_avatar,
+    reset_password,
+    update_password,
+    activate_new_user,
+    validate_password,
+    edit_profile_info,
+    register_new_user,
+    validate_totp_token,
+    enable_two_factor_auth,
+    disable_two_factor_auth,
+    get_two_factor_auth_qr_code,
+    generate_reset_password_totp,
+    validate_reset_password_totp,
+)
 
 app_name = "user_api"
 
 urlpatterns = [
     path(
         "register",
-        RegisterNewUser.as_view(),
+        register_new_user.RegisterNewUser.as_view(),
         name="register_new_user",
     ),
     path(
         "activate-user/<uuid:user_activation_uuid>",
-        ActivateNewUser.as_view(),
+        activate_new_user.ActivateNewUser.as_view(),
         name="activate_new_user",
     ),
     path(
@@ -42,72 +43,72 @@ urlpatterns = [
     ),
     path(
         "get-two-factor_auth-qr-code",
-        GetTwoFactorAuthQRCode.as_view(),
+        get_two_factor_auth_qr_code.GetTwoFactorAuthQRCode.as_view(),
         name="get_two_factor_auth_qr_code"
     ),
     path(
         "validation-totp-token",
-        ValidateTOTPToken.as_view(),
+        validate_totp_token.ValidateTOTPToken.as_view(),
         name="validation_totp_token"
     ),
     path(
-        "activate-two-factor-auth",
-        ActivateTwoFactorAuth.as_view(),
-        name="activate_two_factor_auth"
+        "enable-two-factor-auth",
+        enable_two_factor_auth.EnableTwoFactorAuth.as_view(),
+        name="enable_two_factor_auth"
     ),
     path(
         "info",
-        UserInfo.as_view(),
+        user_info.UserInfo.as_view(),
         name="user_info"
     ),
     path(
         "edit-profile-info",
-        EditProfileInfo.as_view(),
+        edit_profile_info.EditProfileInfo.as_view(),
         name="edit_profile_info"
     ),
     path(
         "validate-password",
-        ValidatePassword.as_view(),
+        validate_password.ValidatePassword.as_view(),
         name="validate_password"
     ),
     path(
         "update-password",
-        UpdatePassword.as_view(),
+        update_password.UpdatePassword.as_view(),
         name="update_password"
     ),
     path(
         "update-email",
-        UpdateEmail.as_view(),
+        update_email.UpdateEmail.as_view(),
         name="update_email"
     ),
     path(
         "upload-avatar",
-        UploadAvatar.as_view(),
+        upload_avatar.UploadAvatar.as_view(),
         name="upload_avatar"
     ),
     path(
         "generate-reset-password-totp",
-        GenerateResetPasswordTOTP.as_view(),
+        generate_reset_password_totp.GenerateResetPasswordTOTP.as_view(),
         name="generate_reset_password_totp"
     ),
     path(
         "validate-reset-password-uuid",
-        ValidateResetPasswordTOTP.as_view(),
+        validate_reset_password_totp.ValidateResetPasswordTOTP.as_view(),
         name="validate_reset_password_totp"
     ),
     path(
         "reset-password",
-        ResetPassword.as_view(),
+        reset_password.ResetPassword.as_view(),
         name="reset_password"
     ),
     path(
         "profile-info",
-        ProfileInfo.as_view(),
+        profile_info.ProfileInfo.as_view(),
         name="profile_info"
     ),
     path(
-        "deactivate-two-factor-auth",
-        DeactivateTwoFactorAuth.as_view(),
-        name="deactivate_two_factor_auth"
+        "disable-two-factor-auth",
+        disable_two_factor_auth.DisableTwoFactorAuth.as_view(),
+        name="disable_two_factor_auth"
     ),
 ]

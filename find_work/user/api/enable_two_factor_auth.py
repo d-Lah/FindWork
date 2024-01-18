@@ -1,15 +1,15 @@
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from user.models import User
 
-from util.user_api_resp.activate_two_factor_auth_resp import (
-    ActivateTwoFactorAuthResp
-)
+from util.success_resp_data import UpdateSuccess
+from util.error_resp_data import TwoFactorAuthAlreadyEnabledError
 
 
-class ActivateTwoFactorAuth(APIView):
+class EnableTwoFactorAuth(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -25,10 +25,15 @@ class ActivateTwoFactorAuth(APIView):
         ).first()
 
         if not user:
-            return ActivateTwoFactorAuthResp(
-            ).resp_two_factor_auth_already_activated_error()
+            return Response(
+                status=TwoFactorAuthAlreadyEnabledError().get_status(),
+                data=TwoFactorAuthAlreadyEnabledError().get_data()
+            )
 
         user.is_two_factor_auth = True
         user.save()
 
-        return ActivateTwoFactorAuthResp().resp_update()
+        return Response(
+            status=UpdateSuccess().get_status(),
+            data=UpdateSuccess().get_data()
+        )
