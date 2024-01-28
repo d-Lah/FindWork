@@ -65,8 +65,8 @@ class TestValidateResetPassword:
             data=data_to_validate_reset_password_totp_w_wrong_email
         )
         assert request.status_code == UserNotFoundError().get_status()
-        assert request.data["email"] == (
-            UserNotFoundError().get_data()["email"]
+        assert request.data["user"] == (
+            UserNotFoundError().get_data()["user"]
         )
 
     def test_should_response_reset_password_totp_incapacitated(

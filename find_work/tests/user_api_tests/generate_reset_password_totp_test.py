@@ -2,8 +2,6 @@ import pytest
 
 from django.urls import reverse
 
-from rest_framework import status
-
 from util.error_resp_data import (
     FieldsEmptyError,
     UserNotFoundError,
@@ -72,6 +70,6 @@ class TestGenerateResetPasswordTOTP:
             data=data_to_generate_reset_password_totp_w_wrong_email
         )
         assert request.status_code == UserNotFoundError().get_status()
-        assert request.data["email"] == (
-            UserNotFoundError().get_data()["email"]
+        assert request.data["user"] == (
+            UserNotFoundError().get_data()["user"]
         )

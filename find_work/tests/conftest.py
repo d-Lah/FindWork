@@ -24,7 +24,6 @@ pytest_plugins = [
     "tests.fixtures.fixtures_user_api.fixtures_update_email",
     "tests.fixtures.fixtures_user_api.fixtures_upload_avatar",
     "tests.fixtures.fixtures_user_api.fixtures_reset_password",
-    "tests.fixtures.fixtures_resume_api.fixtures_create_resume",
     "tests.fixtures.fixtures_user_api.fixtures_update_password",
     "tests.fixtures.fixtures_user_api.fixtures_register_new_user",
     "tests.fixtures.fixtures_user_api.fixtures_activate_new_user",
@@ -35,6 +34,10 @@ pytest_plugins = [
     "tests.fixtures.fixtures_user_api.fixtures_disable_two_factor_auth",
     "tests.fixtures.fixtures_user_api.fixtures_generate_reset_password_totp",
     "tests.fixtures.fixtures_user_api.fixtures_validate_reset_password_totp",
+
+    "tests.fixtures.fixtures_resume_api.fixtures_for_tests",
+    "tests.fixtures.fixtures_resume_api.fixtures_resume_info",
+    "tests.fixtures.fixtures_resume_api.fixtures_create_resume",
 ]
 
 

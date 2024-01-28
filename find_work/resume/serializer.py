@@ -1,13 +1,14 @@
 from rest_framework import serializers
 
+from user.serializer import UserInfoSerializer
+
 from resume.models import (
     Skill,
+    Resume,
     Specialization,
     WorkExperience,
     TypeOfEmployment
 )
-
-from util.error_resp_data import FieldsNotFoundError
 
 
 class CreateResumeSerializer(serializers.Serializer):
@@ -54,3 +55,60 @@ class CreateResumeSerializer(serializers.Serializer):
                     "Type of employment not found"
                 )
         return value
+
+
+class SpecializationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Specialization
+        fields = [
+            "id",
+            "specialization_name"
+        ]
+
+
+class SkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Skill
+        fields = [
+            "id",
+            "skill_name"
+        ]
+
+
+class WorkExperienceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkExperience
+        fields = [
+            "id",
+            "work_experience_name"
+        ]
+
+
+class TypeOfEmploymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TypeOfEmployment
+        fields = [
+            "id",
+            "type_of_employment_name"
+        ]
+
+
+class ResumeInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Resume
+        fields = [
+            "id",
+            "about",
+            "skill",
+            "author",
+            "is_delete",
+            "specialization",
+            "work_experience",
+            "type_of_employment",
+        ]
+
+    author = UserInfoSerializer()
+    skill = SkillSerializer(many=True)
+    specialization = SpecializationSerializer()
+    work_experience = WorkExperienceSerializer()
+    type_of_employment = TypeOfEmploymentSerializer(many=True)

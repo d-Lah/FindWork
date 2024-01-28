@@ -55,7 +55,7 @@ class TestResetPassword:
             InvalidEmailAdressError().get_data()["email"]
         )
 
-    def test_should_response_not_found_error(
+    def test_should_response_user_not_found_error(
             self,
             client,
             data_to_reset_password_w_wrong_email
@@ -65,6 +65,6 @@ class TestResetPassword:
             data=data_to_reset_password_w_wrong_email
         )
         assert request.status_code == UserNotFoundError().get_status()
-        assert request.data["email"] == (
-            UserNotFoundError().get_data()["email"]
+        assert request.data["user"] == (
+            UserNotFoundError().get_data()["user"]
         )

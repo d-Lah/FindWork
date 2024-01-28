@@ -8,38 +8,6 @@ from resume.models import (
 
 
 @pytest.fixture()
-def create_specialization():
-    specialization = Specialization.objects.create(
-        specialization_name="Python"
-    )
-    return specialization
-
-
-@pytest.fixture()
-def create_skill():
-    skill = Skill.objects.create(
-        skill_name="Django"
-    )
-    return skill
-
-
-@pytest.fixture()
-def create_work_experience():
-    work_experience = WorkExperience.objects.create(
-        work_experience_name="1 year"
-    )
-    return work_experience
-
-
-@pytest.fixture()
-def create_type_of_employment():
-    type_of_employment = TypeOfEmployment.objects.create(
-        type_of_employment_name="Part-time"
-    )
-    return type_of_employment
-
-
-@pytest.fixture()
 def data_to_create_resume(
         create_skill,
         create_specialization,

@@ -56,7 +56,7 @@ class UserNotFoundError:
         return status.HTTP_404_NOT_FOUND
 
     def get_data(self):
-        return {"email": "User not found"}
+        return {"user": "User not found"}
 
 
 class UserActivateUUIDIncapError():
@@ -113,3 +113,11 @@ class WrongTOTPTokenError():
 
     def get_data(self):
         return {"totp_token": "Wrong totp token"}
+
+
+class ResumeNotFoundError():
+    def get_status(self):
+        return status.HTTP_404_NOT_FOUND
+
+    def get_data(self):
+        return {"resume": "Resume not found"}

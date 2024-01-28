@@ -124,7 +124,12 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "is_employer",
             "is_employee",
             "is_two_factor_auth",
+            "resume",
         ]
+        resume = serializers.IntegerField(
+            source="resume.id",
+            required=False
+        )
 
 
 class ValidatePasswordSerializer(serializers.ModelSerializer):
