@@ -121,3 +121,8 @@ class ResumeNotFoundError():
 
     def get_data(self):
         return {"resume": "Resume not found"}
+
+
+class ForbiddenRequestDataError:
+    def get_status(self):
+        return status.HTTP_403_FORBIDDEN

@@ -12,15 +12,16 @@ from resume.models import (
     WorkExperience,
     TypeOfEmployment
 )
-from resume.serializer import CreateResumeSerializer
+from resume.serializer import UpdateResumeInfoSerializer
 
 from util.error_resp_data import (
     FieldsEmptyError,
-    UserNotFoundError,
     FieldsNotFoundError,
+    ResumeNotFoundError,
+    ForbiddenRequestDataError
 )
 from util.success_resp_data import (
-    CreateSuccess
+    UpdateSuccess
 )
 
 
@@ -44,15 +45,15 @@ def is_fields_not_found(errors):
     return False
 
 
-class CreateResume(APIView):
+class EditResumeInfo(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(
+    def put(
             self,
-            request
+            request,
     ):
-        serializer = CreateResumeSerializer(data=request.data)
+        serializer = UpdateResumeInfoSerializer(data=request.data)
 
         serializer.is_valid()
 
@@ -73,20 +74,19 @@ class CreateResume(APIView):
                 data=errors
             )
 
-        serializer_data = serializer.validated_data
-
         user_id = request.user.id
-
-        author = User.objects.filter(
-            pk=user_id,
-            is_employee=True
+        resume = Resume.objects.filter(
+            author__id=user_id,
+            author__is_employee=True
         ).first()
 
-        if not author:
+        if not resume:
             return Response(
-                status=UserNotFoundError().get_status(),
-                data=UserNotFoundError().get_data()
+                status=ResumeNotFoundError().get_status(),
+                data=ResumeNotFoundError().get_data()
             )
+
+        serializer_data = serializer.validated_data
 
         specialization = Specialization.objects.filter(
             pk=serializer_data["specialization"]
@@ -95,13 +95,6 @@ class CreateResume(APIView):
         work_experience = WorkExperience.objects.filter(
             pk=serializer_data["work_experience"]
         ).first()
-
-        new_resume = Resume.objects.create(
-            about=serializer_data["about"],
-            author=author,
-            specialization=specialization,
-            work_experience=work_experience,
-        )
 
         skill_list = []
 
@@ -117,13 +110,21 @@ class CreateResume(APIView):
             ).first()
             type_of_employment_list.append(type_of_employment)
 
+        resume.about = serializer_data["about"]
+        resume.specialization = specialization
+        resume.work_experience = work_experience
+        resume.skill.all().exclude()
+        resume.type_of_employment.all().exclude()
+
+        resume.save()
+
         for skill in skill_list:
-            new_resume.skill.add(skill)
+            resume.skill.add(skill)
 
         for type_of_employment in type_of_employment_list:
-            new_resume.type_of_employment.add(type_of_employment)
+            resume.type_of_employment.add(type_of_employment)
 
         return Response(
-            status=CreateSuccess().get_status(),
-            data=CreateSuccess().get_data()
+            status=UpdateSuccess().get_status(),
+            data=UpdateSuccess().get_data()
         )

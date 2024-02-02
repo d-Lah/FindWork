@@ -7,42 +7,47 @@ from resume.models import Resume
 from util.error_resp_data import (
     AuthHeadersError,
     FieldsEmptyError,
-    UserNotFoundError,
     FieldsNotFoundError,
+    ResumeNotFoundError,
+    ForbiddenRequestDataError
 )
 from util.success_resp_data import (
-    CreateSuccess
+    UpdateSuccess
 )
 
 
 @pytest.mark.django_db
-class TestCreateResume:
-    def test_should_create_resume(
+class TestEditResumeInfo:
+    def test_should_edit_resume_info(
             self,
             client,
-            create_new_user,
+            create_resume,
             user_auth_headers,
-            data_to_create_resume
+            data_to_update_resume_info,
     ):
-        create_new_user.is_employee = True
-        create_new_user.save()
-
-        request = client.post(
-            reverse("resume_api:create_resume"),
+        request = client.put(
+            reverse(
+                "resume_api:edit_resume_info",
+            ),
             headers=user_auth_headers,
-            data=data_to_create_resume
+            data=data_to_update_resume_info
         )
 
-        assert request.status_code == CreateSuccess().get_status()
-        assert request.data["success"] == CreateSuccess().get_data()["success"]
-        assert Resume.objects.filter(pk=1).first()
+        assert request.status_code == UpdateSuccess().get_status()
+        assert request.data["success"] == (
+            UpdateSuccess().get_data()["success"]
+        )
+        resume = Resume.objects.filter(pk=1).first()
+        assert resume.about == data_to_update_resume_info["about"]
 
     def test_should_response_auth_headers_error(
             self,
             client,
     ):
         request = client.put(
-            reverse("resume_api:create_resume"),
+            reverse(
+                "resume_api:edit_resume_info",
+            ),
         )
         assert request.status_code == AuthHeadersError().get_status()
 
@@ -50,12 +55,14 @@ class TestCreateResume:
             self,
             client,
             user_auth_headers,
-            data_to_create_resume_wo_data
+            data_to_edit_resume_info_wo_data
     ):
-        request = client.post(
-            reverse("resume_api:create_resume"),
+        request = client.put(
+            reverse(
+                "resume_api:edit_resume_info",
+            ),
             headers=user_auth_headers,
-            data=data_to_create_resume_wo_data
+            data=data_to_edit_resume_info_wo_data
         )
 
         assert request.status_code == FieldsEmptyError().get_status()
@@ -63,33 +70,38 @@ class TestCreateResume:
             FieldsEmptyError().get_data()["fields"]
         )
 
-    def test_should_responce_user_not_found_error(
+    def test_should_response_resume_not_found(
             self,
             client,
+            create_new_user,
             user_auth_headers,
-            data_to_create_resume
     ):
-        request = client.post(
-            reverse("resume_api:create_resume"),
-            headers=user_auth_headers,
-            data=data_to_create_resume
-        )
+        create_new_user.is_employee = False
+        create_new_user.save()
 
-        assert request.status_code == UserNotFoundError().get_status()
-        assert request.data["user"] == (
-            UserNotFoundError().get_data()["user"]
+        request = client.put(
+            reverse(
+                "resume_api:edit_resume_info",
+            ),
+            headers=user_auth_headers,
+        )
+        assert request.status_code == ResumeNotFoundError().get_status()
+        assert request.data["resume"] == (
+            ResumeNotFoundError().get_data()["resume"]
         )
 
     def test_should_response_wrong_specialization_error(
             self,
             client,
             user_auth_headers,
-            data_to_create_resume_w_wrong_specialization
+            data_to_edit_resume_info_w_wrong_specialization
     ):
-        request = client.post(
-            reverse("resume_api:create_resume"),
+        request = client.put(
+            reverse(
+                "resume_api:edit_resume_info",
+            ),
             headers=user_auth_headers,
-            data=data_to_create_resume_w_wrong_specialization
+            data=data_to_edit_resume_info_w_wrong_specialization
         )
 
         assert request.status_code == FieldsNotFoundError().get_status()
@@ -101,12 +113,14 @@ class TestCreateResume:
             self,
             client,
             user_auth_headers,
-            data_to_create_resume_w_wrong_skill
+            data_to_edit_resume_info_w_wrong_skill
     ):
-        request = client.post(
-            reverse("resume_api:create_resume"),
+        request = client.put(
+            reverse(
+                "resume_api:edit_resume_info",
+            ),
             headers=user_auth_headers,
-            data=data_to_create_resume_w_wrong_skill
+            data=data_to_edit_resume_info_w_wrong_skill
         )
 
         assert request.status_code == FieldsNotFoundError().get_status()
@@ -118,12 +132,14 @@ class TestCreateResume:
             self,
             client,
             user_auth_headers,
-            data_to_create_resume_w_wrong_work_experience
+            data_to_edit_resume_info_w_wrong_work_experience
     ):
-        request = client.post(
-            reverse("resume_api:create_resume"),
+        request = client.put(
+            reverse(
+                "resume_api:edit_resume_info",
+            ),
             headers=user_auth_headers,
-            data=data_to_create_resume_w_wrong_work_experience
+            data=data_to_edit_resume_info_w_wrong_work_experience
         )
 
         assert request.status_code == FieldsNotFoundError().get_status()
@@ -135,12 +151,14 @@ class TestCreateResume:
             self,
             client,
             user_auth_headers,
-            data_to_create_resume_w_wrong_type_of_employment
+            data_to_edit_resume_info_w_wrong_type_of_employment
     ):
-        request = client.post(
-            reverse("resume_api:create_resume"),
+        request = client.put(
+            reverse(
+                "resume_api:edit_resume_info",
+            ),
             headers=user_auth_headers,
-            data=data_to_create_resume_w_wrong_type_of_employment
+            data=data_to_edit_resume_info_w_wrong_type_of_employment
         )
 
         assert request.status_code == FieldsNotFoundError().get_status()

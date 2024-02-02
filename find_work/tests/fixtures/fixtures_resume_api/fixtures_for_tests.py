@@ -1,4 +1,7 @@
 import pytest
+
+from django.urls import reverse
+
 from resume.models import (
     Skill,
     Resume,
@@ -42,12 +45,15 @@ def create_type_of_employment():
 
 @pytest.fixture()
 def create_resume(
-        create_new_user,
         create_skill,
+        create_new_user,
         create_specialization,
         create_work_experience,
         create_type_of_employment
 ):
+    create_new_user.is_employee = True
+    create_new_user.save()
+
     new_resume = Resume.objects.create(
         author=create_new_user,
         about="Test",
@@ -58,3 +64,19 @@ def create_resume(
     new_resume.type_of_employment.add(create_type_of_employment)
 
     return new_resume
+
+
+@pytest.fixture()
+def get_resume_id(create_resume):
+    kwargs = {
+        "resume_id": create_resume.pk
+    }
+    return kwargs
+
+
+@pytest.fixture()
+def get_wrong_resume_id():
+    kwargs = {
+        "resume_id": 0
+    }
+    return kwargs

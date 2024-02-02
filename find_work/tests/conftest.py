@@ -36,8 +36,8 @@ pytest_plugins = [
     "tests.fixtures.fixtures_user_api.fixtures_validate_reset_password_totp",
 
     "tests.fixtures.fixtures_resume_api.fixtures_for_tests",
-    "tests.fixtures.fixtures_resume_api.fixtures_resume_info",
     "tests.fixtures.fixtures_resume_api.fixtures_create_resume",
+    "tests.fixtures.fixtures_resume_api.fixtures_edit_resume_info",
 ]
 
 
@@ -64,7 +64,7 @@ def create_new_user():
         user_activation_uuid=uuid4(),
         profile=profile,
         is_employer=False,
-        is_employee=True,
+        is_employee=False,
         password=make_password("password"),
         otp_base32=user_encrypted_opt_base32.decode()
     )

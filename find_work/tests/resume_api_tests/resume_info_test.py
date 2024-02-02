@@ -14,13 +14,13 @@ class TestResumeInfo:
     def test_should_get_resume_info(
             self,
             client,
+            get_resume_id,
             user_auth_headers,
-            data_to_resume_info_w_resume_id
     ):
         request = client.get(
             reverse(
                 "resume_api:resume_info",
-                kwargs=data_to_resume_info_w_resume_id
+                kwargs=get_resume_id
             ),
             headers=user_auth_headers
         )
@@ -32,12 +32,12 @@ class TestResumeInfo:
     def test_should_response_auth_headers_error(
             self,
             client,
-            data_to_resume_info_w_resume_id
+            get_resume_id
     ):
         request = client.get(
             reverse(
                 "resume_api:resume_info",
-                kwargs=data_to_resume_info_w_resume_id
+                kwargs=get_resume_id
             ),
         )
         assert request.status_code == AuthHeadersError().get_status()
@@ -46,12 +46,12 @@ class TestResumeInfo:
             self,
             client,
             user_auth_headers,
-            data_to_resume_info_w_wrong_resume_id
+            get_wrong_resume_id
     ):
         request = client.get(
             reverse(
                 "resume_api:resume_info",
-                kwargs=data_to_resume_info_w_wrong_resume_id
+                kwargs=get_wrong_resume_id
             ),
             headers=user_auth_headers
         )

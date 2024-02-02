@@ -1,9 +1,10 @@
 from django.urls import path
 
-# from resume.api.create_resume import CreateResume
+
 from resume.api import (
     resume_info,
     create_resume,
+    edit_resume_info,
 )
 
 app_name = "resume_api"
@@ -18,5 +19,10 @@ urlpatterns = [
         "resume-info/<int:resume_id>",
         resume_info.ResumeInfo.as_view(),
         name="resume_info"
+    ),
+    path(
+        "edit-resume-info",
+        edit_resume_info.EditResumeInfo.as_view(),
+        name="edit_resume_info"
     ),
 ]
