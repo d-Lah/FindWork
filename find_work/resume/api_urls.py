@@ -4,6 +4,7 @@ from django.urls import path
 from resume.api import (
     resume_info,
     create_resume,
+    delete_resume,
     edit_resume_info,
 )
 
@@ -25,4 +26,9 @@ urlpatterns = [
         edit_resume_info.EditResumeInfo.as_view(),
         name="edit_resume_info"
     ),
+    path(
+        "delete-resume",
+        delete_resume.DeleteResume.as_view(),
+        name="delete_resume"
+    )
 ]

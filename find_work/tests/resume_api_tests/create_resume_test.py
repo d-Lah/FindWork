@@ -63,7 +63,7 @@ class TestCreateResume:
             FieldsEmptyError().get_data()["fields"]
         )
 
-    def test_should_responce_user_not_found_error(
+    def test_should_response_user_not_found_error(
             self,
             client,
             user_auth_headers,

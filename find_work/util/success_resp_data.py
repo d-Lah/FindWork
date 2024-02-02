@@ -42,3 +42,11 @@ class ValidateSuccess:
 
     def get_data(self):
         return {"success": "Validate"}
+
+
+class DeleteSuccess:
+    def get_status(self):
+        return status.HTTP_200_OK
+
+    def get_data(self):
+        return {"success": "Delete"}
