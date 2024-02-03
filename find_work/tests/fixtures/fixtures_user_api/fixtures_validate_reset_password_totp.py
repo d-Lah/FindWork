@@ -40,6 +40,27 @@ def data_to_validate_reset_password_totp_wo_data():
 
 
 @pytest.fixture()
+def data_to_validate_reset_password_totp_w_invalid_email(
+        create_new_user
+):
+    fernet = Fernet(CRYPTOGRAPHY_FERNET_KEY.encode())
+    user_otp_base32 = fernet.decrypt(create_new_user.otp_base32.encode())
+
+    totp = pyotp.TOTP(
+        s=user_otp_base32,
+        interval=172880
+    )
+    reset_password_totp = totp.now()
+
+    data = {
+        "email": "randomEmailemailcom",
+        "reset_password_totp": reset_password_totp
+    }
+
+    return data
+
+
+@pytest.fixture()
 def data_to_validate_reset_password_totp_w_wrong_email(
         create_new_user
 ):

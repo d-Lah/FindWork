@@ -2,9 +2,13 @@ import pytest
 
 from django.urls import reverse
 
-from rest_framework import status
-
-from util.user_api_resp.update_email_resp import UpdateEmailResp
+from util.error_resp_data import (
+    AuthHeadersError,
+    FieldsEmptyError,
+    InvalidEmailAdressError,
+    EmailAlreadyExistsError,
+)
+from util.success_resp_data import UpdateSuccess
 
 
 @pytest.mark.django_db
@@ -20,9 +24,9 @@ class TestUpdateEmail:
             headers=user_auth_headers,
             data=data_to_update_email
         )
-        assert request.status_code == status.HTTP_200_OK
+        assert request.status_code == UpdateSuccess().get_status()
         assert request.data["success"] == (
-            UpdateEmailResp.resp_data["successes"][0]["success"]
+            UpdateSuccess().get_data()["success"]
         )
 
     def test_should_response_auth_headers_error(
@@ -32,7 +36,7 @@ class TestUpdateEmail:
         request = client.put(
             reverse("user_api:update_email"),
         )
-        assert request.status_code == status.HTTP_401_UNAUTHORIZED
+        assert request.status_code == AuthHeadersError().get_status()
 
     def test_should_response_fields_empty_error(
             self,
@@ -45,9 +49,9 @@ class TestUpdateEmail:
             headers=user_auth_headers,
             data=data_to_update_email_wo_email
         )
-        assert request.status_code == status.HTTP_400_BAD_REQUEST
-        assert request.data["error"] == (
-            UpdateEmailResp.resp_data["errors"][0]["error"]
+        assert request.status_code == FieldsEmptyError().get_status()
+        assert request.data["fields"] == (
+            FieldsEmptyError().get_data()["fields"]
         )
 
     def test_should_response_invalid_email_error(
@@ -61,9 +65,9 @@ class TestUpdateEmail:
             headers=user_auth_headers,
             data=data_to_update_email_w_invalid_email
         )
-        assert request.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert request.data["error"] == (
-            UpdateEmailResp.resp_data["errors"][1]["error"]
+        assert request.status_code == InvalidEmailAdressError().get_status()
+        assert request.data["email"] == (
+            InvalidEmailAdressError().get_data()["email"]
         )
 
     def test_should_response_email_already_exist_error(
@@ -77,7 +81,7 @@ class TestUpdateEmail:
             headers=user_auth_headers,
             data=data_to_update_email_w_already_exists_email
         )
-        assert request.status_code == status.HTTP_409_CONFLICT
-        assert request.data["error"] == (
-            UpdateEmailResp.resp_data["errors"][2]["error"]
+        assert request.status_code == EmailAlreadyExistsError().get_status()
+        assert request.data["email"] == (
+            EmailAlreadyExistsError().get_data()["email"]
         )

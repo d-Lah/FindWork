@@ -1,8 +1,10 @@
 from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from user.models import User
 
-from util.user_api_resp.activate_new_user_resp import ActivateNewUserResp
+from util.success_resp_data import UpdateSuccess
+from util.error_resp_data import UserActivateUUIDIncapError
 
 
 class ActivateNewUser(APIView):
@@ -17,8 +19,14 @@ class ActivateNewUser(APIView):
         ).first()
 
         if not user:
-            return ActivateNewUserResp().resp_user_already_activated_error()
+            return Response(
+                status=UserActivateUUIDIncapError().get_status(),
+                data=UserActivateUUIDIncapError().get_data()
+            )
 
         user.is_active = True
         user.save()
-        return ActivateNewUserResp().resp_update()
+        return Response(
+            status=UpdateSuccess().get_status(),
+            data=UpdateSuccess().get_data()
+        )

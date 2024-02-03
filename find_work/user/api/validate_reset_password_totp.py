@@ -1,6 +1,7 @@
 import pyotp
 
 from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from cryptography.fernet import Fernet
 
@@ -11,9 +12,13 @@ from user.serializer import (
     ValidateResetPasswordTOTPSerializer
 )
 
-from util.user_api_resp.validate_reset_password_totp_resp import (
-    ValidateResetPasswordTOTPResp
+from util.error_resp_data import (
+    FieldsEmptyError,
+    UserNotFoundError,
+    InvalidEmailAdressError,
+    ResetPasswordTOTPIncapError
 )
+from util.success_resp_data import ValidateSuccess
 
 
 def is_fields_empty(errors):
@@ -59,14 +64,22 @@ class ValidateResetPasswordTOTP(APIView):
         serializer.is_valid()
 
         if is_fields_empty(serializer.errors):
-            return ValidateResetPasswordTOTPResp().resp_fields_empty_error()
+            return Response(
+                status=FieldsEmptyError().get_status(),
+                data=FieldsEmptyError().get_data()
+            )
 
         if is_invalid_email(serializer.errors):
-            return ValidateResetPasswordTOTPResp(
-            ).resp_invalid_email_address_error()
+            return Response(
+                status=InvalidEmailAdressError().get_status(),
+                data=InvalidEmailAdressError().get_data()
+            )
 
         if is_user_not_found(serializer.errors):
-            return ValidateResetPasswordTOTPResp().resp_user_not_found_error()
+            return Response(
+                status=UserNotFoundError().get_status(),
+                data=UserNotFoundError().get_data()
+            )
 
         serializer_data = serializer.validated_data
 
@@ -82,7 +95,12 @@ class ValidateResetPasswordTOTP(APIView):
         if not totp.verify(
             serializer_data["reset_password_totp"]
         ):
-            return ValidateResetPasswordTOTPResp(
-            ).resp_reset_password_totp_incap_error()
+            return Response(
+                status=ResetPasswordTOTPIncapError().get_status(),
+                data=ResetPasswordTOTPIncapError().get_data()
+            )
 
-        return ValidateResetPasswordTOTPResp().resp_valid()
+        return Response(
+            status=ValidateSuccess().get_status(),
+            data=ValidateSuccess().get_data()
+        )

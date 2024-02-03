@@ -4,7 +4,12 @@ from django.urls import reverse
 
 from rest_framework import status
 
-from util.user_api_resp.validate_password_resp import ValidatePasswordResp
+from util.error_resp_data import (
+    AuthHeadersError,
+    FieldsEmptyError,
+    WrongPasswordError
+)
+from util.success_resp_data import ValidateSuccess
 
 
 @pytest.mark.django_db
@@ -20,9 +25,9 @@ class TestValidatePassword:
             headers=user_auth_headers,
             data=data_to_validate_password
         )
-        assert request.status_code == status.HTTP_200_OK
+        assert request.status_code == ValidateSuccess().get_status()
         assert request.data["success"] == (
-            ValidatePasswordResp.resp_data["successes"][0]["success"]
+            ValidateSuccess().get_data()["success"]
         )
 
     def test_should_response_auth_headers_error(
@@ -43,9 +48,9 @@ class TestValidatePassword:
             reverse("user_api:validate_password"),
             headers=user_auth_headers
         )
-        assert request.status_code == status.HTTP_400_BAD_REQUEST
-        assert request.data["error"] == (
-            ValidatePasswordResp.resp_data["errors"][0]["error"]
+        assert request.status_code == FieldsEmptyError().get_status()
+        assert request.data["fields"] == (
+            FieldsEmptyError().get_data()["fields"]
         )
 
     def test_should_response_wrong_password_error(
@@ -59,7 +64,7 @@ class TestValidatePassword:
             headers=user_auth_headers,
             data=data_to_validate_password_w_wrong_password
         )
-        assert request.status_code == status.HTTP_403_FORBIDDEN
-        assert request.data["error"] == (
-            ValidatePasswordResp.resp_data["errors"][1]["error"]
+        assert request.status_code == WrongPasswordError().get_status()
+        assert request.data["password"] == (
+            WrongPasswordError().get_data()["password"]
         )

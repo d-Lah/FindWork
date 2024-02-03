@@ -22,6 +22,6 @@ repos:
     hooks:
       - id: run-test
         name: run test
-        entry: ./run_tests.sh
+        entry: ./pre_commit_run_tests.sh
         language: system
         stages: [commit]

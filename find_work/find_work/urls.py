@@ -44,6 +44,10 @@ urlpatterns = [
         "api/v1/user1/",
         include("user.view_urls"),
     ),
+    path(
+        "api/v1/resume/",
+        include("resume.api_urls"),
+    ),
 ] + static(
     settings.MEDIA_URL,
     document_root=settings.MEDIA_ROOT,

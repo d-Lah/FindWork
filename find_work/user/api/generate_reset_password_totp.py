@@ -1,6 +1,7 @@
 import pyotp
 
 from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from cryptography.fernet import Fernet
 
@@ -9,14 +10,17 @@ from find_work.settings import CRYPTOGRAPHY_FERNET_KEY
 from user.models import User
 from user.serializer import GenerateResetPasswordTOTPSerializer
 
+from util.error_resp_data import (
+    FieldsEmptyError,
+    UserNotFoundError,
+    InvalidEmailAdressError,
+)
 from util.mail_sender import MailSender
 from util.mail_data_manager import (
     MailSubjectInGenerateResetPasswordUuid,
     MailMessageInGenerateResetPasswordUuid,
 )
-from util.user_api_resp.generate_reset_password_totp_resp import (
-    GenerateResetPasswordTOTPResp
-)
+from util.success_resp_data import CreateSuccess
 
 
 def is_fields_empty(errors):
@@ -61,21 +65,26 @@ class GenerateResetPasswordTOTP(APIView):
         serializer.is_valid()
 
         if is_fields_empty(serializer.errors):
-            return GenerateResetPasswordTOTPResp().resp_fields_empty_error()
+            return Response(
+                status=FieldsEmptyError().get_status(),
+                data=FieldsEmptyError().get_data()
+            )
 
         if is_invalid_email(serializer.errors):
-            return GenerateResetPasswordTOTPResp(
-            ).resp_invalid_email_address_error()
+            return Response(
+                status=InvalidEmailAdressError().get_status(),
+                data=InvalidEmailAdressError().get_data()
+            )
 
         if is_user_not_found(serializer.errors):
-            return GenerateResetPasswordTOTPResp().resp_user_not_found_error()
+            return Response(
+                status=UserNotFoundError().get_status(),
+                data=UserNotFoundError().get_data()
+            )
 
         serializer_data = serializer.validated_data
 
         user = User.objects.filter(email=serializer_data["email"]).first()
-
-        if not user:
-            return GenerateResetPasswordTOTPResp().resp_user_not_found_error()
 
         fernet = Fernet(CRYPTOGRAPHY_FERNET_KEY.encode())
         user_otp_base32 = fernet.decrypt(user.otp_base32.encode())
@@ -98,4 +107,7 @@ class GenerateResetPasswordTOTP(APIView):
             for_user=user.email
         ).send_mail_to_user()
 
-        return GenerateResetPasswordTOTPResp().resp_create()
+        return Response(
+            status=CreateSuccess().get_status(),
+            data=CreateSuccess().get_data()
+        )

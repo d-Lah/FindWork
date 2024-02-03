@@ -2,11 +2,12 @@ import pytest
 
 from django.urls import reverse
 
-from rest_framework import status
-
-from util.user_api_resp.generate_reset_password_totp_resp import (
-    GenerateResetPasswordTOTPResp
+from util.error_resp_data import (
+    FieldsEmptyError,
+    UserNotFoundError,
+    InvalidEmailAdressError,
 )
+from util.success_resp_data import CreateSuccess
 
 
 @pytest.mark.django_db
@@ -26,9 +27,9 @@ class TestGenerateResetPasswordTOTP:
             reverse("user_api:generate_reset_password_totp"),
             data=data_to_generate_reset_password_totp
         )
-        assert request.status_code == status.HTTP_201_CREATED
+        assert request.status_code == CreateSuccess().get_status()
         assert request.data["success"] == (
-            GenerateResetPasswordTOTPResp.resp_data["successes"][0]["success"]
+            CreateSuccess().get_data()["success"]
         )
 
     def test_should_response_fields_empty_error(
@@ -40,9 +41,9 @@ class TestGenerateResetPasswordTOTP:
             reverse("user_api:generate_reset_password_totp"),
             data=data_to_generate_reset_password_totp_wo_email
         )
-        assert request.status_code == status.HTTP_400_BAD_REQUEST
-        assert request.data["error"] == (
-            GenerateResetPasswordTOTPResp.resp_data["errors"][0]["error"]
+        assert request.status_code == FieldsEmptyError().get_status()
+        assert request.data["fields"] == (
+            FieldsEmptyError().get_data()["fields"]
         )
 
     def test_should_response_invalid_email_error(
@@ -54,9 +55,9 @@ class TestGenerateResetPasswordTOTP:
             reverse("user_api:generate_reset_password_totp"),
             data=data_to_generate_reset_password_totp_w_invalid_email
         )
-        assert request.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert request.data["error"] == (
-            GenerateResetPasswordTOTPResp.resp_data["errors"][1]["error"]
+        assert request.status_code == InvalidEmailAdressError().get_status()
+        assert request.data["email"] == (
+            InvalidEmailAdressError().get_data()["email"]
         )
 
     def test_should_response_user_not_found_error(
@@ -68,7 +69,7 @@ class TestGenerateResetPasswordTOTP:
             reverse("user_api:generate_reset_password_totp"),
             data=data_to_generate_reset_password_totp_w_wrong_email
         )
-        assert request.status_code == status.HTTP_404_NOT_FOUND
-        assert request.data["error"] == (
-            GenerateResetPasswordTOTPResp.resp_data["errors"][2]["error"]
+        assert request.status_code == UserNotFoundError().get_status()
+        assert request.data["user"] == (
+            UserNotFoundError().get_data()["user"]
         )

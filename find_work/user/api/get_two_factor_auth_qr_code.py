@@ -1,6 +1,7 @@
 import pyotp
 
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
@@ -10,9 +11,7 @@ from find_work.settings import CRYPTOGRAPHY_FERNET_KEY
 
 from user.models import User
 
-from util.user_api_resp.get_two_factor_auth_qr_code_resp import (
-    GetTwoFacteorAuthQRCodeResp
-)
+from util.success_resp_data import GetSuccess
 
 
 class GetTwoFactorAuthQRCode(APIView):
@@ -36,4 +35,7 @@ class GetTwoFactorAuthQRCode(APIView):
             issuer_name="FindWork"
         )
 
-        return GetTwoFacteorAuthQRCodeResp().resp_get(otp_auth_url)
+        return Response(
+            status=GetSuccess().get_status(),
+            data=GetSuccess().get_data(otp_auth_url)
+        )

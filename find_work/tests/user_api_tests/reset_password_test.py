@@ -2,9 +2,12 @@ import pytest
 
 from django.urls import reverse
 
-from rest_framework import status
-
-from util.user_api_resp.reset_password_resp import ResetPasswordResp
+from util.error_resp_data import (
+    FieldsEmptyError,
+    UserNotFoundError,
+    InvalidEmailAdressError,
+)
+from util.success_resp_data import UpdateSuccess
 
 
 @pytest.mark.django_db
@@ -18,9 +21,9 @@ class TestResetPassword:
             reverse("user_api:reset_password"),
             data=data_to_reset_password
         )
-        assert request.status_code == status.HTTP_200_OK
+        assert request.status_code == UpdateSuccess().get_status()
         assert request.data["success"] == (
-            ResetPasswordResp.resp_data["successes"][0]["success"]
+            UpdateSuccess().get_data()["success"]
         )
 
     def test_should_response_fields_empty_error(
@@ -32,9 +35,9 @@ class TestResetPassword:
             reverse("user_api:reset_password"),
             data=data_to_reset_password_wo_data
         )
-        assert request.status_code == status.HTTP_400_BAD_REQUEST
-        assert request.data["error"] == (
-            ResetPasswordResp.resp_data["errors"][0]["error"]
+        assert request.status_code == FieldsEmptyError().get_status()
+        assert request.data["fields"] == (
+            FieldsEmptyError().get_data()["fields"]
         )
 
     def test_should_response_invalid_email_error(
@@ -47,12 +50,12 @@ class TestResetPassword:
             data=data_to_reset_password_w_invalid_email
 
         )
-        assert request.status_code == status.HTTP_400_BAD_REQUEST
-        assert request.data["error"] == (
-            ResetPasswordResp.resp_data["errors"][1]["error"]
+        assert request.status_code == InvalidEmailAdressError().get_status()
+        assert request.data["email"] == (
+            InvalidEmailAdressError().get_data()["email"]
         )
 
-    def test_should_response_not_found_error(
+    def test_should_response_user_not_found_error(
             self,
             client,
             data_to_reset_password_w_wrong_email
@@ -61,7 +64,7 @@ class TestResetPassword:
             reverse("user_api:reset_password"),
             data=data_to_reset_password_w_wrong_email
         )
-        assert request.status_code == status.HTTP_404_NOT_FOUND
-        assert request.data["error"] == (
-            ResetPasswordResp.resp_data["errors"][2]["error"]
+        assert request.status_code == UserNotFoundError().get_status()
+        assert request.data["user"] == (
+            UserNotFoundError().get_data()["user"]
         )

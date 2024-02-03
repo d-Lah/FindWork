@@ -9,7 +9,13 @@ from user.models import (
     UserAvatar,
 )
 
-from util.user_api_resp.upload_avatar_resp import UploadAvatarResp
+from util.error_resp_data import (
+    AuthHeadersError,
+    FieldsEmptyError,
+    InvalidFileExtError,
+    FileSizeTooLargeError,
+)
+from util.success_resp_data import UploadSuccess
 
 
 @pytest.mark.django_db
@@ -36,9 +42,9 @@ class TestUploadAvatar:
             headers=user_auth_headers,
             data=data_to_upload_avatar
         )
-        assert request.status_code == status.HTTP_201_CREATED
+        assert request.status_code == UploadSuccess().get_status()
         assert request.data["success"] == (
-            UploadAvatarResp.resp_data["successes"][0]["success"]
+            UploadSuccess().get_data()["success"]
         )
 
     def test_should_response_auth_headers_error(
@@ -50,7 +56,7 @@ class TestUploadAvatar:
             reverse("user_api:upload_avatar"),
             data=data_to_upload_avatar_wo_image
         )
-        assert request.status_code == status.HTTP_401_UNAUTHORIZED
+        assert request.status_code == AuthHeadersError().get_status()
 
     def test_should_response_avatar_fields_empty_error(
             self,
@@ -61,9 +67,9 @@ class TestUploadAvatar:
             reverse("user_api:upload_avatar"),
             headers=user_auth_headers,
         )
-        assert request.status_code == status.HTTP_400_BAD_REQUEST
-        assert request.data["error"] == (
-            UploadAvatarResp.resp_data["errors"][0]["error"]
+        assert request.status_code == FieldsEmptyError().get_status()
+        assert request.data["fields"] == (
+            FieldsEmptyError().get_data()["fields"]
         )
 
     def test_should_response_image_size_too_large_error(
@@ -77,9 +83,9 @@ class TestUploadAvatar:
             headers=user_auth_headers,
             data=data_to_upload_avatar_w_big_file
         )
-        assert request.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
-        assert request.data["error"] == (
-            UploadAvatarResp.resp_data["errors"][1]["error"]
+        assert request.status_code == FileSizeTooLargeError().get_status()
+        assert request.data["file"] == (
+            FileSizeTooLargeError().get_data()["file"]
         )
 
     def test_should_response_invalid_image_ext_error(
@@ -93,7 +99,7 @@ class TestUploadAvatar:
             headers=user_auth_headers,
             data=data_to_upload_avatar_w_file_w_invalid_ext
         )
-        assert request.status_code == status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
-        assert request.data["error"] == (
-            UploadAvatarResp.resp_data["errors"][2]["error"]
+        assert request.status_code == InvalidFileExtError().get_status()
+        assert request.data["file"] == (
+            InvalidFileExtError().get_data()["file"]
         )

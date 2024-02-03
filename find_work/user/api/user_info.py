@@ -1,13 +1,12 @@
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from user.models import User
 from user.serializer import UserInfoSerializer
 
-from util.user_api_resp.user_info_resp import (
-    UserInfoResp
-)
+from util.success_resp_data import GetSuccess
 
 
 class UserInfo(APIView):
@@ -25,4 +24,7 @@ class UserInfo(APIView):
 
         serializer_data = serializer.data
 
-        return UserInfoResp().resp_get(serializer_data)
+        return Response(
+            status=GetSuccess().get_status(),
+            data=GetSuccess().get_data(serializer_data)
+        )

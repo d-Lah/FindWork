@@ -4,7 +4,11 @@ from django.urls import reverse
 
 from rest_framework import status
 
-from util.user_api_resp.edit_profile_info_resp import EditProfileInfoResp
+from util.error_resp_data import (
+    AuthHeadersError,
+    FieldsEmptyError,
+)
+from util.success_resp_data import UpdateSuccess
 
 
 @pytest.mark.django_db
@@ -20,9 +24,9 @@ class TestEditProfileInfo:
             headers=user_auth_headers,
             data=data_to_edit_profile_info
         )
-        assert request.status_code == status.HTTP_200_OK
+        assert request.status_code == UpdateSuccess().get_status()
         assert request.data["success"] == (
-            EditProfileInfoResp.resp_data["successes"][0]["success"]
+            UpdateSuccess().get_data()["success"]
         )
 
     def test_should_response_auth_headers_error(
@@ -32,7 +36,7 @@ class TestEditProfileInfo:
         request = client.put(
             reverse("user_api:edit_profile_info"),
         )
-        assert request.status_code == status.HTTP_401_UNAUTHORIZED
+        assert request.status_code == AuthHeadersError().get_status()
 
     def test_should_response_fields_empty_error(
             self,
@@ -45,7 +49,7 @@ class TestEditProfileInfo:
             headers=user_auth_headers,
             data=data_to_edit_profile_info_wo_data
         )
-        assert request.status_code == status.HTTP_400_BAD_REQUEST
-        assert request.data["error"] == (
-            EditProfileInfoResp.resp_data["errors"][0]["error"]
+        assert request.status_code == FieldsEmptyError().get_status()
+        assert request.data["fields"] == (
+            FieldsEmptyError().get_data()["fields"]
         )

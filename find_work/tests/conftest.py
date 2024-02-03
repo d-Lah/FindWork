@@ -20,20 +20,24 @@ from user.models import (
     Profile,
 )
 pytest_plugins = [
+    "tests.fixtures.fixtures_user_api.fixtures_login_user",
+    "tests.fixtures.fixtures_user_api.fixtures_update_email",
+    "tests.fixtures.fixtures_user_api.fixtures_upload_avatar",
+    "tests.fixtures.fixtures_user_api.fixtures_reset_password",
+    "tests.fixtures.fixtures_user_api.fixtures_update_password",
+    "tests.fixtures.fixtures_user_api.fixtures_register_new_user",
     "tests.fixtures.fixtures_user_api.fixtures_activate_new_user",
-    "tests.fixtures.fixtures_user_api.fixtures_activate_two_factor_auth",
     "tests.fixtures.fixtures_user_api.fixtures_validate_password",
     "tests.fixtures.fixtures_user_api.fixtures_edit_profile_info",
-    "tests.fixtures.fixtures_user_api.fixtures_generate_reset_password_totp",
-    "tests.fixtures.fixtures_user_api.fixtures_login_user",
-    "tests.fixtures.fixtures_user_api.fixtures_register_new_user",
-    "tests.fixtures.fixtures_user_api.fixtures_update_email",
-    "tests.fixtures.fixtures_user_api.fixtures_update_password",
-    "tests.fixtures.fixtures_user_api.fixtures_upload_avatar",
     "tests.fixtures.fixtures_user_api.fixtures_validate_totp_token",
+    "tests.fixtures.fixtures_user_api.fixtures_enable_two_factor_auth",
+    "tests.fixtures.fixtures_user_api.fixtures_disable_two_factor_auth",
+    "tests.fixtures.fixtures_user_api.fixtures_generate_reset_password_totp",
     "tests.fixtures.fixtures_user_api.fixtures_validate_reset_password_totp",
-    "tests.fixtures.fixtures_user_api.fixtures_reset_password",
-    "tests.fixtures.fixtures_user_api.fixtures_deactivate_two_factor_auth",
+
+    "tests.fixtures.fixtures_resume_api.fixtures_for_tests",
+    "tests.fixtures.fixtures_resume_api.fixtures_create_resume",
+    "tests.fixtures.fixtures_resume_api.fixtures_edit_resume_info",
 ]
 
 
@@ -47,7 +51,7 @@ def client():
 def create_new_user():
     profile = Profile(
         first_name="Ran",
-        second_name="Goose",
+        last_name="Goose",
     )
     profile.save()
 
@@ -60,7 +64,7 @@ def create_new_user():
         user_activation_uuid=uuid4(),
         profile=profile,
         is_employer=False,
-        is_employee=True,
+        is_employee=False,
         password=make_password("password"),
         otp_base32=user_encrypted_opt_base32.decode()
     )

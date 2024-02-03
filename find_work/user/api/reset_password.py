@@ -1,9 +1,15 @@
 from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from user.models import User
 from user.serializer import ResetPasswordSerializer
 
-from util.user_api_resp.reset_password_resp import ResetPasswordResp
+from util.error_resp_data import (
+    FieldsEmptyError,
+    UserNotFoundError,
+    InvalidEmailAdressError,
+)
+from util.success_resp_data import UpdateSuccess
 
 
 def is_fields_empty(errors):
@@ -47,13 +53,22 @@ class ResetPassword(APIView):
         serializer.is_valid()
 
         if is_fields_empty(serializer.errors):
-            return ResetPasswordResp().resp_fields_empty_error()
+            return Response(
+                status=FieldsEmptyError().get_status(),
+                data=FieldsEmptyError().get_data()
+            )
 
         if is_invalid_email(serializer.errors):
-            return ResetPasswordResp().resp_invalid_email_address_error()
+            return Response(
+                status=InvalidEmailAdressError().get_status(),
+                data=InvalidEmailAdressError().get_data()
+            )
 
         if is_user_not_found(serializer.errors):
-            return ResetPasswordResp().resp_user_not_found_error()
+            return Response(
+                status=UserNotFoundError().get_status(),
+                data=UserNotFoundError().get_data()
+            )
 
         serializer_data = serializer.validated_data
 
@@ -61,10 +76,10 @@ class ResetPassword(APIView):
             email=serializer_data["email"],
         ).first()
 
-        if not user:
-            return ResetPasswordResp().resp_user_not_found_error()
-
         user.set_password(serializer_data["password"])
         user.save()
 
-        return ResetPasswordResp().resp_update()
+        return Response(
+            status=UpdateSuccess().get_status(),
+            data=UpdateSuccess().get_data()
+        )
