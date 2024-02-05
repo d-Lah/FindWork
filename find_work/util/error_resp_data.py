@@ -5,6 +5,9 @@ class AuthHeadersError:
     def get_status(self):
         return status.HTTP_401_UNAUTHORIZED
 
+    def get_data(self):
+        return {"detail": "Authentication credentials were not provided."}
+
 
 class InvalidEmailAdressError:
     def get_status(self):
@@ -59,7 +62,7 @@ class UserNotFoundError:
         return {"user": "User not found"}
 
 
-class UserActivateUUIDIncapError():
+class UserActivateUUIDIncapError:
     def get_status(self):
         return status.HTTP_409_CONFLICT
 
@@ -67,7 +70,7 @@ class UserActivateUUIDIncapError():
         return {"user_activate_uuid": "User activate uuid is incapacitated"}
 
 
-class TwoFactorAuthAlreadyEnabledError():
+class TwoFactorAuthAlreadyEnabledError:
     def get_status(self):
         return status.HTTP_409_CONFLICT
 
@@ -75,7 +78,7 @@ class TwoFactorAuthAlreadyEnabledError():
         return {"user": "Two-factor authentication is already enabled"}
 
 
-class TwoFactorAuthAlreadyDisabledError():
+class TwoFactorAuthAlreadyDisabledError:
     def get_status(self):
         return status.HTTP_409_CONFLICT
 
@@ -83,7 +86,7 @@ class TwoFactorAuthAlreadyDisabledError():
         return {"user": "Two-factor authentication is already disabled"}
 
 
-class InvalidFileExtError():
+class InvalidFileExtError:
     def get_status(self):
         return status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
@@ -91,7 +94,7 @@ class InvalidFileExtError():
         return {"file": "Invalid file extension"}
 
 
-class FileSizeTooLargeError():
+class FileSizeTooLargeError:
     def get_status(self):
         return status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
 
@@ -99,7 +102,7 @@ class FileSizeTooLargeError():
         return {"file": "File size to large"}
 
 
-class WrongPasswordError():
+class WrongPasswordError:
     def get_status(self):
         return status.HTTP_403_FORBIDDEN
 
@@ -107,7 +110,7 @@ class WrongPasswordError():
         return {"password": "Wrong passwor"}
 
 
-class WrongTOTPTokenError():
+class WrongTOTPTokenError:
     def get_status(self):
         return status.HTTP_403_FORBIDDEN
 
@@ -115,7 +118,7 @@ class WrongTOTPTokenError():
         return {"totp_token": "Wrong totp token"}
 
 
-class ResumeNotFoundError():
+class ResumeNotFoundError:
     def get_status(self):
         return status.HTTP_404_NOT_FOUND
 
@@ -126,3 +129,27 @@ class ResumeNotFoundError():
 class ForbiddenRequestDataError:
     def get_status(self):
         return status.HTTP_403_FORBIDDEN
+
+
+class UserNotEmployerError:
+    def get_status(self):
+        return status.HTTP_403_FORBIDDEN
+
+    def get_data(self):
+        return {"detail": "User not employer"}
+
+
+class UserNotEmployeeError:
+    def get_status(self):
+        return status.HTTP_403_FORBIDDEN
+
+    def get_data(self):
+        return {"detail": "User not employee"}
+
+
+class NameAlreadyExistsError:
+    def get_status(self):
+        return status.HTTP_409_CONFLICT
+
+    def get_data(self):
+        return {"name": "Name already exists"}

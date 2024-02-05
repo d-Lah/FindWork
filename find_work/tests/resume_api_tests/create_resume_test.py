@@ -7,8 +7,8 @@ from resume.models import Resume
 from util.error_resp_data import (
     AuthHeadersError,
     FieldsEmptyError,
-    UserNotFoundError,
     FieldsNotFoundError,
+    UserNotEmployeeError
 )
 from util.success_resp_data import (
     CreateSuccess
@@ -24,9 +24,6 @@ class TestCreateResume:
             user_auth_headers,
             data_to_create_resume
     ):
-        create_new_user.is_employee = True
-        create_new_user.save()
-
         request = client.post(
             reverse("resume_api:create_resume"),
             headers=user_auth_headers,
@@ -44,7 +41,30 @@ class TestCreateResume:
         request = client.put(
             reverse("resume_api:create_resume"),
         )
+
         assert request.status_code == AuthHeadersError().get_status()
+        assert request.data["detail"] == (
+            AuthHeadersError().get_data()["detail"]
+        )
+
+    def test_should_response_user_not_employee_error(
+            self,
+            client,
+            create_new_user,
+            user_auth_headers,
+    ):
+        create_new_user.is_employee = False
+        create_new_user.save()
+
+        request = client.post(
+            reverse("resume_api:create_resume"),
+            headers=user_auth_headers
+        )
+
+        assert request.status_code == UserNotEmployeeError().get_status()
+        assert request.data["detail"] == (
+            UserNotEmployeeError().get_data()["detail"]
+        )
 
     def test_should_response_fields_empty_error(
             self,
@@ -61,23 +81,6 @@ class TestCreateResume:
         assert request.status_code == FieldsEmptyError().get_status()
         assert request.data["fields"] == (
             FieldsEmptyError().get_data()["fields"]
-        )
-
-    def test_should_response_user_not_found_error(
-            self,
-            client,
-            user_auth_headers,
-            data_to_create_resume
-    ):
-        request = client.post(
-            reverse("resume_api:create_resume"),
-            headers=user_auth_headers,
-            data=data_to_create_resume
-        )
-
-        assert request.status_code == UserNotFoundError().get_status()
-        assert request.data["user"] == (
-            UserNotFoundError().get_data()["user"]
         )
 
     def test_should_response_wrong_specialization_error(

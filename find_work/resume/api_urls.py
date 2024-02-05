@@ -1,6 +1,5 @@
 from django.urls import path
 
-
 from resume.api import (
     resume_info,
     create_resume,

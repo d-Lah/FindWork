@@ -2,8 +2,6 @@ import pytest
 
 from django.urls import reverse
 
-from rest_framework import status
-
 from user.models import (
     Profile,
     UserAvatar,
@@ -56,7 +54,11 @@ class TestUploadAvatar:
             reverse("user_api:upload_avatar"),
             data=data_to_upload_avatar_wo_image
         )
+
         assert request.status_code == AuthHeadersError().get_status()
+        assert request.data["detail"] == (
+            AuthHeadersError().get_data()["detail"]
+        )
 
     def test_should_response_avatar_fields_empty_error(
             self,

@@ -9,7 +9,7 @@ from util.error_resp_data import (
     FieldsEmptyError,
     FieldsNotFoundError,
     ResumeNotFoundError,
-    ForbiddenRequestDataError
+    UserNotEmployeeError,
 )
 from util.success_resp_data import (
     UpdateSuccess
@@ -26,9 +26,7 @@ class TestEditResumeInfo:
             data_to_update_resume_info,
     ):
         request = client.put(
-            reverse(
-                "resume_api:edit_resume_info",
-            ),
+            reverse("resume_api:edit_resume_info"),
             headers=user_auth_headers,
             data=data_to_update_resume_info
         )
@@ -45,11 +43,32 @@ class TestEditResumeInfo:
             client,
     ):
         request = client.put(
-            reverse(
-                "resume_api:edit_resume_info",
-            ),
+            reverse("resume_api:edit_resume_info"),
         )
+
         assert request.status_code == AuthHeadersError().get_status()
+        assert request.data["detail"] == (
+            AuthHeadersError().get_data()["detail"]
+        )
+
+    def test_should_response_user_not_employee_error(
+            self,
+            client,
+            create_new_user,
+            user_auth_headers,
+    ):
+        create_new_user.is_employee = False
+        create_new_user.save()
+
+        request = client.post(
+            reverse("resume_api:edit_resume_info"),
+            headers=user_auth_headers
+        )
+
+        assert request.status_code == UserNotEmployeeError().get_status()
+        assert request.data["detail"] == (
+            UserNotEmployeeError().get_data()["detail"]
+        )
 
     def test_should_response_fields_empty_error(
             self,
@@ -58,9 +77,7 @@ class TestEditResumeInfo:
             data_to_edit_resume_info_wo_data
     ):
         request = client.put(
-            reverse(
-                "resume_api:edit_resume_info",
-            ),
+            reverse("resume_api:edit_resume_info"),
             headers=user_auth_headers,
             data=data_to_edit_resume_info_wo_data
         )
@@ -73,16 +90,14 @@ class TestEditResumeInfo:
     def test_should_response_resume_not_found(
             self,
             client,
-            create_new_user,
+            create_resume,
             user_auth_headers,
     ):
-        create_new_user.is_employee = False
-        create_new_user.save()
+        create_resume.is_delete = True
+        create_resume.save()
 
         request = client.put(
-            reverse(
-                "resume_api:edit_resume_info",
-            ),
+            reverse("resume_api:edit_resume_info"),
             headers=user_auth_headers,
         )
         assert request.status_code == ResumeNotFoundError().get_status()
@@ -97,9 +112,7 @@ class TestEditResumeInfo:
             data_to_edit_resume_info_w_wrong_specialization
     ):
         request = client.put(
-            reverse(
-                "resume_api:edit_resume_info",
-            ),
+            reverse("resume_api:edit_resume_info"),
             headers=user_auth_headers,
             data=data_to_edit_resume_info_w_wrong_specialization
         )
@@ -116,9 +129,7 @@ class TestEditResumeInfo:
             data_to_edit_resume_info_w_wrong_skill
     ):
         request = client.put(
-            reverse(
-                "resume_api:edit_resume_info",
-            ),
+            reverse("resume_api:edit_resume_info"),
             headers=user_auth_headers,
             data=data_to_edit_resume_info_w_wrong_skill
         )
@@ -135,9 +146,7 @@ class TestEditResumeInfo:
             data_to_edit_resume_info_w_wrong_work_experience
     ):
         request = client.put(
-            reverse(
-                "resume_api:edit_resume_info",
-            ),
+            reverse("resume_api:edit_resume_info"),
             headers=user_auth_headers,
             data=data_to_edit_resume_info_w_wrong_work_experience
         )
@@ -154,9 +163,7 @@ class TestEditResumeInfo:
             data_to_edit_resume_info_w_wrong_type_of_employment
     ):
         request = client.put(
-            reverse(
-                "resume_api:edit_resume_info",
-            ),
+            reverse("resume_api:edit_resume_info"),
             headers=user_auth_headers,
             data=data_to_edit_resume_info_w_wrong_type_of_employment
         )

@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from user.models import User
+from find_work.permissions import IsEmployee
 
 from resume.models import (
     Skill,
@@ -18,7 +18,6 @@ from util.error_resp_data import (
     FieldsEmptyError,
     FieldsNotFoundError,
     ResumeNotFoundError,
-    ForbiddenRequestDataError
 )
 from util.success_resp_data import (
     UpdateSuccess
@@ -47,7 +46,10 @@ def is_fields_not_found(errors):
 
 class EditResumeInfo(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [
+        IsAuthenticated,
+        IsEmployee
+    ]
 
     def put(
             self,
@@ -77,7 +79,7 @@ class EditResumeInfo(APIView):
         user_id = request.user.id
         resume = Resume.objects.filter(
             author__id=user_id,
-            author__is_employee=True
+            is_delete=False
         ).first()
 
         if not resume:

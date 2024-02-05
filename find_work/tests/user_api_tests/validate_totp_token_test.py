@@ -2,8 +2,6 @@ import pytest
 
 from django.urls import reverse
 
-from rest_framework import status
-
 from util.error_resp_data import (
     AuthHeadersError,
     FieldsEmptyError,
@@ -37,7 +35,11 @@ class TestValidateTOTPToken:
         request = client.post(
             reverse("user_api:validation_totp_token"),
         )
+
         assert request.status_code == AuthHeadersError().get_status()
+        assert request.data["detail"] == (
+            AuthHeadersError().get_data()["detail"]
+        )
 
     def test_should_response_fields_empty_error(
             self,

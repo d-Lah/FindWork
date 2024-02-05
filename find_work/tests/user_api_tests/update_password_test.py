@@ -2,8 +2,6 @@ import pytest
 
 from django.urls import reverse
 
-from rest_framework import status
-
 from util.error_resp_data import (
     FieldsEmptyError,
     AuthHeadersError,
@@ -42,7 +40,11 @@ class TestUpdatePassword:
         request = client.put(
             reverse("user_api:update_password"),
         )
+
         assert request.status_code == AuthHeadersError().get_status()
+        assert request.data["detail"] == (
+            AuthHeadersError().get_data()["detail"]
+        )
 
     def test_should_response_fields_empty_error(
             self,

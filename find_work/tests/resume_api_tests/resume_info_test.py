@@ -40,7 +40,11 @@ class TestResumeInfo:
                 kwargs=get_resume_id
             ),
         )
+
         assert request.status_code == AuthHeadersError().get_status()
+        assert request.data["detail"] == (
+            AuthHeadersError().get_data()["detail"]
+        )
 
     def test_should_response_resume_not_found(
             self,

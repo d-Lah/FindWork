@@ -2,8 +2,6 @@ import pytest
 
 from django.urls import reverse
 
-from rest_framework import status
-
 from util.error_resp_data import (
     AuthHeadersError,
     TwoFactorAuthAlreadyDisabledError
@@ -37,6 +35,9 @@ class TestDeactivateTwoFactorAuth:
         )
 
         assert request.status_code == AuthHeadersError().get_status()
+        assert request.data["detail"] == (
+            AuthHeadersError().get_data()["detail"]
+        )
 
     def test_should_response_two_factor_auth_is_already_disabled_error(
             self,

@@ -48,6 +48,10 @@ urlpatterns = [
         "api/v1/resume/",
         include("resume.api_urls"),
     ),
+    path(
+        "api/v1/company/",
+        include("company.api_urls"),
+    ),
 ] + static(
     settings.MEDIA_URL,
     document_root=settings.MEDIA_ROOT,
