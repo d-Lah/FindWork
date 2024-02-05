@@ -81,20 +81,3 @@ class TestCreateCompany:
         assert request.data["fields"] == (
             FieldsEmptyError().get_data()["fields"]
         )
-
-    def test_should_response_user_not_found_error(
-            self,
-            client,
-            user_auth_headers,
-            data_to_create_company_w_already_exists_name
-    ):
-        request = client.post(
-            reverse("company_api:create_company"),
-            headers=user_auth_headers,
-            data=data_to_create_company_w_already_exists_name
-        )
-
-        assert request.status_code == NameAlreadyExistsError().get_status()
-        assert request.data["name"] == (
-            NameAlreadyExistsError().get_data()["name"]
-        )

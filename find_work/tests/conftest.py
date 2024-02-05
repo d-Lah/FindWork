@@ -192,3 +192,19 @@ def get_wrong_resume_id():
         "resume_id": 0
     }
     return kwargs
+
+
+@pytest.fixture()
+def get_company_id(create_company):
+    kwargs = {
+        "company_id": create_company.pk
+    }
+    return kwargs
+
+
+@pytest.fixture()
+def get_wrong_company_id():
+    kwargs = {
+        "company_id": 0
+    }
+    return kwargs

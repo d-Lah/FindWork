@@ -33,6 +33,7 @@ class Company(models.Model):
         on_delete=models.CASCADE,
         null=True,
     )
+    is_delete = models.BooleanField(default=False)
 
 
 class CompanyAvatar(models.Model):

@@ -153,3 +153,11 @@ class NameAlreadyExistsError:
 
     def get_data(self):
         return {"name": "Name already exists"}
+
+
+class CompanyNotFoundError:
+    def get_status(self):
+        return status.HTTP_404_NOT_FOUND
+
+    def get_data(self):
+        return {"company": "Company not found"}
