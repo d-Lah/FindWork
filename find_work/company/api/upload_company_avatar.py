@@ -4,11 +4,13 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from user.models import (
-    Profile,
-    UserAvatar,
+from find_work.permissions import IsEmployer
+
+from company.models import (
+    Company,
+    CompanyAvatar
 )
-from user.serializer import UploadAvatarSerializer
+from company.serializer import UploadCompanyAvatarSerializer
 
 from util.error_resp_data import (
     FieldsEmptyError,
@@ -19,46 +21,51 @@ from util.success_resp_data import UploadSuccess
 
 
 def is_fields_empty(errors):
-    if not errors.get("user_avatar_url"):
+    if not errors.get("company_avatar_url"):
         return False
 
-    if errors["user_avatar_url"][0] == "No file was submitted.":
+    if errors["company_avatar_url"][0] == "No file was submitted.":
         return True
 
     return False
 
 
 def is_file_size_to_large(errors):
-    if not errors.get("user_avatar_url"):
+    if not errors.get("company_avatar_url"):
         return False
 
-    if errors["user_avatar_url"][0] == "Image size to large":
+    error = FileSizeTooLargeError().get_data()["file"]
+    if errors["company_avatar_url"][0] == error:
         return True
 
     return False
 
 
 def is_invalid_image_extension(errors):
-    if not errors.get("user_avatar_url"):
+    if not errors.get("company_avatar_url"):
         return False
 
-    if errors["user_avatar_url"][0] == "Invalid image extension":
+    error = InvalidFileExtError().get_data()["file"]
+    if errors["company_avatar_url"][0] == error:
         return True
 
     return False
 
 
-class UploadAvatar(APIView):
+class UploadCompanyAvatar(APIView):
 
     parser_classes = [MultiPartParser]
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [
+        IsAuthenticated,
+        IsEmployer
+    ]
 
     def post(
             self,
             request
     ):
-        serializer = UploadAvatarSerializer(data=request.FILES)
+        serializer = UploadCompanyAvatarSerializer(data=request.FILES)
 
         serializer.is_valid()
 
@@ -80,21 +87,18 @@ class UploadAvatar(APIView):
                 data=FileSizeTooLargeError().get_data()
             )
 
-        serialized_data = serializer.validated_data
-
-        new_user_avatar = UserAvatar(
-            user_avatar_url=serialized_data["user_avatar_url"]
-        )
+        serializer_data = serializer.validated_data
 
         user_id = request.user.id
-        profile = Profile.objects.filter(user__id=user_id).first()
+        company = Company.objects.filter(author__id=user_id).first()
 
-        new_user_avatar.for_profile = profile
-        new_user_avatar.user_avatar_url = serialized_data["user_avatar_url"]
-        new_user_avatar.save()
+        new_company_avatar = CompanyAvatar.objects.create(
+            for_company=company,
+            company_avatar_url=serializer_data["company_avatar_url"]
+        )
 
-        profile.user_avatar = new_user_avatar
-        profile.save()
+        company.user_avatar = new_company_avatar
+        company.save()
 
         return Response(
             status=UploadSuccess().get_status(),

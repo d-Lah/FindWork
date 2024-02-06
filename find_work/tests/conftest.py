@@ -12,7 +12,8 @@ from rest_framework.test import APIClient
 from cryptography.fernet import Fernet
 
 from find_work.settings import (
-    CRYPTOGRAPHY_FERNET_KEY
+    BASE_DIR,
+    CRYPTOGRAPHY_FERNET_KEY,
 )
 
 from user.models import (
@@ -33,7 +34,7 @@ from company.models import Company
 pytest_plugins = [
     "tests.fixtures.fixtures_user_api.fixtures_login_user",
     "tests.fixtures.fixtures_user_api.fixtures_update_email",
-    "tests.fixtures.fixtures_user_api.fixtures_upload_avatar",
+    "tests.fixtures.fixtures_user_api.fixtures_upload_user_avatar",
     "tests.fixtures.fixtures_user_api.fixtures_reset_password",
     "tests.fixtures.fixtures_user_api.fixtures_update_password",
     "tests.fixtures.fixtures_user_api.fixtures_register_new_user",
@@ -51,6 +52,7 @@ pytest_plugins = [
 
     "tests.fixtures.fixtures_company_api.fixtures_create_company",
     "tests.fixtures.fixtures_company_api.fixtures_edit_company_info",
+    "tests.fixtures.fixtures_company_api.fixtures_upload_company_avatar",
 ]
 
 
@@ -209,3 +211,41 @@ def get_wrong_company_id():
         "company_id": 0
     }
     return kwargs
+
+
+@pytest.fixture()
+def data_to_upload_avatar():
+    data = {
+        "user_avatar_url": (
+            BASE_DIR / "media" / "for_test" / "upload_user_avatar.png"
+        ).open("rb")
+    }
+    return data
+
+
+@pytest.fixture()
+def data_to_upload_avatar_wo_image():
+    data = {
+        "user_avatar_url": ""
+    }
+    return data
+
+
+@pytest.fixture()
+def data_to_upload_avatar_w_big_file():
+    data = {
+        "user_avatar_url": (
+            BASE_DIR / "media" / "for_test" / "img_size_too_large.png"
+        ).open("rb")
+    }
+    return data
+
+
+@pytest.fixture()
+def data_to_upload_avatar_w_file_w_invalid_ext():
+    data = {
+        "user_avatar_url": (
+            BASE_DIR / "media" / "for_test" / "invalid_img_ext.gif"
+        ).open("rb")
+    }
+    return data

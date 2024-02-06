@@ -8,13 +8,13 @@ from user.api import (
     user_info,
     update_email,
     profile_info,
-    upload_avatar,
     reset_password,
     update_password,
     activate_new_user,
     validate_password,
     edit_profile_info,
     register_new_user,
+    upload_user_avatar,
     validate_totp_token,
     enable_two_factor_auth,
     disable_two_factor_auth,
@@ -82,9 +82,9 @@ urlpatterns = [
         name="update_email"
     ),
     path(
-        "upload-avatar",
-        upload_avatar.UploadAvatar.as_view(),
-        name="upload_avatar"
+        "upload-user-avatar",
+        upload_user_avatar.UploadUserAvatar.as_view(),
+        name="upload_user_avatar"
     ),
     path(
         "generate-reset-password-totp",

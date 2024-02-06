@@ -2,9 +2,9 @@ import pytest
 
 from django.urls import reverse
 
-from user.models import (
-    Profile,
-    UserAvatar,
+from company.models import (
+    Company,
+    CompanyAvatar,
 )
 
 from util.error_resp_data import (
@@ -17,28 +17,29 @@ from util.success_resp_data import UploadSuccess
 
 
 @pytest.mark.django_db
-class TestUploadAvatar:
+class TestUploadCompanyAvatar:
     def test_should_upload_avatar(
             self,
             client,
             mocker,
+            create_company,
             user_auth_headers,
-            data_to_upload_avatar
+            data_to_upload_company_avatar
     ):
         mocker.patch.object(
-            Profile,
+            Company,
             "save",
             return_value="return ResponseUpload().get_response()")
         mocker.patch.object(
-            UserAvatar,
+            CompanyAvatar,
             "save",
             return_value="return ResponseUpload().get_response()"
         )
 
         request = client.post(
-            reverse("user_api:upload_avatar"),
+            reverse("company_api:upload_company_avatar"),
             headers=user_auth_headers,
-            data=data_to_upload_avatar
+            data=data_to_upload_company_avatar
         )
         assert request.status_code == UploadSuccess().get_status()
         assert request.data["success"] == (
@@ -48,11 +49,9 @@ class TestUploadAvatar:
     def test_should_response_auth_headers_error(
             self,
             client,
-            data_to_upload_avatar_wo_image
     ):
         request = client.post(
-            reverse("user_api:upload_avatar"),
-            data=data_to_upload_avatar_wo_image
+            reverse("company_api:upload_company_avatar"),
         )
 
         assert request.status_code == AuthHeadersError().get_status()
@@ -60,15 +59,35 @@ class TestUploadAvatar:
             AuthHeadersError().get_data()["detail"]
         )
 
-    def test_should_response_avatar_fields_empty_error(
+    def test_should_response_user_not_employer_error(
             self,
             client,
-            user_auth_headers
+            create_new_user,
+            user_auth_headers,
+    ):
+        create_new_user.is_employer = False
+        create_new_user.save()
+
+        request = client.post(
+            reverse("company_api:upload_company_avatar"),
+        )
+
+        assert request.status_code == AuthHeadersError().get_status()
+        assert request.data["detail"] == (
+            AuthHeadersError().get_data()["detail"]
+        )
+
+    def test_should_response_fields_empty_error(
+            self,
+            client,
+            create_company,
+            user_auth_headers,
     ):
         request = client.post(
-            reverse("user_api:upload_avatar"),
+            reverse("company_api:upload_company_avatar"),
             headers=user_auth_headers,
         )
+
         assert request.status_code == FieldsEmptyError().get_status()
         assert request.data["fields"] == (
             FieldsEmptyError().get_data()["fields"]
@@ -77,14 +96,16 @@ class TestUploadAvatar:
     def test_should_response_image_size_too_large_error(
             self,
             client,
+            create_company,
             user_auth_headers,
-            data_to_upload_avatar_w_big_file
+            data_to_upload_company_avatar_w_big_file
     ):
         request = client.post(
-            reverse("user_api:upload_avatar"),
+            reverse("company_api:upload_company_avatar"),
             headers=user_auth_headers,
-            data=data_to_upload_avatar_w_big_file
+            data=data_to_upload_company_avatar_w_big_file
         )
+
         assert request.status_code == FileSizeTooLargeError().get_status()
         assert request.data["file"] == (
             FileSizeTooLargeError().get_data()["file"]
@@ -93,14 +114,16 @@ class TestUploadAvatar:
     def test_should_response_invalid_image_ext_error(
             self,
             client,
+            create_company,
             user_auth_headers,
-            data_to_upload_avatar_w_file_w_invalid_ext
+            data_to_upload_company_avatar_w_file_w_invalid_ext
     ):
         request = client.post(
-            reverse("user_api:upload_avatar"),
+            reverse("company_api:upload_company_avatar"),
             headers=user_auth_headers,
-            data=data_to_upload_avatar_w_file_w_invalid_ext
+            data=data_to_upload_company_avatar_w_file_w_invalid_ext
         )
+
         assert request.status_code == InvalidFileExtError().get_status()
         assert request.data["file"] == (
             InvalidFileExtError().get_data()["file"]
