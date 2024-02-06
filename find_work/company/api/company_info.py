@@ -19,18 +19,18 @@ class CompanyInfo(APIView):
             request,
             company_id
     ):
-        resume = Company.objects.filter(
+        company = Company.objects.filter(
             id=company_id,
             is_delete=False
         ).first()
 
-        if not resume:
+        if not company:
             return Response(
                 status=CompanyNotFoundError().get_status(),
                 data=CompanyNotFoundError().get_data()
             )
 
-        serializer = CompanyInfoSerializer(resume)
+        serializer = CompanyInfoSerializer(company)
 
         serializer_data = serializer.data
 

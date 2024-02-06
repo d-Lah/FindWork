@@ -8,10 +8,11 @@ from util.error_resp_data import (
     AuthHeadersError,
     FieldsEmptyError,
     UserNotEmployerError,
+    CompanyNotFoundError,
     NameAlreadyExistsError,
 )
 
-from util.success_resp_data import CreateSuccess
+from util.success_resp_data import UpdateSuccess
 
 
 @pytest.mark.django_db
@@ -19,26 +20,30 @@ class TestCreateCompany:
     def test_should_create_company(
             self,
             client,
+            create_company,
             create_new_user,
             user_auth_headers,
-            data_to_create_company
+            data_to_edit_company_info
     ):
-        request = client.post(
-            reverse("company_api:create_company"),
+        request = client.put(
+            reverse("company_api:edit_company_info"),
             headers=user_auth_headers,
-            data=data_to_create_company
+            data=data_to_edit_company_info
         )
 
-        assert request.status_code == CreateSuccess().get_status()
-        assert request.data == CreateSuccess().get_data()
-        assert Company.objects.filter(pk=1).first()
+        assert request.status_code == UpdateSuccess().get_status()
+        assert request.data["success"] == (
+            UpdateSuccess().get_data()["success"]
+        )
+        company = Company.objects.filter(pk=1).first()
+        assert company.name == data_to_edit_company_info["name"]
 
     def test_should_response_auth_headers_error(
             self,
             client,
     ):
-        request = client.post(
-            reverse("company_api:create_company"),
+        request = client.put(
+            reverse("company_api:edit_company_info"),
         )
 
         assert request.status_code == AuthHeadersError().get_status()
@@ -55,8 +60,8 @@ class TestCreateCompany:
         create_new_user.is_employer = False
         create_new_user.save()
 
-        request = client.post(
-            reverse("company_api:create_company"),
+        request = client.put(
+            reverse("company_api:edit_company_info"),
             headers=user_auth_headers
         )
 
@@ -69,12 +74,12 @@ class TestCreateCompany:
             self,
             client,
             user_auth_headers,
-            data_to_create_company_wo_data
+            data_to_edit_company_info_wo_data
     ):
-        request = client.post(
-            reverse("company_api:create_company"),
+        request = client.put(
+            reverse("company_api:edit_company_info"),
             headers=user_auth_headers,
-            data=data_to_create_company_wo_data
+            data=data_to_edit_company_info_wo_data
         )
 
         assert request.status_code == FieldsEmptyError().get_status()
@@ -86,15 +91,33 @@ class TestCreateCompany:
             self,
             client,
             user_auth_headers,
-            data_to_create_company_w_already_exists_name
+            data_to_edit_company_info_w_already_exists_name
     ):
-        request = client.post(
-            reverse("company_api:create_company"),
+        request = client.put(
+            reverse("company_api:edit_company_info"),
             headers=user_auth_headers,
-            data=data_to_create_company_w_already_exists_name
+            data=data_to_edit_company_info_w_already_exists_name
         )
 
         assert request.status_code == NameAlreadyExistsError().get_status()
         assert request.data["name"] == (
             NameAlreadyExistsError().get_data()["name"]
+        )
+
+    def test_should_response_company_not_found(
+            self,
+            client,
+            create_company,
+            user_auth_headers,
+    ):
+        create_company.is_delete = True
+        create_company.save()
+
+        request = client.put(
+            reverse("company_api:edit_company_info"),
+            headers=user_auth_headers,
+        )
+        assert request.status_code == CompanyNotFoundError().get_status()
+        assert request.data["company"] == (
+            CompanyNotFoundError().get_data()["company"]
         )

@@ -46,12 +46,39 @@ class FieldsNotFoundError:
         return status.HTTP_404_NOT_FOUND
 
     def get_data(self):
-        return {
-            "specialization": "Specialization not found",
-            "skill": "Skill not found",
-            "work_experience": "Work experience not found",
-            "type_of_employment": "Type of employment not found",
-        }
+        return {"fields": "Fields not found"}
+
+
+class SpecializationNotFoundError:
+    def get_status(self):
+        return status.HTTP_404_NOT_FOUND
+
+    def get_data(self):
+        return {"specialization": "Specialization not found"}
+
+
+class SkillNotFoundError:
+    def get_status(self):
+        return status.HTTP_404_NOT_FOUND
+
+    def get_data(self):
+        return {"skill": "Skill not found"}
+
+
+class WorkExperienceNotFoundError:
+    def get_status(self):
+        return status.HTTP_404_NOT_FOUND
+
+    def get_data(self):
+        return {"work_experience": "Work experience not found"}
+
+
+class TypeOfEmploymentNotFoundError:
+    def get_status(self):
+        return status.HTTP_404_NOT_FOUND
+
+    def get_data(self):
+        return {"type_of_employment": "Type of employment not found"}
 
 
 class UserNotFoundError:

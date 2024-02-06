@@ -27,3 +27,11 @@ class CompanyInfoSerializer(serializers.ModelSerializer):
         source="company_avatar.company_avatar_url",
         required=False
     )
+
+
+class EditCompanyInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = [
+            "name",
+        ]

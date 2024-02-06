@@ -1,22 +1,20 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from find_work.permissions import IsEmployer
 
 from company.models import Company
-from company.serializer import CreateCompanySerializer
-
-from user.models import User
+from company.serializer import EditCompanyInfoSerializer
 
 from util.error_resp_data import (
     FieldsEmptyError,
+    CompanyNotFoundError,
     NameAlreadyExistsError,
 )
 from util.success_resp_data import (
-    CreateSuccess
+    UpdateSuccess
 )
 
 
@@ -40,18 +38,18 @@ def is_name_already_exists(errors):
     return False
 
 
-class CreateCompany(APIView):
+class EditCompanyInfo(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [
         IsAuthenticated,
-        IsEmployer,
+        IsEmployer
     ]
 
-    def post(
+    def put(
             self,
             request,
     ):
-        serializer = CreateCompanySerializer(data=request.data)
+        serializer = EditCompanyInfoSerializer(data=request.data)
 
         serializer.is_valid()
 
@@ -68,16 +66,23 @@ class CreateCompany(APIView):
             )
 
         user_id = request.user.id
-        author = User.objects.filter(pk=user_id).first()
+        company = Company.objects.filter(
+            author__id=user_id,
+            is_delete=False
+        ).first()
+
+        if not company:
+            return Response(
+                status=CompanyNotFoundError().get_status(),
+                data=CompanyNotFoundError().get_data()
+            )
 
         serializer_data = serializer.validated_data
 
-        Company.objects.create(
-            name=serializer_data["name"],
-            author=author
-        )
+        company.name = serializer_data["name"]
+        company.save()
 
         return Response(
-            status=CreateSuccess().get_status(),
-            data=CreateSuccess().get_data()
+            status=UpdateSuccess().get_status(),
+            data=UpdateSuccess().get_data()
         )

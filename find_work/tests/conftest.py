@@ -50,6 +50,7 @@ pytest_plugins = [
     "tests.fixtures.fixtures_resume_api.fixtures_edit_resume_info",
 
     "tests.fixtures.fixtures_company_api.fixtures_create_company",
+    "tests.fixtures.fixtures_company_api.fixtures_edit_company_info",
 ]
 
 

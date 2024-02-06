@@ -7,9 +7,12 @@ from resume.models import Resume
 from util.error_resp_data import (
     AuthHeadersError,
     FieldsEmptyError,
-    FieldsNotFoundError,
+    SkillNotFoundError,
     ResumeNotFoundError,
     UserNotEmployeeError,
+    SpecializationNotFoundError,
+    WorkExperienceNotFoundError,
+    TypeOfEmploymentNotFoundError
 )
 from util.success_resp_data import (
     UpdateSuccess
@@ -117,9 +120,11 @@ class TestEditResumeInfo:
             data=data_to_edit_resume_info_w_wrong_specialization
         )
 
-        assert request.status_code == FieldsNotFoundError().get_status()
+        assert request.status_code == (
+            SpecializationNotFoundError().get_status()
+        )
         assert request.data["specialization"] == (
-            FieldsNotFoundError().get_data()["specialization"]
+            SpecializationNotFoundError().get_data()["specialization"]
         )
 
     def test_should_response_wrong_skill_error(
@@ -134,9 +139,9 @@ class TestEditResumeInfo:
             data=data_to_edit_resume_info_w_wrong_skill
         )
 
-        assert request.status_code == FieldsNotFoundError().get_status()
+        assert request.status_code == SkillNotFoundError().get_status()
         assert request.data["skill"] == (
-            FieldsNotFoundError().get_data()["skill"]
+            SkillNotFoundError().get_data()["skill"]
         )
 
     def test_should_response_wrong_work_experience_error(
@@ -151,9 +156,11 @@ class TestEditResumeInfo:
             data=data_to_edit_resume_info_w_wrong_work_experience
         )
 
-        assert request.status_code == FieldsNotFoundError().get_status()
+        assert request.status_code == (
+            WorkExperienceNotFoundError().get_status()
+        )
         assert request.data["work_experience"] == (
-            FieldsNotFoundError().get_data()["work_experience"]
+            WorkExperienceNotFoundError().get_data()["work_experience"]
         )
 
     def test_should_response_wrong_type_of_employment_error(
@@ -168,7 +175,9 @@ class TestEditResumeInfo:
             data=data_to_edit_resume_info_w_wrong_type_of_employment
         )
 
-        assert request.status_code == FieldsNotFoundError().get_status()
+        assert request.status_code == (
+            TypeOfEmploymentNotFoundError().get_status()
+        )
         assert request.data["type_of_employment"] == (
-            FieldsNotFoundError().get_data()["type_of_employment"]
+            TypeOfEmploymentNotFoundError().get_data()["type_of_employment"]
         )
