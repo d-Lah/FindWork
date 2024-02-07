@@ -2,6 +2,7 @@ from django.urls import path
 
 from company.api import (
     company_info,
+    delete_company,
     create_company,
     edit_company_info,
     upload_company_avatar,
@@ -29,5 +30,10 @@ urlpatterns = [
         "upload-company-avatar",
         upload_company_avatar.UploadCompanyAvatar.as_view(),
         name="upload_company_avatar"
+    ),
+    path(
+        "delete-company",
+        delete_company.DeleteCompany.as_view(),
+        name="delete_company"
     ),
 ]
