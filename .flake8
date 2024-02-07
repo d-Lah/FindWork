@@ -1,7 +1,0 @@
-[flake8]
-exclude =
-    */migrations/*
-    apps.py
-    */settings/*
-    */test_settings.py
-ignore = E501, E402, F401, W503
