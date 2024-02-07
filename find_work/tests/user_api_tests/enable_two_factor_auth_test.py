@@ -35,6 +35,9 @@ class TestEnableTwoFactorAuth:
         )
 
         assert request.status_code == AuthHeadersError().get_status()
+        assert request.data["detail"] == (
+            AuthHeadersError().get_data()["detail"]
+        )
 
     def test_should_response_two_factor_auth_is_already_enabled_error(
             self,

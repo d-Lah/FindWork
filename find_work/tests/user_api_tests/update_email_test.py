@@ -36,7 +36,11 @@ class TestUpdateEmail:
         request = client.put(
             reverse("user_api:update_email"),
         )
+
         assert request.status_code == AuthHeadersError().get_status()
+        assert request.data["detail"] == (
+            AuthHeadersError().get_data()["detail"]
+        )
 
     def test_should_response_fields_empty_error(
             self,

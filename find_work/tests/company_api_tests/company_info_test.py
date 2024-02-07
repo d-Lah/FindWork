@@ -4,23 +4,23 @@ from django.urls import reverse
 
 from util.error_resp_data import (
     AuthHeadersError,
-    ResumeNotFoundError,
+    CompanyNotFoundError,
 )
 from util.success_resp_data import GetSuccess
 
 
 @pytest.mark.django_db
-class TestResumeInfo:
+class TestCompanyInfo:
     def test_should_get_resume_info(
             self,
             client,
-            get_resume_id,
+            get_company_id,
             user_auth_headers,
     ):
         request = client.get(
             reverse(
-                "resume_api:resume_info",
-                kwargs=get_resume_id
+                "company_api:company_info",
+                kwargs=get_company_id
             ),
             headers=user_auth_headers
         )
@@ -32,12 +32,12 @@ class TestResumeInfo:
     def test_should_response_auth_headers_error(
             self,
             client,
-            get_resume_id
+            get_company_id
     ):
         request = client.get(
             reverse(
-                "resume_api:resume_info",
-                kwargs=get_resume_id
+                "company_api:company_info",
+                kwargs=get_company_id
             ),
         )
 
@@ -50,16 +50,16 @@ class TestResumeInfo:
             self,
             client,
             user_auth_headers,
-            get_wrong_resume_id
+            get_wrong_company_id
     ):
         request = client.get(
             reverse(
-                "resume_api:resume_info",
-                kwargs=get_wrong_resume_id
+                "company_api:company_info",
+                kwargs=get_wrong_company_id
             ),
             headers=user_auth_headers
         )
-        assert request.status_code == ResumeNotFoundError().get_status()
-        assert request.data["resume"] == (
-            ResumeNotFoundError().get_data()["resume"]
+        assert request.status_code == CompanyNotFoundError().get_status()
+        assert request.data["company"] == (
+            CompanyNotFoundError().get_data()["company"]
         )

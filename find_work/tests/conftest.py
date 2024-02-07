@@ -12,17 +12,29 @@ from rest_framework.test import APIClient
 from cryptography.fernet import Fernet
 
 from find_work.settings import (
-    CRYPTOGRAPHY_FERNET_KEY
+    BASE_DIR,
+    CRYPTOGRAPHY_FERNET_KEY,
 )
 
 from user.models import (
     User,
     Profile,
 )
+
+from resume.models import (
+    Skill,
+    Resume,
+    WorkExperience,
+    Specialization,
+    TypeOfEmployment,
+)
+
+from company.models import Company
+
 pytest_plugins = [
     "tests.fixtures.fixtures_user_api.fixtures_login_user",
     "tests.fixtures.fixtures_user_api.fixtures_update_email",
-    "tests.fixtures.fixtures_user_api.fixtures_upload_avatar",
+    "tests.fixtures.fixtures_user_api.fixtures_upload_user_avatar",
     "tests.fixtures.fixtures_user_api.fixtures_reset_password",
     "tests.fixtures.fixtures_user_api.fixtures_update_password",
     "tests.fixtures.fixtures_user_api.fixtures_register_new_user",
@@ -35,9 +47,12 @@ pytest_plugins = [
     "tests.fixtures.fixtures_user_api.fixtures_generate_reset_password_totp",
     "tests.fixtures.fixtures_user_api.fixtures_validate_reset_password_totp",
 
-    "tests.fixtures.fixtures_resume_api.fixtures_for_tests",
     "tests.fixtures.fixtures_resume_api.fixtures_create_resume",
     "tests.fixtures.fixtures_resume_api.fixtures_edit_resume_info",
+
+    "tests.fixtures.fixtures_company_api.fixtures_create_company",
+    "tests.fixtures.fixtures_company_api.fixtures_edit_company_info",
+    "tests.fixtures.fixtures_company_api.fixtures_upload_company_avatar",
 ]
 
 
@@ -63,8 +78,8 @@ def create_new_user():
         email="raNGoose@email.com",
         user_activation_uuid=uuid4(),
         profile=profile,
-        is_employer=False,
-        is_employee=False,
+        is_employer=True,
+        is_employee=True,
         password=make_password("password"),
         otp_base32=user_encrypted_opt_base32.decode()
     )
@@ -102,3 +117,135 @@ def user_auth_headers(user_obtain_token):
     authorization = {"Authorization": f"Bearer {access_token}"}
 
     return authorization
+
+
+@pytest.fixture
+def create_company(create_new_user):
+    new_company = Company.objects.create(
+        name="Test",
+        author=create_new_user
+    )
+
+    return new_company
+
+
+@pytest.fixture()
+def create_specialization():
+    specialization = Specialization.objects.create(
+        specialization_name="Python"
+    )
+    return specialization
+
+
+@pytest.fixture()
+def create_skill():
+    skill = Skill.objects.create(
+        skill_name="Django"
+    )
+    return skill
+
+
+@pytest.fixture()
+def create_work_experience():
+    work_experience = WorkExperience.objects.create(
+        work_experience_name="1 year"
+    )
+    return work_experience
+
+
+@pytest.fixture()
+def create_type_of_employment():
+    type_of_employment = TypeOfEmployment.objects.create(
+        type_of_employment_name="Part-time"
+    )
+    return type_of_employment
+
+
+@pytest.fixture()
+def create_resume(
+        create_skill,
+        create_new_user,
+        create_specialization,
+        create_work_experience,
+        create_type_of_employment
+):
+    new_resume = Resume.objects.create(
+        author=create_new_user,
+        about="Test",
+        specialization=create_specialization,
+        work_experience=create_work_experience,
+    )
+    new_resume.skill.add(create_skill)
+    new_resume.type_of_employment.add(create_type_of_employment)
+
+    return new_resume
+
+
+@pytest.fixture()
+def get_resume_id(create_resume):
+    kwargs = {
+        "resume_id": create_resume.pk
+    }
+    return kwargs
+
+
+@pytest.fixture()
+def get_wrong_resume_id():
+    kwargs = {
+        "resume_id": 0
+    }
+    return kwargs
+
+
+@pytest.fixture()
+def get_company_id(create_company):
+    kwargs = {
+        "company_id": create_company.pk
+    }
+    return kwargs
+
+
+@pytest.fixture()
+def get_wrong_company_id():
+    kwargs = {
+        "company_id": 0
+    }
+    return kwargs
+
+
+@pytest.fixture()
+def data_to_upload_avatar():
+    data = {
+        "user_avatar_url": (
+            BASE_DIR / "media" / "for_test" / "upload_user_avatar.png"
+        ).open("rb")
+    }
+    return data
+
+
+@pytest.fixture()
+def data_to_upload_avatar_wo_image():
+    data = {
+        "user_avatar_url": ""
+    }
+    return data
+
+
+@pytest.fixture()
+def data_to_upload_avatar_w_big_file():
+    data = {
+        "user_avatar_url": (
+            BASE_DIR / "media" / "for_test" / "img_size_too_large.png"
+        ).open("rb")
+    }
+    return data
+
+
+@pytest.fixture()
+def data_to_upload_avatar_w_file_w_invalid_ext():
+    data = {
+        "user_avatar_url": (
+            BASE_DIR / "media" / "for_test" / "invalid_img_ext.gif"
+        ).open("rb")
+    }
+    return data

@@ -12,6 +12,11 @@ from user.models import (
     UserAvatar,
 )
 
+from util.error_resp_data import (
+    InvalidFileExtError,
+    FileSizeTooLargeError
+)
+
 
 class EditProfileInfoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -108,10 +113,14 @@ class UploadAvatarSerializer(serializers.ModelSerializer):
     def validate_user_avatar_url(self, value):
         image_ext = value.name.split(".")[1]
         if image_ext not in ALLOWED_IMAGE_EXT:
-            raise serializers.ValidationError("Invalid image extension")
+            raise serializers.ValidationError(
+                InvalidFileExtError().get_data()["file"]
+            )
 
         if value.size > IMAGE_MAX_MEMORY_SIZE:
-            raise serializers.ValidationError("Image size to large")
+            raise serializers.ValidationError(
+                FileSizeTooLargeError().get_data()["file"]
+            )
 
 
 class UserInfoSerializer(serializers.ModelSerializer):

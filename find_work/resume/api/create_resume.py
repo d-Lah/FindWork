@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from find_work.permissions import IsEmployee
+
 from user.models import User
 
 from resume.models import (
@@ -16,7 +18,6 @@ from resume.serializer import CreateResumeSerializer
 
 from util.error_resp_data import (
     FieldsEmptyError,
-    UserNotFoundError,
     FieldsNotFoundError,
 )
 from util.success_resp_data import (
@@ -46,7 +47,10 @@ def is_fields_not_found(errors):
 
 class CreateResume(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [
+        IsAuthenticated,
+        IsEmployee
+    ]
 
     def post(
             self,
@@ -77,16 +81,7 @@ class CreateResume(APIView):
 
         user_id = request.user.id
 
-        author = User.objects.filter(
-            pk=user_id,
-            is_employee=True
-        ).first()
-
-        if not author:
-            return Response(
-                status=UserNotFoundError().get_status(),
-                data=UserNotFoundError().get_data()
-            )
+        author = User.objects.filter(pk=user_id).first()
 
         specialization = Specialization.objects.filter(
             pk=serializer_data["specialization"]

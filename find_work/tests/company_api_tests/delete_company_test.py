@@ -2,34 +2,34 @@ import pytest
 
 from django.urls import reverse
 
-from resume.models import Resume
+from company.models import Company
 
-from util.success_resp_data import DeleteSuccess
 from util.error_resp_data import (
     AuthHeadersError,
-    ResumeNotFoundError,
-    UserNotEmployeeError,
+    CompanyNotFoundError,
+    UserNotEmployerError,
 )
+from util.success_resp_data import DeleteSuccess
 
 
 @pytest.mark.django_db
-class TestDeleteResume:
+class TestDeleteCompany:
     def test_should_delete_resume(
             self,
             client,
-            create_resume,
+            create_company,
             create_new_user,
             user_auth_headers
     ):
         request = client.delete(
-            reverse("resume_api:delete_resume"),
+            reverse("company_api:delete_company"),
             headers=user_auth_headers
         )
 
         assert request.status_code == DeleteSuccess().get_status()
         assert request.data["success"] == DeleteSuccess().get_data()["success"]
-        resume = Resume.objects.filter(pk=1).first()
-        assert resume.is_delete
+        company = Company.objects.filter(pk=1).first()
+        assert company.is_delete
 
     def test_response_user_auth_headers_error(
             self,
@@ -37,7 +37,7 @@ class TestDeleteResume:
             create_resume,
     ):
         request = client.delete(
-            reverse("resume_api:delete_resume"),
+            reverse("company_api:delete_company"),
         )
 
         assert request.status_code == AuthHeadersError().get_status()
@@ -45,26 +45,26 @@ class TestDeleteResume:
             AuthHeadersError().get_data()["detail"]
         )
 
-    def test_should_response_user_not_employee_error(
+    def test_should_response_user_not_employer_error(
             self,
             client,
             create_new_user,
             user_auth_headers,
     ):
-        create_new_user.is_employee = False
+        create_new_user.is_employer = False
         create_new_user.save()
 
         request = client.delete(
-            reverse("resume_api:delete_resume"),
+            reverse("company_api:delete_company"),
             headers=user_auth_headers
         )
 
-        assert request.status_code == UserNotEmployeeError().get_status()
+        assert request.status_code == UserNotEmployerError().get_status()
         assert request.data["detail"] == (
-            UserNotEmployeeError().get_data()["detail"]
+            UserNotEmployerError().get_data()["detail"]
         )
 
-    def test_response_resume_not_found(
+    def test_response_company_not_found(
             self,
             client,
             create_resume,
@@ -74,11 +74,11 @@ class TestDeleteResume:
         create_resume.save()
 
         request = client.delete(
-            reverse("resume_api:delete_resume"),
+            reverse("company_api:delete_company"),
             headers=user_auth_headers
         )
 
-        assert request.status_code == ResumeNotFoundError().get_status()
-        assert request.data["resume"] == (
-            ResumeNotFoundError().get_data()["resume"]
+        assert request.status_code == CompanyNotFoundError().get_status()
+        assert request.data["company"] == (
+            CompanyNotFoundError().get_data()["company"]
         )

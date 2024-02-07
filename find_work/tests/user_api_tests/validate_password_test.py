@@ -37,7 +37,11 @@ class TestValidatePassword:
         request = client.post(
             reverse("user_api:validate_password"),
         )
-        assert request.status_code == status.HTTP_401_UNAUTHORIZED
+
+        assert request.status_code == AuthHeadersError().get_status()
+        assert request.data["detail"] == (
+            AuthHeadersError().get_data()["detail"]
+        )
 
     def test_should_response_fields_empty_error(
         self,

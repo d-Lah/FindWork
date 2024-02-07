@@ -3,19 +3,19 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from find_work.permissions import IsEmployee
+from find_work.permissions import IsEmployer
 
-from resume.models import Resume
+from company.models import Company
 
 from util.success_resp_data import DeleteSuccess
-from util.error_resp_data import ResumeNotFoundError
+from util.error_resp_data import CompanyNotFoundError
 
 
-class DeleteResume(APIView):
+class DeleteCompany(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [
         IsAuthenticated,
-        IsEmployee
+        IsEmployer
     ]
 
     def delete(
@@ -24,15 +24,15 @@ class DeleteResume(APIView):
     ):
 
         user_id = request.user.id
-        resume = Resume.objects.filter(
+        resume = Company.objects.filter(
             author__id=user_id,
             is_delete=False
         ).first()
 
         if not resume:
             return Response(
-                status=ResumeNotFoundError().get_status(),
-                data=ResumeNotFoundError().get_data()
+                status=CompanyNotFoundError().get_status(),
+                data=CompanyNotFoundError().get_data()
             )
 
         resume.is_delete = True

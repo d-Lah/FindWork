@@ -7,8 +7,11 @@ from resume.models import Resume
 from util.error_resp_data import (
     AuthHeadersError,
     FieldsEmptyError,
-    UserNotFoundError,
-    FieldsNotFoundError,
+    SkillNotFoundError,
+    UserNotEmployeeError,
+    SpecializationNotFoundError,
+    WorkExperienceNotFoundError,
+    TypeOfEmploymentNotFoundError,
 )
 from util.success_resp_data import (
     CreateSuccess
@@ -24,9 +27,6 @@ class TestCreateResume:
             user_auth_headers,
             data_to_create_resume
     ):
-        create_new_user.is_employee = True
-        create_new_user.save()
-
         request = client.post(
             reverse("resume_api:create_resume"),
             headers=user_auth_headers,
@@ -44,7 +44,30 @@ class TestCreateResume:
         request = client.put(
             reverse("resume_api:create_resume"),
         )
+
         assert request.status_code == AuthHeadersError().get_status()
+        assert request.data["detail"] == (
+            AuthHeadersError().get_data()["detail"]
+        )
+
+    def test_should_response_user_not_employee_error(
+            self,
+            client,
+            create_new_user,
+            user_auth_headers,
+    ):
+        create_new_user.is_employee = False
+        create_new_user.save()
+
+        request = client.post(
+            reverse("resume_api:create_resume"),
+            headers=user_auth_headers
+        )
+
+        assert request.status_code == UserNotEmployeeError().get_status()
+        assert request.data["detail"] == (
+            UserNotEmployeeError().get_data()["detail"]
+        )
 
     def test_should_response_fields_empty_error(
             self,
@@ -63,23 +86,6 @@ class TestCreateResume:
             FieldsEmptyError().get_data()["fields"]
         )
 
-    def test_should_response_user_not_found_error(
-            self,
-            client,
-            user_auth_headers,
-            data_to_create_resume
-    ):
-        request = client.post(
-            reverse("resume_api:create_resume"),
-            headers=user_auth_headers,
-            data=data_to_create_resume
-        )
-
-        assert request.status_code == UserNotFoundError().get_status()
-        assert request.data["user"] == (
-            UserNotFoundError().get_data()["user"]
-        )
-
     def test_should_response_wrong_specialization_error(
             self,
             client,
@@ -92,9 +98,11 @@ class TestCreateResume:
             data=data_to_create_resume_w_wrong_specialization
         )
 
-        assert request.status_code == FieldsNotFoundError().get_status()
+        assert request.status_code == (
+            SpecializationNotFoundError().get_status()
+        )
         assert request.data["specialization"] == (
-            FieldsNotFoundError().get_data()["specialization"]
+            SpecializationNotFoundError().get_data()["specialization"]
         )
 
     def test_should_response_wrong_skill_error(
@@ -109,9 +117,9 @@ class TestCreateResume:
             data=data_to_create_resume_w_wrong_skill
         )
 
-        assert request.status_code == FieldsNotFoundError().get_status()
+        assert request.status_code == SkillNotFoundError().get_status()
         assert request.data["skill"] == (
-            FieldsNotFoundError().get_data()["skill"]
+            SkillNotFoundError().get_data()["skill"]
         )
 
     def test_should_response_wrong_work_experience_error(
@@ -126,9 +134,11 @@ class TestCreateResume:
             data=data_to_create_resume_w_wrong_work_experience
         )
 
-        assert request.status_code == FieldsNotFoundError().get_status()
+        assert request.status_code == (
+            WorkExperienceNotFoundError().get_status()
+        )
         assert request.data["work_experience"] == (
-            FieldsNotFoundError().get_data()["work_experience"]
+            WorkExperienceNotFoundError().get_data()["work_experience"]
         )
 
     def test_should_response_wrong_type_of_employment_error(
@@ -143,7 +153,9 @@ class TestCreateResume:
             data=data_to_create_resume_w_wrong_type_of_employment
         )
 
-        assert request.status_code == FieldsNotFoundError().get_status()
+        assert request.status_code == (
+            TypeOfEmploymentNotFoundError().get_status()
+        )
         assert request.data["type_of_employment"] == (
-            FieldsNotFoundError().get_data()["type_of_employment"]
+            TypeOfEmploymentNotFoundError().get_data()["type_of_employment"]
         )
