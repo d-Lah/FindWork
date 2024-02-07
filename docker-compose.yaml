@@ -1,0 +1,30 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+
+
+  backend:
+    image:  find_work
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY
+      - EMAIL_HOST_USER
+      - EMAIL_HOST_PASSWORD
+      - POSTGRES_NAME
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - CRYPTOGRAPHY_FERNET_KEY
+    depends_on:
+      - db
+    volumes:
+      - ./find_work/media:/find_work/media

@@ -1,0 +1,114 @@
+from django.urls import path
+
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+    TokenObtainPairView,
+)
+from user.api import (
+    user_info,
+    update_email,
+    profile_info,
+    reset_password,
+    update_password,
+    activate_new_user,
+    validate_password,
+    edit_profile_info,
+    register_new_user,
+    upload_user_avatar,
+    validate_totp_token,
+    enable_two_factor_auth,
+    disable_two_factor_auth,
+    get_two_factor_auth_qr_code,
+    generate_reset_password_totp,
+    validate_reset_password_totp,
+)
+
+app_name = "user_api"
+
+urlpatterns = [
+    path(
+        "register",
+        register_new_user.RegisterNewUser.as_view(),
+        name="register_new_user",
+    ),
+    path(
+        "activate-user/<uuid:user_activation_uuid>",
+        activate_new_user.ActivateNewUser.as_view(),
+        name="activate_new_user",
+    ),
+    path(
+        "login",
+        TokenObtainPairView.as_view(),
+        name="login_user"
+    ),
+    path(
+        "get-two-factor_auth-qr-code",
+        get_two_factor_auth_qr_code.GetTwoFactorAuthQRCode.as_view(),
+        name="get_two_factor_auth_qr_code"
+    ),
+    path(
+        "validation-totp-token",
+        validate_totp_token.ValidateTOTPToken.as_view(),
+        name="validation_totp_token"
+    ),
+    path(
+        "enable-two-factor-auth",
+        enable_two_factor_auth.EnableTwoFactorAuth.as_view(),
+        name="enable_two_factor_auth"
+    ),
+    path(
+        "info",
+        user_info.UserInfo.as_view(),
+        name="user_info"
+    ),
+    path(
+        "edit-profile-info",
+        edit_profile_info.EditProfileInfo.as_view(),
+        name="edit_profile_info"
+    ),
+    path(
+        "validate-password",
+        validate_password.ValidatePassword.as_view(),
+        name="validate_password"
+    ),
+    path(
+        "update-password",
+        update_password.UpdatePassword.as_view(),
+        name="update_password"
+    ),
+    path(
+        "update-email",
+        update_email.UpdateEmail.as_view(),
+        name="update_email"
+    ),
+    path(
+        "upload-user-avatar",
+        upload_user_avatar.UploadUserAvatar.as_view(),
+        name="upload_user_avatar"
+    ),
+    path(
+        "generate-reset-password-totp",
+        generate_reset_password_totp.GenerateResetPasswordTOTP.as_view(),
+        name="generate_reset_password_totp"
+    ),
+    path(
+        "validate-reset-password-uuid",
+        validate_reset_password_totp.ValidateResetPasswordTOTP.as_view(),
+        name="validate_reset_password_totp"
+    ),
+    path(
+        "reset-password",
+        reset_password.ResetPassword.as_view(),
+        name="reset_password"
+    ),
+    path(
+        "profile-info",
+        profile_info.ProfileInfo.as_view(),
+        name="profile_info"
+    ),
+    path(
+        "disable-two-factor-auth",
+        disable_two_factor_auth.DisableTwoFactorAuth.as_view(),
+        name="disable_two_factor_auth"
+    ),
+]

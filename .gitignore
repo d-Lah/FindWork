@@ -1,0 +1,8 @@
+data
+.idea
+.DS_Store
+__pycache__
+db_for_test.sqlite3
+.env
+*/user_*
+user_avatar
