@@ -16,8 +16,10 @@ from util.mail_data_manager import (
     MailMessageInUpdateUserPassword,
 )
 from util.mail_sender import MailSender
+from util.error_exceptions import IsFieldsEmpty
 from util.success_resp_data import UpdateSuccess
 from util.error_resp_data import FieldsEmptyError
+from util.error_validation import ErrorValidation
 
 
 class UpdatePassword(APIView):
@@ -31,9 +33,10 @@ class UpdatePassword(APIView):
         serializer = UpdatePasswordSerializer(data=request.data)
         serializer.is_valid()
 
-        deserialized_data = serializer.validated_data
-
-        if serializer.errors:
+        error_validation = ErrorValidation(serializer.errors)
+        try:
+            error_validation.is_fields_empty()
+        except IsFieldsEmpty:
             return Response(
                 status=FieldsEmptyError().get_status(),
                 data=FieldsEmptyError().get_data()
@@ -41,6 +44,8 @@ class UpdatePassword(APIView):
 
         user_id = request.user.id
         user = User.objects.filter(pk=user_id).first()
+
+        deserialized_data = serializer.validated_data
 
         user.password = make_password(deserialized_data["password"])
         user.save()

@@ -11,37 +11,13 @@ from util.error_resp_data import (
     InvalidEmailAdressError,
     EmailAlreadyExistsError,
 )
+from util.error_exceptions import (
+    IsFieldsEmpty,
+    IsFieldsInvalid,
+    IsFieldsAlreadyExists,
+)
 from util.success_resp_data import UpdateSuccess
-
-
-def is_fields_empty(errors):
-    if not errors.get("email"):
-        return False
-
-    if "blank" in errors["email"][0]:
-        return True
-
-    return False
-
-
-def is_invalid_email(errors):
-    if not errors.get("email"):
-        return False
-
-    if "valid email address" in errors["email"][0]:
-        return True
-
-    return False
-
-
-def is_email_already_exists(errors):
-    if not errors.get("email"):
-        return False
-
-    if "email already exists" in errors["email"][0]:
-        return True
-
-    return False
+from util.error_validation import ErrorValidation
 
 
 class UpdateEmail(APIView):
@@ -57,19 +33,22 @@ class UpdateEmail(APIView):
 
         serializer.is_valid()
 
-        if is_fields_empty(serializer.errors):
+        error_validation = ErrorValidation(serializer.errors)
+        try:
+            error_validation.is_fields_empty()
+            error_validation.is_fields_invalid()
+            error_validation.is_fields_already_exists()
+        except IsFieldsEmpty:
             return Response(
                 status=FieldsEmptyError().get_status(),
                 data=FieldsEmptyError().get_data()
             )
-
-        if is_invalid_email(serializer.errors):
+        except IsFieldsInvalid:
             return Response(
                 status=InvalidEmailAdressError().get_status(),
                 data=InvalidEmailAdressError().get_data()
             )
-
-        if is_email_already_exists(serializer.errors):
+        except IsFieldsAlreadyExists:
             return Response(
                 status=EmailAlreadyExistsError().get_status(),
                 data=EmailAlreadyExistsError().get_data()

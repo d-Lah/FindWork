@@ -46,7 +46,7 @@ def is_user_not_found(errors):
     if not errors.get("email"):
         return False
 
-    if errors["email"][0] == "User with given email not found":
+    if errors["email"][0] == "User not found":
         return True
 
     return False

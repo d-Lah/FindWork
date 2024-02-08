@@ -13,6 +13,7 @@ from user.models import (
 )
 
 from util.error_resp_data import (
+    UserNotFoundError,
     InvalidFileExtError,
     FileSizeTooLargeError
 )
@@ -35,7 +36,7 @@ class GenerateResetPasswordTOTPSerializer(serializers.Serializer):
 
         if not user:
             raise serializers.ValidationError(
-                "User with given email not found"
+                UserNotFoundError().get_data()["user"]
             )
 
         return value
@@ -82,7 +83,7 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
 
         if not user:
             raise serializers.ValidationError(
-                "User with given email not found"
+                UserNotFoundError().get_data()["user"]
             )
         return value
 
@@ -156,7 +157,7 @@ class ValidateResetPasswordTOTPSerializer(serializers.Serializer):
 
         if not user:
             raise serializers.ValidationError(
-                "User with given email not found"
+                UserNotFoundError().get_data()["user"]
             )
 
         return value
