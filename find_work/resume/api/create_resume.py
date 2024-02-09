@@ -20,29 +20,12 @@ from util.error_resp_data import (
     FieldsEmptyError,
     FieldsNotFoundError,
 )
-from util.success_resp_data import (
-    CreateSuccess
+from util.error_exceptions import (
+    IsFieldsEmpty,
+    IsFieldsNotFound
 )
-
-
-def is_fields_empty(errors):
-    if not errors:
-        return False
-
-    for field in errors:
-        if "blank" in errors[field][0]:
-            return True
-    return False
-
-
-def is_fields_not_found(errors):
-    if not errors:
-        return False
-
-    for field in errors:
-        if "not found" in errors[field][0]:
-            return True
-    return False
+from util.success_resp_data import CreateSuccess
+from util.error_validation import ErrorValidation
 
 
 class CreateResume(APIView):
@@ -60,13 +43,16 @@ class CreateResume(APIView):
 
         serializer.is_valid()
 
-        if is_fields_empty(serializer.errors):
+        error_validation = ErrorValidation(serializer.errors)
+        try:
+            error_validation.is_fields_empty()
+            error_validation.is_fields_not_found()
+        except IsFieldsEmpty:
             return Response(
                 status=FieldsEmptyError().get_status(),
                 data=FieldsEmptyError().get_data()
             )
-
-        if is_fields_not_found(serializer.errors):
+        except IsFieldsNotFound:
             errors = {}
             for field in serializer.errors:
                 error_msg = str(serializer.errors[field][0])
