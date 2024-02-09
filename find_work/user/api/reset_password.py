@@ -9,38 +9,13 @@ from util.error_resp_data import (
     UserNotFoundError,
     InvalidEmailAdressError,
 )
+from util.error_exceptions import (
+    IsFieldsEmpty,
+    IsFieldsInvalid,
+    IsFieldsNotFound,
+)
 from util.success_resp_data import UpdateSuccess
-
-
-def is_fields_empty(errors):
-    if not errors:
-        return False
-
-    for field in errors:
-        if "blank" in errors[field][0]:
-            return True
-
-    return False
-
-
-def is_invalid_email(errors):
-    if not errors.get("email"):
-        return False
-
-    if "valid email address" in errors["email"][0]:
-        return True
-
-    return False
-
-
-def is_user_not_found(errors):
-    if not errors.get("email"):
-        return False
-
-    if errors["email"][0] == "User with given email not found":
-        return True
-
-    return False
+from util.error_validation import ErrorValidation
 
 
 class ResetPassword(APIView):
@@ -52,19 +27,22 @@ class ResetPassword(APIView):
 
         serializer.is_valid()
 
-        if is_fields_empty(serializer.errors):
+        error_validation = ErrorValidation(serializer.errors)
+        try:
+            error_validation.is_fields_empty()
+            error_validation.is_fields_invalid()
+            error_validation.is_fields_not_found()
+        except IsFieldsEmpty:
             return Response(
                 status=FieldsEmptyError().get_status(),
                 data=FieldsEmptyError().get_data()
             )
-
-        if is_invalid_email(serializer.errors):
+        except IsFieldsInvalid:
             return Response(
                 status=InvalidEmailAdressError().get_status(),
                 data=InvalidEmailAdressError().get_data()
             )
-
-        if is_user_not_found(serializer.errors):
+        except IsFieldsNotFound:
             return Response(
                 status=UserNotFoundError().get_status(),
                 data=UserNotFoundError().get_data()

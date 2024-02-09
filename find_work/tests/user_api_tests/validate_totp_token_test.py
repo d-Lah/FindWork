@@ -44,11 +44,13 @@ class TestValidateTOTPToken:
     def test_should_response_fields_empty_error(
             self,
             client,
-            user_auth_headers
+            user_auth_headers,
+            data_to_validate_totp_token_wo_data
     ):
         request = client.post(
             reverse("user_api:validation_totp_token"),
             headers=user_auth_headers,
+            data=data_to_validate_totp_token_wo_data
         )
         assert request.status_code == FieldsEmptyError().get_status()
         assert request.data["fields"] == (

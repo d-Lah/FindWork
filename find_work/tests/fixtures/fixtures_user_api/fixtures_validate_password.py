@@ -16,3 +16,12 @@ def data_to_validate_password_w_wrong_password():
     }
 
     return data
+
+
+@pytest.fixture()
+def data_to_validate_password_wo_data():
+    data = {
+        "password": ""
+    }
+
+    return data

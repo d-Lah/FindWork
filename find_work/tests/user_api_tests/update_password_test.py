@@ -49,11 +49,13 @@ class TestUpdatePassword:
     def test_should_response_fields_empty_error(
             self,
             client,
-            user_auth_headers
+            user_auth_headers,
+            data_to_update_password_wo_data,
     ):
         request = client.put(
             reverse("user_api:update_password"),
             headers=user_auth_headers,
+            data=data_to_update_password_wo_data
         )
         assert request.status_code == FieldsEmptyError().get_status()
         assert request.data["fields"] == (

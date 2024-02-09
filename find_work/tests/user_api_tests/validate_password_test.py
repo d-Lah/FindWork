@@ -46,11 +46,13 @@ class TestValidatePassword:
     def test_should_response_fields_empty_error(
         self,
         client,
-        user_auth_headers
+        user_auth_headers,
+        data_to_validate_password_wo_data
     ):
         request = client.post(
             reverse("user_api:validate_password"),
-            headers=user_auth_headers
+            headers=user_auth_headers,
+            data=data_to_validate_password_wo_data
         )
         assert request.status_code == FieldsEmptyError().get_status()
         assert request.data["fields"] == (

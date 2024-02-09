@@ -15,12 +15,18 @@ from util.error_resp_data import (
     UserNotFoundError,
     InvalidEmailAdressError,
 )
+from util.error_exceptions import (
+    IsFieldsEmpty,
+    IsFieldsInvalid,
+    IsFieldsNotFound,
+)
 from util.mail_sender import MailSender
 from util.mail_data_manager import (
     MailSubjectInGenerateResetPasswordUuid,
     MailMessageInGenerateResetPasswordUuid,
 )
 from util.success_resp_data import CreateSuccess
+from util.error_validation import ErrorValidation
 
 
 def is_fields_empty(errors):
@@ -64,19 +70,22 @@ class GenerateResetPasswordTOTP(APIView):
 
         serializer.is_valid()
 
-        if is_fields_empty(serializer.errors):
+        error_validation = ErrorValidation(serializer.errors)
+        try:
+            error_validation.is_fields_empty()
+            error_validation.is_fields_invalid()
+            error_validation.is_fields_not_found()
+        except IsFieldsEmpty:
             return Response(
                 status=FieldsEmptyError().get_status(),
                 data=FieldsEmptyError().get_data()
             )
-
-        if is_invalid_email(serializer.errors):
+        except IsFieldsInvalid:
             return Response(
                 status=InvalidEmailAdressError().get_status(),
                 data=InvalidEmailAdressError().get_data()
             )
-
-        if is_user_not_found(serializer.errors):
+        except IsFieldsNotFound:
             return Response(
                 status=UserNotFoundError().get_status(),
                 data=UserNotFoundError().get_data()

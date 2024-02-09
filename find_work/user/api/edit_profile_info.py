@@ -6,8 +6,10 @@ from rest_framework.response import Response
 from user.models import Profile
 from user.serializer import EditProfileInfoSerializer
 
+from util.error_exceptions import IsFieldsEmpty
 from util.success_resp_data import UpdateSuccess
 from util.error_resp_data import FieldsEmptyError
+from util.error_validation import ErrorValidation
 
 
 class EditProfileInfo(APIView):
@@ -21,7 +23,11 @@ class EditProfileInfo(APIView):
         serializer = EditProfileInfoSerializer(data=request.data)
 
         serializer.is_valid()
-        if serializer.errors:
+
+        error_validation = ErrorValidation(serializer.errors)
+        try:
+            error_validation.is_fields_empty()
+        except IsFieldsEmpty:
             return Response(
                 status=FieldsEmptyError().get_status(),
                 data=FieldsEmptyError().get_data()
