@@ -37,3 +37,11 @@ def data_to_validate_totp_token_w_wrong_totp_token(
         "totp_token": wrong_totp_token
     }
     return data
+
+
+@pytest.fixture()
+def data_to_validate_totp_token_wo_data():
+    data = {
+        "totp_token": ""
+    }
+    return data

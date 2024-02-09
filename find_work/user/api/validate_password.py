@@ -12,6 +12,8 @@ from util.error_resp_data import (
     FieldsEmptyError,
     WrongPasswordError,
 )
+from util.error_exceptions import IsFieldsEmpty
+from util.error_validation import ErrorValidation
 from util.success_resp_data import ValidateSuccess
 
 
@@ -26,7 +28,10 @@ class ValidatePassword(APIView):
         serializer = ValidatePasswordSerializer(data=request.data)
         serializer.is_valid()
 
-        if serializer.errors:
+        error_validation = ErrorValidation(serializer.errors)
+        try:
+            error_validation.is_fields_empty()
+        except IsFieldsEmpty:
             return Response(
                 status=FieldsEmptyError().get_status(),
                 data=FieldsEmptyError().get_data()
