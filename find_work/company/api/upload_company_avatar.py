@@ -17,39 +17,13 @@ from util.error_resp_data import (
     InvalidFileExtError,
     FileSizeTooLargeError,
 )
+from util.error_exceptions import (
+    IsFileFieldsEmpty,
+    IsFileFieldsInvalid,
+    IsFileFieldsSizeTooLarge
+)
 from util.success_resp_data import UploadSuccess
-
-
-def is_fields_empty(errors):
-    if not errors.get("company_avatar_url"):
-        return False
-
-    if errors["company_avatar_url"][0] == "No file was submitted.":
-        return True
-
-    return False
-
-
-def is_file_size_to_large(errors):
-    if not errors.get("company_avatar_url"):
-        return False
-
-    error = FileSizeTooLargeError().get_data()["file"]
-    if errors["company_avatar_url"][0] == error:
-        return True
-
-    return False
-
-
-def is_invalid_image_extension(errors):
-    if not errors.get("company_avatar_url"):
-        return False
-
-    error = InvalidFileExtError().get_data()["file"]
-    if errors["company_avatar_url"][0] == error:
-        return True
-
-    return False
+from util.error_validation import ErrorValidation
 
 
 class UploadCompanyAvatar(APIView):
@@ -69,19 +43,22 @@ class UploadCompanyAvatar(APIView):
 
         serializer.is_valid()
 
-        if is_fields_empty(serializer.errors):
+        error_validation = ErrorValidation(serializer.errors)
+        try:
+            error_validation.is_file_fields_empty()
+            error_validation.is_file_fields_invalid()
+            error_validation.is_file_fields_size_too_large()
+        except IsFileFieldsEmpty:
             return Response(
                 status=FieldsEmptyError().get_status(),
                 data=FieldsEmptyError().get_data()
             )
-
-        if is_invalid_image_extension(serializer.errors):
+        except IsFileFieldsInvalid:
             return Response(
                 status=InvalidFileExtError().get_status(),
                 data=InvalidFileExtError().get_data()
             )
-
-        if is_file_size_to_large(serializer.errors):
+        except IsFileFieldsSizeTooLarge:
             return Response(
                 status=FileSizeTooLargeError().get_status(),
                 data=FileSizeTooLargeError().get_data()
