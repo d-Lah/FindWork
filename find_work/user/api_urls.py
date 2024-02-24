@@ -57,7 +57,7 @@ urlpatterns = [
         name="enable_two_factor_auth"
     ),
     path(
-        "info",
+        "user_info/<int:user_id>",
         user_info.UserInfo.as_view(),
         name="user_info"
     ),
@@ -102,7 +102,7 @@ urlpatterns = [
         name="reset_password"
     ),
     path(
-        "profile-info",
+        "profile-info/<int:user_id>",
         profile_info.ProfileInfo.as_view(),
         name="profile_info"
     ),

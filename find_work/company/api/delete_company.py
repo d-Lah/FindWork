@@ -3,10 +3,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from find_work.permissions import IsEmployer
-
 from company.models import Company
 
+from util.permissions import IsEmployer
 from util.success_resp_data import DeleteSuccess
 from util.error_resp_data import CompanyNotFoundError
 

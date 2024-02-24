@@ -3,8 +3,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from find_work.permissions import IsEmployee
-
 from user.models import User
 
 from resume.models import (
@@ -24,6 +22,7 @@ from util.error_exceptions import (
     IsFieldsEmpty,
     IsFieldsNotFound
 )
+from util.permissions import IsEmployee
 from util.success_resp_data import CreateSuccess
 from util.error_validation import ErrorValidation
 

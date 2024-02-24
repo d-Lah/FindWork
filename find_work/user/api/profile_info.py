@@ -7,6 +7,7 @@ from user.models import Profile
 from user.serializer import ProfileInfoSerializer
 
 from util.success_resp_data import GetSuccess
+from util.error_resp_data import UserNotFoundError
 
 
 class ProfileInfo(APIView):
@@ -15,10 +16,15 @@ class ProfileInfo(APIView):
 
     def get(
             self,
-            request
+            request,
+            user_id
     ):
-        user_id = request.user.id
         profile = Profile.objects.filter(user__id=user_id).first()
+        if not profile:
+            return Response(
+                status=UserNotFoundError().get_status(),
+                data=UserNotFoundError().get_data()
+            )
 
         serializer = ProfileInfoSerializer(profile)
 

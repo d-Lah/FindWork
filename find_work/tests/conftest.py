@@ -214,38 +214,16 @@ def get_wrong_company_id():
 
 
 @pytest.fixture()
-def data_to_upload_avatar():
-    data = {
-        "user_avatar_url": (
-            BASE_DIR / "media" / "for_test" / "upload_user_avatar.png"
-        ).open("rb")
+def get_user_id(create_new_user):
+    kwargs = {
+        "user_id": create_new_user.pk
     }
-    return data
+    return kwargs
 
 
 @pytest.fixture()
-def data_to_upload_avatar_wo_image():
-    data = {
-        "user_avatar_url": ""
+def get_wrong_user_id():
+    kwargs = {
+        "user_id": 0
     }
-    return data
-
-
-@pytest.fixture()
-def data_to_upload_avatar_w_big_file():
-    data = {
-        "user_avatar_url": (
-            BASE_DIR / "media" / "for_test" / "img_size_too_large.png"
-        ).open("rb")
-    }
-    return data
-
-
-@pytest.fixture()
-def data_to_upload_avatar_w_file_w_invalid_ext():
-    data = {
-        "user_avatar_url": (
-            BASE_DIR / "media" / "for_test" / "invalid_img_ext.gif"
-        ).open("rb")
-    }
-    return data
+    return kwargs

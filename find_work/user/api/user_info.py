@@ -7,6 +7,7 @@ from user.models import User
 from user.serializer import UserInfoSerializer
 
 from util.success_resp_data import GetSuccess
+from util.error_resp_data import UserNotFoundError
 
 
 class UserInfo(APIView):
@@ -15,10 +16,15 @@ class UserInfo(APIView):
 
     def get(
             self,
-            request
+            request,
+            user_id
     ):
-        user_id = request.user.id
         user = User.objects.filter(pk=user_id).first()
+        if not user:
+            return Response(
+                status=UserNotFoundError().get_status(),
+                data=UserNotFoundError().get_data()
+            )
 
         serializer = UserInfoSerializer(user)
 
