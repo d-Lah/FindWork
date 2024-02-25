@@ -3,8 +3,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from find_work.permissions import IsEmployer
-
 from company.models import Company
 from company.serializer import EditCompanyInfoSerializer
 
@@ -17,6 +15,7 @@ from util.error_exceptions import (
     IsFieldsEmpty,
     IsFieldsAlreadyExists
 )
+from util.permissions import IsEmployer
 from util.success_resp_data import UpdateSuccess
 from util.error_validation import ErrorValidation
 

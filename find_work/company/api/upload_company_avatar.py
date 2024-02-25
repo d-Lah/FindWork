@@ -4,8 +4,6 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from find_work.permissions import IsEmployer
-
 from company.models import (
     Company,
     CompanyAvatar
@@ -22,6 +20,7 @@ from util.error_exceptions import (
     IsFileFieldsInvalid,
     IsFileFieldsSizeTooLarge
 )
+from util.permissions import IsEmployer
 from util.success_resp_data import UploadSuccess
 from util.error_validation import ErrorValidation
 

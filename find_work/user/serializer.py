@@ -130,14 +130,19 @@ class UserInfoSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "email",
+            "resume",
+            "company",
             "date_joined",
             "is_employer",
             "is_employee",
             "is_two_factor_auth",
-            "resume",
         ]
         resume = serializers.IntegerField(
             source="resume.id",
+            required=False
+        )
+        company = serializers.IntegerField(
+            source="company.id",
             required=False
         )
 
