@@ -44,8 +44,13 @@ HTTP_LOCALHOST = "http://localhost:8000"
 
 INSTALLED_APPS = [
     "user.apps.UserConfig",
+    "skill.apps.SkillConfig",
     "resume.apps.ResumeConfig",
     "company.apps.CompanyConfig",
+    "vacancy.apps.VacancyConfig",
+    "specialization.apps.SpecializationConfig",
+    "work_experience.apps.WorkExperienceConfig",
+    "type_of_employment.apps.TypeOfEmploymentConfig",
 
     "django_filters",
     "rest_framework",

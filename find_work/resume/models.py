@@ -2,6 +2,14 @@ from django.db import models
 
 from user.models import User
 
+from skill.models import Skill
+
+from specialization.models import Specialization
+
+from work_experience.models import WorkExperience
+
+from type_of_employment.models import TypeOfEmployment
+
 
 class Resume(models.Model):
     author = models.OneToOneField(
@@ -10,53 +18,17 @@ class Resume(models.Model):
     )
     about = models.TextField()
     specialization = models.ForeignKey(
-        "Specialization",
-        on_delete=models.CASCADE
+        Specialization,
+        on_delete=models.CASCADE,
     )
     skill = models.ManyToManyField(
-        "Skill",
+        Skill,
     )
     work_experience = models.ForeignKey(
-        "WorkExperience",
-        on_delete=models.CASCADE
+        WorkExperience,
+        on_delete=models.CASCADE,
     )
     type_of_employment = models.ManyToManyField(
-        "TypeOfEmployment",
+        TypeOfEmployment,
     )
     is_delete = models.BooleanField(default=False)
-
-
-class Specialization(models.Model):
-    specialization_name = models.CharField(
-        max_length=150,
-        unique=True
-    )
-
-    def __str__(self):
-        return self.specialization_name
-
-
-class Skill(models.Model):
-    skill_name = models.CharField(
-        max_length=150,
-        unique=True
-    )
-
-    def __str__(self):
-        return self.skill_name
-
-
-class WorkExperience(models.Model):
-    work_experience_name = models.CharField(
-        max_length=150,
-    )
-
-    def __str__(self):
-        return self.work_experience_name
-
-
-class TypeOfEmployment(models.Model):
-    type_of_employment_name = models.CharField(max_length=150)
-
-    def __str__(self):
-        return self.type_of_employment_name

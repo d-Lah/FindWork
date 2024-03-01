@@ -2,13 +2,16 @@ from rest_framework import serializers
 
 from user.serializer import UserInfoSerializer
 
-from resume.models import (
-    Skill,
-    Resume,
-    Specialization,
-    WorkExperience,
-    TypeOfEmployment
-)
+from resume.models import Resume
+
+from skill.models import Skill
+
+from specialization.models import Specialization
+
+from work_experience.models import WorkExperience
+
+from type_of_employment.models import TypeOfEmployment
+
 from util.error_resp_data import (
     SkillNotFoundError,
     SpecializationNotFoundError,
