@@ -52,6 +52,10 @@ urlpatterns = [
         "api/v1/company/",
         include("company.api_urls"),
     ),
+    path(
+        "api/v1/vacancy/",
+        include("vacancy.api_urls"),
+    ),
 ] + static(
     settings.MEDIA_URL,
     document_root=settings.MEDIA_ROOT,

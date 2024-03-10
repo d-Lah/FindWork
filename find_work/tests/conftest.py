@@ -53,6 +53,8 @@ pytest_plugins = [
     "tests.fixtures.fixtures_company_api.fixtures_create_company",
     "tests.fixtures.fixtures_company_api.fixtures_edit_company_info",
     "tests.fixtures.fixtures_company_api.fixtures_upload_company_avatar",
+
+    "tests.fixtures.fixtures_vacancy_api.fixtures_create_vacancy",
 ]
 
 

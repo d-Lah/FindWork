@@ -3,13 +3,16 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from resume.models import (
-    Skill,
-    Resume,
-    Specialization,
-    WorkExperience,
-    TypeOfEmployment
-)
+from resume.models import Resume
+
+from skill.models import Skill
+
+from specialization.models import Specialization
+
+from work_experience.models import WorkExperience
+
+from type_of_employment.models import TypeOfEmployment
+
 from resume.serializer import UpdateResumeInfoSerializer
 
 from util.error_resp_data import (

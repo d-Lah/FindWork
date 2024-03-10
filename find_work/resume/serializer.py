@@ -5,12 +5,16 @@ from user.serializer import UserInfoSerializer
 from resume.models import Resume
 
 from skill.models import Skill
+from skill.serializer import SkillSerializer
 
 from specialization.models import Specialization
+from specialization.serializer import SpecializationSerializer
 
 from work_experience.models import WorkExperience
+from work_experience.serializer import WorkExperienceSerializer
 
 from type_of_employment.models import TypeOfEmployment
+from type_of_employment.serializer import TypeOfEmploymentSerializer
 
 from util.error_resp_data import (
     SkillNotFoundError,
@@ -124,42 +128,6 @@ class UpdateResumeInfoSerializer(serializers.Serializer):
                     ).get_data()["type_of_employment"]
                 )
         return value
-
-
-class SpecializationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Specialization
-        fields = [
-            "id",
-            "specialization_name"
-        ]
-
-
-class SkillSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Skill
-        fields = [
-            "id",
-            "skill_name"
-        ]
-
-
-class WorkExperienceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = WorkExperience
-        fields = [
-            "id",
-            "work_experience_name"
-        ]
-
-
-class TypeOfEmploymentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TypeOfEmployment
-        fields = [
-            "id",
-            "type_of_employment_name"
-        ]
 
 
 class ResumeInfoSerializer(serializers.ModelSerializer):

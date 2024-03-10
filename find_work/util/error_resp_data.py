@@ -188,3 +188,11 @@ class CompanyNotFoundError:
 
     def get_data(self):
         return {"company": "Company not found"}
+
+
+class UserNotCompanyOwner:
+    def get_status(self):
+        return status.HTTP_403_FORBIDDEN
+
+    def get_data(self):
+        return {"detail": "User not company owner"}
