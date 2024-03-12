@@ -24,9 +24,7 @@ class Vacancy(models.Model):
         verbose_name="date created",
         auto_now_add=True,
     )
-    rqd_skill = models.ManyToManyField(
-        Skill,
-    )
+    rqd_skill = models.ManyToManyField(Skill)
     rqd_specialization = models.ForeignKey(
         Specialization,
         on_delete=models.CASCADE,
@@ -40,6 +38,4 @@ class Vacancy(models.Model):
     )
     is_close = models.BooleanField(default=False)
     is_delete = models.BooleanField(default=False)
-    resumes = models.ManyToManyField(
-        Resume
-    )
+    resumes = models.ManyToManyField(Resume)

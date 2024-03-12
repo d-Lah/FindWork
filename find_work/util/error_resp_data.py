@@ -196,3 +196,11 @@ class UserNotCompanyOwner:
 
     def get_data(self):
         return {"detail": "User not company owner"}
+
+
+class VacancyNotFound:
+    def get_status(self):
+        return status.HTTP_404_NOT_FOUND
+
+    def get_data(self):
+        return {"vacancy": "Vacancy not found"}

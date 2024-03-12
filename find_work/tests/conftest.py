@@ -30,6 +30,7 @@ from resume.models import (
 )
 
 from company.models import Company
+from vacancy.models import Vacancy
 
 pytest_plugins = [
     "tests.fixtures.fixtures_user_api.fixtures_login_user",
@@ -184,6 +185,27 @@ def create_resume(
 
 
 @pytest.fixture()
+def create_vacancy(
+        create_skill,
+        create_company,
+        create_specialization,
+        create_work_experience,
+        create_type_of_employment
+):
+    new_vacancy = Vacancy.objects.create(
+        company=create_company,
+        title="Test",
+        body="Test",
+        rqd_specialization=create_specialization,
+        rqd_work_experience=create_work_experience,
+    )
+    new_vacancy.rqd_skill.add(create_skill)
+    new_vacancy.rqd_type_of_employment.add(create_type_of_employment)
+
+    return new_vacancy
+
+
+@pytest.fixture()
 def get_resume_id(create_resume):
     kwargs = {
         "resume_id": create_resume.pk
@@ -227,5 +249,21 @@ def get_user_id(create_new_user):
 def get_wrong_user_id():
     kwargs = {
         "user_id": 0
+    }
+    return kwargs
+
+
+@pytest.fixture()
+def get_vacancy_id(create_vacancy):
+    kwargs = {
+        "vacancy_id": create_vacancy.pk
+    }
+    return kwargs
+
+
+@pytest.fixture()
+def get_wrong_vacancy_id():
+    kwargs = {
+        "vacancy_id": 0
     }
     return kwargs
