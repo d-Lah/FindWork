@@ -10,10 +10,10 @@ from find_work.settings import (
 
 
 @pytest.fixture()
-def data_to_validate_totp_token(create_new_user):
+def data_to_validate_totp_token(create_user):
 
     fernet = Fernet(CRYPTOGRAPHY_FERNET_KEY.encode())
-    user_otp_base32 = fernet.decrypt(create_new_user.otp_base32.encode())
+    user_otp_base32 = fernet.decrypt(create_user.otp_base32.encode())
 
     totp = pyotp.TOTP(user_otp_base32.decode())
 
@@ -25,10 +25,10 @@ def data_to_validate_totp_token(create_new_user):
 
 @pytest.fixture()
 def data_to_validate_totp_token_w_wrong_totp_token(
-        create_new_user
+        create_user
 ):
     fernet = Fernet(CRYPTOGRAPHY_FERNET_KEY.encode())
-    user_otp_base32 = fernet.decrypt(create_new_user.otp_base32.encode())
+    user_otp_base32 = fernet.decrypt(create_user.otp_base32.encode())
 
     totp = pyotp.TOTP(user_otp_base32)
     wrong_totp_token = int(totp.now()) - 1

@@ -23,7 +23,7 @@ class TestCreateResume:
     def test_should_create_resume(
             self,
             client,
-            create_new_user,
+            create_user,
             user_auth_headers,
             data_to_create_resume
     ):
@@ -53,11 +53,11 @@ class TestCreateResume:
     def test_should_response_user_not_employee_error(
             self,
             client,
-            create_new_user,
+            create_user,
             user_auth_headers,
     ):
-        create_new_user.is_employee = False
-        create_new_user.save()
+        create_user.is_employee = False
+        create_user.save()
 
         request = client.post(
             reverse("resume_api:create_resume"),

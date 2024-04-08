@@ -77,7 +77,7 @@ class CreateResumeSerializer(serializers.Serializer):
         return value
 
 
-class UpdateResumeInfoSerializer(serializers.Serializer):
+class EditResumeInfoSerializer(serializers.Serializer):
     about = serializers.CharField()
     specialization = serializers.IntegerField()
     work_experience = serializers.IntegerField()

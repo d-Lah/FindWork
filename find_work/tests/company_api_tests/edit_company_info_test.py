@@ -21,7 +21,7 @@ class TestCreateCompany:
             self,
             client,
             create_company,
-            create_new_user,
+            create_user,
             user_auth_headers,
             data_to_edit_company_info
     ):
@@ -54,11 +54,11 @@ class TestCreateCompany:
     def test_should_response_user_not_employer_error(
             self,
             client,
-            create_new_user,
+            create_user,
             user_auth_headers,
     ):
-        create_new_user.is_employer = False
-        create_new_user.save()
+        create_user.is_employer = False
+        create_user.save()
 
         request = client.put(
             reverse("company_api:edit_company_info"),

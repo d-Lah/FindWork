@@ -26,6 +26,11 @@ class EmailAlreadyExistsError:
 
 
 class FieldsEmptyError:
+    detail = {
+        "opt1": "blank",
+        "opt2": "required"
+    }
+
     def get_status(self):
         return status.HTTP_400_BAD_REQUEST
 
@@ -50,6 +55,8 @@ class FieldsNotFoundError:
 
 
 class SpecializationNotFoundError:
+    detail = "Specialization not found"
+
     def get_status(self):
         return status.HTTP_404_NOT_FOUND
 
@@ -58,6 +65,8 @@ class SpecializationNotFoundError:
 
 
 class SkillNotFoundError:
+    detail = "Skill not found"
+
     def get_status(self):
         return status.HTTP_404_NOT_FOUND
 
@@ -66,6 +75,8 @@ class SkillNotFoundError:
 
 
 class WorkExperienceNotFoundError:
+    detail = "Work experience not found"
+
     def get_status(self):
         return status.HTTP_404_NOT_FOUND
 
@@ -74,6 +85,8 @@ class WorkExperienceNotFoundError:
 
 
 class TypeOfEmploymentNotFoundError:
+    detail = "Type of employment not found"
+
     def get_status(self):
         return status.HTTP_404_NOT_FOUND
 
@@ -199,8 +212,18 @@ class UserNotCompanyOwner:
 
 
 class VacancyNotFound:
+    detail = "Vacancy not found"
+
     def get_status(self):
         return status.HTTP_404_NOT_FOUND
 
     def get_data(self):
         return {"vacancy": "Vacancy not found"}
+
+
+class CompanyNotVacancyCreator:
+    def get_status(self):
+        return status.HTTP_403_FORBIDDEN
+
+    def get_data(self):
+        return {"detail": "Company not vacancy creator"}

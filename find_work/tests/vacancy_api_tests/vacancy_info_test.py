@@ -46,7 +46,7 @@ class TestVacancyInfo:
             AuthHeadersError().get_data()["detail"]
         )
 
-    def test_should_response_resume_not_found(
+    def test_should_response_vacancy_not_found(
             self,
             client,
             user_auth_headers,

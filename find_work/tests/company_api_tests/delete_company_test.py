@@ -18,7 +18,7 @@ class TestDeleteCompany:
             self,
             client,
             create_company,
-            create_new_user,
+            create_user,
             user_auth_headers
     ):
         request = client.delete(
@@ -48,11 +48,11 @@ class TestDeleteCompany:
     def test_should_response_user_not_employer_error(
             self,
             client,
-            create_new_user,
+            create_user,
             user_auth_headers,
     ):
-        create_new_user.is_employer = False
-        create_new_user.save()
+        create_user.is_employer = False
+        create_user.save()
 
         request = client.delete(
             reverse("company_api:delete_company"),

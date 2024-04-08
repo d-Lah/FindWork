@@ -4,7 +4,7 @@ import pytest
 @pytest.fixture()
 def data_to_update_resume_info(
         create_skill,
-        create_new_user,
+        create_user,
         create_specialization,
         create_work_experience,
         create_type_of_employment

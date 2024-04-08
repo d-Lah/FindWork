@@ -13,7 +13,7 @@ from work_experience.models import WorkExperience
 
 from type_of_employment.models import TypeOfEmployment
 
-from resume.serializer import UpdateResumeInfoSerializer
+from resume.serializer import EditResumeInfoSerializer
 
 from util.error_resp_data import (
     FieldsEmptyError,
@@ -40,7 +40,7 @@ class EditResumeInfo(APIView):
             self,
             request,
     ):
-        serializer = UpdateResumeInfoSerializer(data=request.data)
+        serializer = EditResumeInfoSerializer(data=request.data)
 
         serializer.is_valid()
 

@@ -56,6 +56,7 @@ pytest_plugins = [
     "tests.fixtures.fixtures_company_api.fixtures_upload_company_avatar",
 
     "tests.fixtures.fixtures_vacancy_api.fixtures_create_vacancy",
+    "tests.fixtures.fixtures_vacancy_api.fixtures_edit_vacancy_info",
 ]
 
 
@@ -66,7 +67,7 @@ def client():
 
 
 @pytest.fixture()
-def create_new_user():
+def create_user():
     profile = Profile(
         first_name="Ran",
         last_name="Goose",
@@ -94,13 +95,13 @@ def create_new_user():
 @pytest.fixture
 def user_obtain_token(
     client,
-    create_new_user
+    create_user
 ):
-    create_new_user.is_active = True
-    create_new_user.save()
+    create_user.is_active = True
+    create_user.save()
 
     data = {
-        "email": create_new_user.email,
+        "email": create_user.email,
         "password": "password"
     }
 
@@ -123,10 +124,10 @@ def user_auth_headers(user_obtain_token):
 
 
 @pytest.fixture
-def create_company(create_new_user):
+def create_company(create_user):
     new_company = Company.objects.create(
         name="Test",
-        author=create_new_user
+        author=create_user
     )
 
     return new_company
@@ -167,13 +168,13 @@ def create_type_of_employment():
 @pytest.fixture()
 def create_resume(
         create_skill,
-        create_new_user,
+        create_user,
         create_specialization,
         create_work_experience,
         create_type_of_employment
 ):
     new_resume = Resume.objects.create(
-        author=create_new_user,
+        author=create_user,
         about="Test",
         specialization=create_specialization,
         work_experience=create_work_experience,
@@ -203,6 +204,73 @@ def create_vacancy(
     new_vacancy.rqd_type_of_employment.add(create_type_of_employment)
 
     return new_vacancy
+
+
+@pytest.fixture()
+def create_sec_user():
+    profile = Profile(
+        first_name="Bil",
+        last_name="Tog",
+    )
+    profile.save()
+
+    fernet = Fernet(CRYPTOGRAPHY_FERNET_KEY.encode())
+    user_otp_base32 = pyotp.random_base32()
+    user_encrypted_opt_base32 = fernet.encrypt(user_otp_base32.encode())
+
+    user = User(
+        email="lal@email.com",
+        user_activation_uuid=uuid4(),
+        profile=profile,
+        is_employer=True,
+        is_employee=True,
+        password=make_password("password"),
+        otp_base32=user_encrypted_opt_base32.decode()
+    )
+    user.save()
+
+    return user
+
+
+@pytest.fixture
+def sec_user_obtain_token(
+    client,
+    create_sec_user
+):
+    create_sec_user.is_active = True
+    create_sec_user.save()
+
+    data = {
+        "email": create_sec_user.email,
+        "password": "password"
+    }
+
+    request = client.post(
+        reverse("user_api:login_user"),
+        data=data
+    )
+
+    return request.data
+
+
+@pytest.fixture
+def sec_user_auth_headers(sec_user_obtain_token):
+
+    access_token = sec_user_obtain_token["access"]
+
+    authorization = {"Authorization": f"Bearer {access_token}"}
+
+    return authorization
+
+
+@pytest.fixture
+def create_sec_company(create_sec_user):
+    new_company = Company.objects.create(
+        name="Test2",
+        author=create_sec_user
+    )
+
+    return new_company
 
 
 @pytest.fixture()
@@ -238,9 +306,9 @@ def get_wrong_company_id():
 
 
 @pytest.fixture()
-def get_user_id(create_new_user):
+def get_user_id(create_user):
     kwargs = {
-        "user_id": create_new_user.pk
+        "user_id": create_user.pk
     }
     return kwargs
 

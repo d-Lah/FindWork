@@ -24,6 +24,7 @@ from util.error_resp_data import (
     WorkExperienceNotFoundError,
     TypeOfEmploymentNotFoundError
 )
+from util.exceptions import NotFoundException
 
 
 class CreateVacancySerializer(serializers.Serializer):
@@ -104,3 +105,48 @@ class VacancyInfoSerializer(serializers.ModelSerializer):
     rqd_specialization = SpecializationSerializer()
     rqd_work_experience = WorkExperienceSerializer()
     rqd_type_of_employment = TypeOfEmploymentSerializer(many=True)
+
+
+class EditVacancyInfoSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    body = serializers.CharField()
+    rqd_specialization = serializers.IntegerField()
+    rqd_work_experience = serializers.IntegerField()
+    rqd_skill = serializers.ListField(
+        child=serializers.IntegerField()
+    )
+    rqd_type_of_employment = serializers.ListField(
+        child=serializers.IntegerField()
+    )
+
+    def validate_rqd_specialization(self, value):
+        specialization = Specialization.objects.filter(pk=value).first()
+
+        if not specialization:
+            raise NotFoundException(SpecializationNotFoundError.detail)
+        return value
+
+    def validate_rqd_skill(self, value):
+        for id in value:
+            skill = Skill.objects.filter(pk=id).first()
+
+            if not skill:
+                raise NotFoundException(SkillNotFoundError.detail)
+        return value
+
+    def validate_rqd_work_experience(self, value):
+        work_experience = WorkExperience.objects.filter(pk=value).first()
+
+        if not work_experience:
+            raise NotFoundException(WorkExperienceNotFoundError.detail)
+        return value
+
+    def validate_rqd_type_of_employment(self, value):
+        for id in value:
+            type_of_employment = TypeOfEmployment.objects.filter(
+                pk=id
+            ).first()
+
+            if not type_of_employment:
+                raise NotFoundException(TypeOfEmploymentNotFoundError.detail)
+        return value

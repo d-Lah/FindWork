@@ -18,7 +18,7 @@ class TestDeleteResume:
             self,
             client,
             create_resume,
-            create_new_user,
+            create_user,
             user_auth_headers
     ):
         request = client.delete(
@@ -48,11 +48,11 @@ class TestDeleteResume:
     def test_should_response_user_not_employee_error(
             self,
             client,
-            create_new_user,
+            create_user,
             user_auth_headers,
     ):
-        create_new_user.is_employee = False
-        create_new_user.save()
+        create_user.is_employee = False
+        create_user.save()
 
         request = client.delete(
             reverse("resume_api:delete_resume"),

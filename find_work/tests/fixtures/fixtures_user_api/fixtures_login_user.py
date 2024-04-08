@@ -2,21 +2,21 @@ import pytest
 
 
 @pytest.fixture()
-def data_to_login_user(create_new_user):
-    create_new_user.is_active = True
-    create_new_user.save()
+def data_to_login_user(create_user):
+    create_user.is_active = True
+    create_user.save()
 
     data = {
-        "email": create_new_user.email,
+        "email": create_user.email,
         "password": "password"
     }
     return data
 
 
 @pytest.fixture()
-def data_to_login_user_w_not_active_user(create_new_user):
+def data_to_login_user_w_not_active_user(create_user):
     data = {
-        "email": create_new_user.email,
+        "email": create_user.email,
         "password": "password"
     }
     return data
@@ -35,10 +35,10 @@ def data_to_login_user_wo_email(
 
 @pytest.fixture()
 def data_to_login_user_wo_password(
-        create_new_user,
+        create_user,
 ):
     data = {
-        "email": create_new_user.email,
+        "email": create_user.email,
         "password": ""
     }
 
@@ -57,13 +57,13 @@ def data_to_login_user_w_wrong_email():
 
 @pytest.fixture()
 def data_to_login_user_w_wrong_password(
-        create_new_user,
+        create_user,
 ):
-    create_new_user.is_active = True
-    create_new_user.save()
+    create_user.is_active = True
+    create_user.save()
 
     data = {
-        "email": create_new_user.email,
+        "email": create_user.email,
         "password": "wrong_password"
     }
 
