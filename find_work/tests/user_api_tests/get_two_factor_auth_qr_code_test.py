@@ -2,8 +2,10 @@ import pytest
 
 from django.urls import reverse
 
-from util.success_resp_data import GetSuccess
-from util.error_resp_data import AuthHeadersError
+from rest_framework import status
+
+from util import error_resp_data
+from util import success_resp_data
 
 
 @pytest.mark.django_db
@@ -18,8 +20,10 @@ class TestGetTwoFactorAuthQRCode:
             headers=user_auth_headers,
         )
 
-        assert request.status_code == GetSuccess().get_status()
-        assert request.data["success"] == GetSuccess().get_data()["success"]
+        assert request.status_code == success_resp_data.get["status_code"]
+        assert request.data["detail"] == (
+            success_resp_data.get["data"]["detail"]
+        )
 
     def test_should_response_auth_headers_error(
             self,
@@ -29,7 +33,5 @@ class TestGetTwoFactorAuthQRCode:
             reverse("user_api:get_two_factor_auth_qr_code"),
         )
 
-        assert request.status_code == AuthHeadersError().get_status()
-        assert request.data["detail"] == (
-            AuthHeadersError().get_data()["detail"]
-        )
+        assert request.status_code == status.HTTP_401_UNAUTHORIZED
+        assert request.data["detail"] == error_resp_data.auth_headers

@@ -1,13 +1,15 @@
 from rest_framework import permissions
 
+from user.models import User
+
 from company.models import Company
 
 from vacancy.models import Vacancy
 
 from rest_framework import status
 
+from util import error_resp_data
 from util.exceptions import NotFoundException
-from util.error_resp_data import VacancyNotFound
 
 
 class IsEmployer(permissions.BasePermission):
@@ -48,7 +50,7 @@ class IsVacancyFound(permissions.BasePermission):
             is_delete=False
         )
         if not vacancy:
-            raise NotFoundException(VacancyNotFound.detail)
+            raise NotFoundException(error_resp_data.VacancyNotFound.detail)
 
         return True
 
@@ -91,3 +93,21 @@ class IsVacancyCreator(permissions.BasePermission):
             return True
         else:
             return False
+
+
+class IsUserFound(permissions.BasePermission):
+    message = "User not found."
+
+    def has_permission(
+            self,
+            request,
+            view
+    ):
+        user_id = view.kwargs["user_id"]
+        user = User.objects.filter(
+            pk=user_id,
+        )
+        if not user:
+            raise NotFoundException(error_resp_data.user_not_found)
+
+        return True

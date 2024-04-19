@@ -11,15 +11,12 @@ from find_work.settings import HTTP_LOCALHOST
 from user.models import User
 from user.serializer import UpdatePasswordSerializer
 
+from util import success_resp_data
 from util.mail_data_manager import (
     MailSubjectInUpdateUserPassword,
     MailMessageInUpdateUserPassword,
 )
 from util.mail_sender import MailSender
-from util.error_exceptions import IsFieldsEmpty
-from util.success_resp_data import UpdateSuccess
-from util.error_resp_data import FieldsEmptyError
-from util.error_validation import ErrorValidation
 
 
 class UpdatePassword(APIView):
@@ -31,16 +28,7 @@ class UpdatePassword(APIView):
             request
     ):
         serializer = UpdatePasswordSerializer(data=request.data)
-        serializer.is_valid()
-
-        error_validation = ErrorValidation(serializer.errors)
-        try:
-            error_validation.is_fields_empty()
-        except IsFieldsEmpty:
-            return Response(
-                status=FieldsEmptyError().get_status(),
-                data=FieldsEmptyError().get_data()
-            )
+        serializer.is_valid(raise_exception=True)
 
         user_id = request.user.id
         user = User.objects.filter(pk=user_id).first()
@@ -66,6 +54,6 @@ class UpdatePassword(APIView):
         ).send_mail_to_user()
 
         return Response(
-            status=UpdateSuccess().get_status(),
-            data=UpdateSuccess().get_data()
+            status=success_resp_data.update["status_code"],
+            data=success_resp_data.update["data"]
         )

@@ -6,13 +6,16 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from user.models import Profile
 from user.serializer import ProfileInfoSerializer
 
-from util.success_resp_data import GetSuccess
-from util.error_resp_data import UserNotFoundError
+from util import success_resp_data
+from util.permissions import IsUserFound
 
 
 class ProfileInfo(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [
+        IsAuthenticated,
+        IsUserFound
+    ]
 
     def get(
             self,
@@ -20,17 +23,15 @@ class ProfileInfo(APIView):
             user_id
     ):
         profile = Profile.objects.filter(user__id=user_id).first()
-        if not profile:
-            return Response(
-                status=UserNotFoundError().get_status(),
-                data=UserNotFoundError().get_data()
-            )
 
         serializer = ProfileInfoSerializer(profile)
 
         serializer_data = serializer.data
 
+        resp_data = success_resp_data.get["data"]
+        resp_data["request_data"] = serializer_data
+
         return Response(
-            status=GetSuccess().get_status(),
-            data=GetSuccess().get_data(serializer_data)
+            status=success_resp_data.get["status_code"],
+            data=resp_data
         )

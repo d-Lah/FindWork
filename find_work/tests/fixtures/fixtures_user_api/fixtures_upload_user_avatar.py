@@ -14,6 +14,14 @@ def data_to_upload_user_avatar():
 
 
 @pytest.fixture()
+def data_to_upload_user_avatar_wo_data():
+    data = {
+        "user_avatar_url": ""
+    }
+    return data
+
+
+@pytest.fixture()
 def data_to_upload_user_avatar_w_big_file():
     data = {
         "user_avatar_url": (

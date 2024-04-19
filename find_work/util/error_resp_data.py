@@ -1,5 +1,26 @@
 from rest_framework import status
 
+auth_headers = "Authentication credentials were not provided."
+user_with_given_email_not_found = "User with given email not found."
+field_empty = {
+    "field_blank": "This field may not be blank.",
+    "field_required": "This field is required."
+}
+user_not_found = "User not found."
+invalid_email = "Enter a valid email address."
+field_not_unique = "This field must be unique."
+field_not_boolean = "Must be a valid boolean."
+field_is_blank = "This field may not be blank."
+field_is_required = "This field is required."
+invalid_file_ext = "Invalid file extension."
+file_size_too_large = "File size to large."
+file_not_submitted = "No file was submitted."
+reset_password_totp_incap = "Reset password TOTP is incapacitated."
+totp_incap = "TOTP incapacitated."
+already_enable = "Two-factor authentication is already enabled."
+already_disable = "Two-factor authentication is already disabled."
+user_activation_uuid_incap = "User activate uuid is incapacitated."
+
 
 class AuthHeadersError:
     def get_status(self):

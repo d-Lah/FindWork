@@ -5,8 +5,9 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from user.models import User
 
-from util.success_resp_data import UpdateSuccess
-from util.error_resp_data import TwoFactorAuthAlreadyEnabledError
+from util import error_resp_data
+from util import success_resp_data
+from util.exceptions import AlreadyEnableOrDisableException
 
 
 class EnableTwoFactorAuth(APIView):
@@ -25,15 +26,14 @@ class EnableTwoFactorAuth(APIView):
         ).first()
 
         if not user:
-            return Response(
-                status=TwoFactorAuthAlreadyEnabledError().get_status(),
-                data=TwoFactorAuthAlreadyEnabledError().get_data()
+            raise AlreadyEnableOrDisableException(
+                error_resp_data.already_enable
             )
 
         user.is_two_factor_auth = True
         user.save()
 
         return Response(
-            status=UpdateSuccess().get_status(),
-            data=UpdateSuccess().get_data()
+            status=success_resp_data.update["status_code"],
+            data=success_resp_data.update["data"]
         )

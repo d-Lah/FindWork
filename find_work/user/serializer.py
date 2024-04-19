@@ -14,8 +14,13 @@ from user.models import (
 
 from util.error_resp_data import (
     UserNotFoundError,
-    InvalidFileExtError,
     FileSizeTooLargeError
+)
+from util import error_resp_data
+from util.exceptions import (
+    NotFoundException,
+    InvalidFileExtException,
+    FileSizeTooLargeException,
 )
 
 
@@ -35,8 +40,8 @@ class GenerateResetPasswordTOTPSerializer(serializers.Serializer):
         user = User.objects.filter(email=value).first()
 
         if not user:
-            raise serializers.ValidationError(
-                UserNotFoundError().get_data()["user"]
+            raise NotFoundException(
+                error_resp_data.user_with_given_email_not_found
             )
 
         return value
@@ -82,18 +87,17 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
         user = User.objects.filter(email=value).first()
 
         if not user:
-            raise serializers.ValidationError(
-                UserNotFoundError().get_data()["user"]
+            raise NotFoundException(
+                error_resp_data.user_with_given_email_not_found
             )
         return value
 
 
-class UpdateEmailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = [
-            "email",
-        ]
+class UpdateEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        max_length=150,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
 
 
 class UpdatePasswordSerializer(serializers.ModelSerializer):
@@ -114,13 +118,11 @@ class UploadAvatarSerializer(serializers.ModelSerializer):
     def validate_user_avatar_url(self, value):
         image_ext = value.name.split(".")[1]
         if image_ext not in ALLOWED_IMAGE_EXT:
-            raise serializers.ValidationError(
-                InvalidFileExtError().get_data()["file"]
-            )
+            raise InvalidFileExtException(error_resp_data.invalid_file_ext)
 
         if value.size > IMAGE_MAX_MEMORY_SIZE:
-            raise serializers.ValidationError(
-                FileSizeTooLargeError().get_data()["file"]
+            raise FileSizeTooLargeException(
+                error_resp_data.file_size_too_large
             )
 
 
@@ -161,12 +163,12 @@ class ValidateResetPasswordTOTPSerializer(serializers.Serializer):
         user = User.objects.filter(email=value).first()
 
         if not user:
-            raise serializers.ValidationError(
-                UserNotFoundError().get_data()["user"]
+            raise NotFoundException(
+                error_resp_data.user_with_given_email_not_found
             )
 
         return value
 
 
-class ValidateTOTPTokenSerializer(serializers.Serializer):
-    totp_token = serializers.CharField()
+class ValidateTOTPSerializer(serializers.Serializer):
+    totp = serializers.CharField()

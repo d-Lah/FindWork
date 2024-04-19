@@ -23,22 +23,10 @@ def data_to_login_user_w_not_active_user(create_user):
 
 
 @pytest.fixture()
-def data_to_login_user_wo_email(
+def data_to_login_user_wo_data(
 ):
     data = {
         "email": "",
-        "password": "password"
-    }
-
-    return data
-
-
-@pytest.fixture()
-def data_to_login_user_wo_password(
-        create_user,
-):
-    data = {
-        "email": create_user.email,
         "password": ""
     }
 
