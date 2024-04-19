@@ -1,5 +1,5 @@
 from django.urls import reverse
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,12 +11,14 @@ from find_work.settings import HTTP_LOCALHOST
 from user.models import User
 from user.serializer import UpdatePasswordSerializer
 
+from util import error_resp_data
 from util import success_resp_data
 from util.mail_data_manager import (
     MailSubjectInUpdateUserPassword,
     MailMessageInUpdateUserPassword,
 )
 from util.mail_sender import MailSender
+from util.exceptions import WrongPasswordException
 
 
 class UpdatePassword(APIView):
@@ -33,9 +35,16 @@ class UpdatePassword(APIView):
         user_id = request.user.id
         user = User.objects.filter(pk=user_id).first()
 
-        deserialized_data = serializer.validated_data
+        serialized_data = serializer.validated_data
 
-        user.password = make_password(deserialized_data["password"])
+        is_check_password = check_password(
+            serialized_data["old_password"],
+            user.password
+        )
+        if not is_check_password:
+            raise WrongPasswordException(error_resp_data.wrong_password)
+
+        user.password = make_password(serialized_data["new_password"])
         user.save()
 
         link_on_generate_reset_password_uuid = (

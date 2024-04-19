@@ -55,5 +55,22 @@ class TestUpdatePassword:
             headers=user_auth_headers,
             data=data_to_update_password_wo_data
         )
+
         assert request.status_code == status.HTTP_400_BAD_REQUEST
-        assert request.data["password"][0] == error_resp_data.field_is_blank
+        for field in request.data:
+            assert request.data[field][0] == error_resp_data.field_is_blank
+
+    def test_should_response_wrong_password_error(
+        self,
+        client,
+        user_auth_headers,
+        data_to_update_password_w_wrong_old_password,
+    ):
+        request = client.put(
+            reverse("user_api:update_password"),
+            headers=user_auth_headers,
+            data=data_to_update_password_w_wrong_old_password
+        )
+
+        assert request.status_code == status.HTTP_403_FORBIDDEN
+        assert request.data["detail"] == error_resp_data.wrong_password

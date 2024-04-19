@@ -42,3 +42,10 @@ class UserActivationUUIDIncapException(APIException):
 
     def __init__(self, detail):
         self.detail = {"detail": detail}
+
+
+class WrongPasswordException(APIException):
+    status_code = status.HTTP_403_FORBIDDEN
+
+    def __init__(self, detail):
+        self.detail = {"detail": detail}

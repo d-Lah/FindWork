@@ -12,7 +12,6 @@ from user.api import (
     reset_password,
     update_password,
     activate_new_user,
-    validate_password,
     edit_profile_info,
     register_new_user,
     upload_user_avatar,
@@ -65,11 +64,6 @@ urlpatterns = [
         "edit-profile-info",
         edit_profile_info.EditProfileInfo.as_view(),
         name="edit_profile_info"
-    ),
-    path(
-        "validate-password",
-        validate_password.ValidatePassword.as_view(),
-        name="validate_password"
     ),
     path(
         "update-password",

@@ -20,6 +20,7 @@ totp_incap = "TOTP incapacitated."
 already_enable = "Two-factor authentication is already enabled."
 already_disable = "Two-factor authentication is already disabled."
 user_activation_uuid_incap = "User activate uuid is incapacitated."
+wrong_password = "Wrong password."
 
 
 class AuthHeadersError:

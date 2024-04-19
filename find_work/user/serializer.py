@@ -100,12 +100,9 @@ class UpdateEmailSerializer(serializers.Serializer):
     )
 
 
-class UpdatePasswordSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = [
-            "password"
-        ]
+class UpdatePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(max_length=128)
+    new_password = serializers.CharField(max_length=128)
 
 
 class UploadAvatarSerializer(serializers.ModelSerializer):
@@ -147,12 +144,6 @@ class UserInfoSerializer(serializers.ModelSerializer):
             source="company.id",
             required=False
         )
-
-
-class ValidatePasswordSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["password"]
 
 
 class ValidateResetPasswordTOTPSerializer(serializers.Serializer):
