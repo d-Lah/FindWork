@@ -2,6 +2,7 @@ from django.urls import path
 
 from vacancy.api import (
     vacancy_info,
+    delete_vacancy,
     create_vacancy,
     edit_vacancy_info,
 )
@@ -23,5 +24,10 @@ urlpatterns = [
         "edit-vacancy-info/<int:vacancy_id>",
         edit_vacancy_info.EditVacancyInfo.as_view(),
         name="edit_vacancy_info",
+    ),
+    path(
+        "delete-vacancy/<int:vacancy_id>",
+        delete_vacancy.DeleteVacancy.as_view(),
+        name="delete_vacancy"
     ),
 ]
