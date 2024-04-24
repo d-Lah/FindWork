@@ -1,26 +1,35 @@
 from rest_framework import status
 
+user_not_employee = "User not employee"
+user_not_resume_owner = "User not resume owner"
 auth_headers = "Authentication credentials were not provided."
-user_with_given_email_not_found = "User with given email not found."
-field_empty = {
-    "field_blank": "This field may not be blank.",
-    "field_required": "This field is required."
-}
+
 user_not_found = "User not found."
-invalid_email = "Enter a valid email address."
-field_not_unique = "This field must be unique."
-field_not_boolean = "Must be a valid boolean."
-field_is_blank = "This field may not be blank."
+skill_not_found = "Skill not found."
+resume_not_found = "Resume not found."
+company_not_found = "Company not found."
+vacancy_not_found = "Vacancy not found."
+specialization_not_found = "Specialization not found."
+work_experience_not_found = "Work experience not found."
+type_of_employment_not_found = "Type of employment not found."
+user_with_given_email_not_found = "User with given email not found."
+
 field_is_required = "This field is required."
-invalid_file_ext = "Invalid file extension."
+field_not_boolean = "Must be a valid boolean."
+field_not_unique = "This field must be unique."
+field_is_blank = "This field may not be blank."
+
 file_size_too_large = "File size to large."
+invalid_file_ext = "Invalid file extension."
 file_not_submitted = "No file was submitted."
-reset_password_totp_incap = "Reset password TOTP is incapacitated."
+
 totp_incap = "TOTP incapacitated."
+wrong_password = "Wrong password."
+invalid_email = "Enter a valid email address."
 already_enable = "Two-factor authentication is already enabled."
 already_disable = "Two-factor authentication is already disabled."
+reset_password_totp_incap = "Reset password TOTP is incapacitated."
 user_activation_uuid_incap = "User activate uuid is incapacitated."
-wrong_password = "Wrong password."
 
 
 class AuthHeadersError:

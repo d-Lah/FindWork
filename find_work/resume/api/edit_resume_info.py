@@ -15,54 +15,51 @@ from type_of_employment.models import TypeOfEmployment
 
 from resume.serializer import EditResumeInfoSerializer
 
-from util.error_resp_data import (
-    FieldsEmptyError,
-    FieldsNotFoundError,
-    ResumeNotFoundError,
+from util.permissions import (
+    IsEmployee,
+    IsResumeFound,
+    IsResumeOwner
 )
-from util.error_exceptions import (
-    IsFieldsEmpty,
-    IsFieldsNotFound
-)
-from util.permissions import IsEmployee
-from util.success_resp_data import UpdateSuccess
-from util.error_validation import ErrorValidation
+from util import success_resp_data
 
 
 class EditResumeInfo(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [
         IsAuthenticated,
-        IsEmployee
+        IsResumeFound,
+        IsEmployee,
+        IsResumeOwner
     ]
 
     def put(
             self,
             request,
+            resume_id
     ):
         serializer = EditResumeInfoSerializer(data=request.data)
 
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
 
-        error_validation = ErrorValidation(serializer.errors)
-        try:
-            error_validation.is_fields_empty()
-            error_validation.is_fields_not_found()
-        except IsFieldsEmpty:
-            return Response(
-                status=FieldsEmptyError().get_status(),
-                data=FieldsEmptyError().get_data()
-            )
-        except IsFieldsNotFound:
-            errors = {}
-            for field in serializer.errors:
-                error_msg = str(serializer.errors[field][0])
-                errors[field] = error_msg
-
-            return Response(
-                status=FieldsNotFoundError().get_status(),
-                data=errors
-            )
+        # error_validation = ErrorValidation(serializer.errors)
+        # try:
+        #     error_validation.is_fields_empty()
+        #     error_validation.is_fields_not_found()
+        # except IsFieldsEmpty:
+        #     return Response(
+        #         status=FieldsEmptyError().get_status(),
+        #         data=FieldsEmptyError().get_data()
+        #     )
+        # except IsFieldsNotFound:
+        #     errors = {}
+        #     for field in serializer.errors:
+        #         error_msg = str(serializer.errors[field][0])
+        #         errors[field] = error_msg
+        #
+        #     return Response(
+        #         status=FieldsNotFoundError().get_status(),
+        #         data=errors
+        #     )
 
         user_id = request.user.id
         resume = Resume.objects.filter(
@@ -70,11 +67,11 @@ class EditResumeInfo(APIView):
             is_delete=False
         ).first()
 
-        if not resume:
-            return Response(
-                status=ResumeNotFoundError().get_status(),
-                data=ResumeNotFoundError().get_data()
-            )
+        # if not resume:
+        #     return Response(
+        #         status=ResumeNotFoundError().get_status(),
+        #         data=ResumeNotFoundError().get_data()
+        #     )
 
         serializer_data = serializer.validated_data
 
@@ -115,6 +112,6 @@ class EditResumeInfo(APIView):
             resume.type_of_employment.add(type_of_employment)
 
         return Response(
-            status=UpdateSuccess().get_status(),
-            data=UpdateSuccess().get_data()
+            status=success_resp_data.update["status_code"],
+            data=success_resp_data.update["data"]
         )

@@ -21,12 +21,12 @@ urlpatterns = [
         name="resume_info"
     ),
     path(
-        "edit-resume-info",
+        "edit-resume-info/<int:resume_id>",
         edit_resume_info.EditResumeInfo.as_view(),
         name="edit_resume_info"
     ),
     path(
-        "delete-resume",
+        "delete-resume/<int:resume_id>",
         delete_resume.DeleteResume.as_view(),
         name="delete_resume"
     )

@@ -5,39 +5,34 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from resume.models import Resume
 
-from util.permissions import IsEmployee
-from util.success_resp_data import DeleteSuccess
-from util.error_resp_data import ResumeNotFoundError
+from util import success_resp_data
+from util.permissions import (
+    IsEmployee,
+    IsResumeFound,
+    IsResumeOwner
+)
 
 
 class DeleteResume(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [
         IsAuthenticated,
-        IsEmployee
+        IsResumeFound,
+        IsEmployee,
+        IsResumeOwner
     ]
 
     def delete(
             self,
             request,
+            resume_id
     ):
-
-        user_id = request.user.id
-        resume = Resume.objects.filter(
-            author__id=user_id,
-            is_delete=False
-        ).first()
-
-        if not resume:
-            return Response(
-                status=ResumeNotFoundError().get_status(),
-                data=ResumeNotFoundError().get_data()
-            )
+        resume = Resume.objects.filter(pk=resume_id).first()
 
         resume.is_delete = True
         resume.save()
 
         return Response(
-            status=DeleteSuccess().get_status(),
-            data=DeleteSuccess().get_data()
+            status=success_resp_data.delete["status_code"],
+            data=success_resp_data.delete["data"]
         )

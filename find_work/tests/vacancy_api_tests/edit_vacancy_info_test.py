@@ -13,6 +13,7 @@ from util.error_resp_data import (
     WorkExperienceNotFoundError,
     TypeOfEmploymentNotFoundError,
 )
+from util import error_resp_data
 from util.success_resp_data import UpdateSuccess
 
 
@@ -133,10 +134,10 @@ class TestEditVacancy:
         )
 
         assert request.status_code == FieldsEmptyError().get_status()
-        for key in request.data:
+        for field in request.data:
             assert (
-                FieldsEmptyError.detail["opt1"] in request.data[key][0]
-                or FieldsEmptyError.detail["opt2"] in request.data[key][0]
+                request.data[field][0] == error_resp_data.field_is_blank
+                or request.data[field][0] == error_resp_data.field_is_required
             )
 
     def test_should_response_wrong_rqd_specialization_error(
