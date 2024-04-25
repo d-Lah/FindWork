@@ -72,6 +72,25 @@ class IsResumeFound(permissions.BasePermission):
         return True
 
 
+class IsCompanyFound(permissions.BasePermission):
+    message = "Company not found"
+
+    def has_permission(
+            self,
+            request,
+            view
+    ):
+        company_id = view.kwargs["company_id"]
+        company = Company.objects.filter(
+            pk=company_id,
+            is_delete=False
+        )
+        if not company:
+            raise NotFoundException(error_resp_data.company_not_found)
+
+        return True
+
+
 class IsCompanyOwner(permissions.BasePermission):
     message = "User not company owner"
 
@@ -84,10 +103,10 @@ class IsCompanyOwner(permissions.BasePermission):
 
         company = Company.objects.filter(author__id=user_id).first()
 
-        if company:
-            return True
-        else:
+        if not company:
             return False
+
+        return True
 
 
 class IsResumeOwner(permissions.BasePermission):

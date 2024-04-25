@@ -7,7 +7,6 @@ from resume.models import Resume
 
 from util import success_resp_data
 from util.permissions import (
-    IsEmployee,
     IsResumeFound,
     IsResumeOwner
 )
@@ -18,7 +17,6 @@ class DeleteResume(APIView):
     permission_classes = [
         IsAuthenticated,
         IsResumeFound,
-        IsEmployee,
         IsResumeOwner
     ]
 

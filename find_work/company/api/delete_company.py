@@ -5,39 +5,33 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from company.models import Company
 
-from util.permissions import IsEmployer
-from util.success_resp_data import DeleteSuccess
-from util.error_resp_data import CompanyNotFoundError
+from util import success_resp_data
+from util.permissions import (
+    IsCompanyFound,
+    IsCompanyOwner,
+)
 
 
 class DeleteCompany(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [
         IsAuthenticated,
-        IsEmployer
+        IsCompanyFound,
+        IsCompanyOwner
     ]
 
     def delete(
             self,
             request,
+            company_id
     ):
 
-        user_id = request.user.id
-        resume = Company.objects.filter(
-            author__id=user_id,
-            is_delete=False
-        ).first()
+        company = Company.objects.filter(pk=company_id).first()
 
-        if not resume:
-            return Response(
-                status=CompanyNotFoundError().get_status(),
-                data=CompanyNotFoundError().get_data()
-            )
-
-        resume.is_delete = True
-        resume.save()
+        company.is_delete = True
+        company.save()
 
         return Response(
-            status=DeleteSuccess().get_status(),
-            data=DeleteSuccess().get_data()
+            status=success_resp_data.delete["status_code"],
+            data=success_resp_data.delete["data"]
         )

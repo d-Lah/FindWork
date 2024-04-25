@@ -15,8 +15,6 @@ class TestDeleteResume:
     def test_should_delete_resume(
             self,
             client,
-            create_user,
-            create_resume,
             get_resume_id,
             user_auth_headers,
     ):
@@ -38,7 +36,6 @@ class TestDeleteResume:
     def test_response_user_auth_headers_error(
             self,
             client,
-            create_resume,
             get_resume_id,
     ):
         request = client.delete(
@@ -51,31 +48,9 @@ class TestDeleteResume:
         assert request.status_code == status.HTTP_401_UNAUTHORIZED
         assert request.data["detail"] == error_resp_data.auth_headers
 
-    def test_should_response_user_not_employee_error(
-            self,
-            client,
-            create_user,
-            get_resume_id,
-            user_auth_headers,
-    ):
-        create_user.is_employee = False
-        create_user.save()
-
-        request = client.delete(
-            reverse(
-                "resume_api:delete_resume",
-                kwargs=get_resume_id
-            ),
-            headers=user_auth_headers
-        )
-
-        assert request.status_code == status.HTTP_403_FORBIDDEN
-        assert request.data["detail"] == error_resp_data.user_not_employee
-
     def test_response_resume_not_found(
             self,
             client,
-            create_resume,
             user_auth_headers,
             get_wrong_resume_id,
     ):
@@ -93,7 +68,6 @@ class TestDeleteResume:
     def test_response_user_not_resume_owner_error(
             self,
             client,
-            create_resume,
             get_resume_id,
             sec_user_auth_headers,
     ):

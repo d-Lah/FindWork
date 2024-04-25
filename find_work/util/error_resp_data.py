@@ -1,7 +1,9 @@
 from rest_framework import status
 
 user_not_employee = "User not employee"
+user_not_employer = "User not employer"
 user_not_resume_owner = "User not resume owner"
+user_not_company_owner = "User not company owner"
 auth_headers = "Authentication credentials were not provided."
 
 user_not_found = "User not found."

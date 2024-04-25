@@ -12,10 +12,6 @@ from user.models import (
     UserAvatar,
 )
 
-from util.error_resp_data import (
-    UserNotFoundError,
-    FileSizeTooLargeError
-)
 from util import error_resp_data
 from util.exceptions import (
     NotFoundException,

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from find_work.settings import (
     ALLOWED_IMAGE_EXT,
@@ -12,10 +13,11 @@ from company.models import (
     CompanyAvatar
 )
 
-from util.error_resp_data import (
-    InvalidFileExtError,
-    FileSizeTooLargeError
+from util.exceptions import (
+    InvalidFileExtException,
+    FileSizeTooLargeException
 )
+from util import error_resp_data
 
 
 class CreateCompanySerializer(serializers.ModelSerializer):
@@ -24,6 +26,9 @@ class CreateCompanySerializer(serializers.ModelSerializer):
         fields = [
             "name",
         ]
+    name = serializers.CharField(
+        validators=[UniqueValidator(queryset=Company.objects.all())]
+    )
 
 
 class CompanyInfoSerializer(serializers.ModelSerializer):
@@ -48,6 +53,9 @@ class EditCompanyInfoSerializer(serializers.ModelSerializer):
         fields = [
             "name",
         ]
+    name = serializers.CharField(
+        validators=[UniqueValidator(queryset=Company.objects.all())]
+    )
 
 
 class UploadCompanyAvatarSerializer(serializers.ModelSerializer):
@@ -60,11 +68,9 @@ class UploadCompanyAvatarSerializer(serializers.ModelSerializer):
     def validate_company_avatar_url(self, value):
         image_ext = value.name.split(".")[1]
         if image_ext not in ALLOWED_IMAGE_EXT:
-            raise serializers.ValidationError(
-                InvalidFileExtError().get_data()["file"]
-            )
+            raise InvalidFileExtException(error_resp_data.invalid_file_ext)
 
         if value.size > IMAGE_MAX_MEMORY_SIZE:
-            raise serializers.ValidationError(
-                FileSizeTooLargeError().get_data()["file"]
+            raise FileSizeTooLargeException(
+                error_resp_data.file_size_too_large
             )
