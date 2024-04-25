@@ -11,7 +11,7 @@ from find_work.settings import CRYPTOGRAPHY_FERNET_KEY
 
 from user.models import User
 
-from util.success_resp_data import GetSuccess
+from util import success_resp_data
 
 
 class GetTwoFactorAuthQRCode(APIView):
@@ -35,7 +35,10 @@ class GetTwoFactorAuthQRCode(APIView):
             issuer_name="FindWork"
         )
 
+        resp_data = success_resp_data.get["data"]
+        resp_data["request_data"] = otp_auth_url
+
         return Response(
-            status=GetSuccess().get_status(),
-            data=GetSuccess().get_data(otp_auth_url)
+            status=success_resp_data.get["status_code"],
+            data=resp_data
         )

@@ -2,18 +2,15 @@ import pytest
 
 from django.urls import reverse
 
+from rest_framework import status
+
 from user.models import (
     Profile,
     UserAvatar,
 )
 
-from util.error_resp_data import (
-    AuthHeadersError,
-    FieldsEmptyError,
-    InvalidFileExtError,
-    FileSizeTooLargeError,
-)
-from util.success_resp_data import UploadSuccess
+from util import error_resp_data
+from util import success_resp_data
 
 
 @pytest.mark.django_db
@@ -40,9 +37,10 @@ class TestUploadUserAvatar:
             headers=user_auth_headers,
             data=data_to_upload_user_avatar
         )
-        assert request.status_code == UploadSuccess().get_status()
-        assert request.data["success"] == (
-            UploadSuccess().get_data()["success"]
+
+        assert request.status_code == success_resp_data.upload["status_code"]
+        assert request.data["detail"] == (
+            success_resp_data.upload["data"]["detail"]
         )
 
     def test_should_response_auth_headers_error(
@@ -53,26 +51,27 @@ class TestUploadUserAvatar:
             reverse("user_api:upload_user_avatar"),
         )
 
-        assert request.status_code == AuthHeadersError().get_status()
-        assert request.data["detail"] == (
-            AuthHeadersError().get_data()["detail"]
-        )
+        assert request.status_code == status.HTTP_401_UNAUTHORIZED
+        assert request.data["detail"] == error_resp_data.auth_headers
 
-    def test_should_response_avatar_fields_empty_error(
+    def test_should_response_avatar_file_not_submitted_error(
             self,
             client,
-            user_auth_headers
+            user_auth_headers,
+            data_to_upload_user_avatar_wo_data
     ):
         request = client.post(
             reverse("user_api:upload_user_avatar"),
             headers=user_auth_headers,
-        )
-        assert request.status_code == FieldsEmptyError().get_status()
-        assert request.data["fields"] == (
-            FieldsEmptyError().get_data()["fields"]
+            data=data_to_upload_user_avatar_wo_data
         )
 
-    def test_should_response_image_size_too_large_error(
+        assert request.status_code == status.HTTP_400_BAD_REQUEST
+        assert request.data["user_avatar_url"][0] == (
+            error_resp_data.file_not_submitted
+        )
+
+    def test_should_response_large_size_too_large_error(
             self,
             client,
             user_auth_headers,
@@ -83,10 +82,9 @@ class TestUploadUserAvatar:
             headers=user_auth_headers,
             data=data_to_upload_user_avatar_w_big_file
         )
-        assert request.status_code == FileSizeTooLargeError().get_status()
-        assert request.data["file"] == (
-            FileSizeTooLargeError().get_data()["file"]
-        )
+
+        assert request.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+        assert request.data["detail"] == error_resp_data.file_size_too_large
 
     def test_should_response_invalid_image_ext_error(
             self,
@@ -99,7 +97,6 @@ class TestUploadUserAvatar:
             headers=user_auth_headers,
             data=data_to_upload_user_avatar_w_file_w_invalid_ext
         )
-        assert request.status_code == InvalidFileExtError().get_status()
-        assert request.data["file"] == (
-            InvalidFileExtError().get_data()["file"]
-        )
+
+        assert request.status_code == status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+        assert request.data["detail"] == error_resp_data.invalid_file_ext

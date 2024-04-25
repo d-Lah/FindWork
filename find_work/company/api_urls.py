@@ -22,17 +22,17 @@ urlpatterns = [
         name="company_info"
     ),
     path(
-        "edit-company-info",
+        "edit-company-info/<int:company_id>",
         edit_company_info.EditCompanyInfo.as_view(),
         name="edit_company_info"
     ),
     path(
-        "upload-company-avatar",
+        "upload-company-avatar/<int:company_id>",
         upload_company_avatar.UploadCompanyAvatar.as_view(),
         name="upload_company_avatar"
     ),
     path(
-        "delete-company",
+        "delete-company/<int:company_id>",
         delete_company.DeleteCompany.as_view(),
         name="delete_company"
     ),

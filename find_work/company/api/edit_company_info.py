@@ -6,61 +6,34 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from company.models import Company
 from company.serializer import EditCompanyInfoSerializer
 
-from util.error_resp_data import (
-    FieldsEmptyError,
-    CompanyNotFoundError,
-    NameAlreadyExistsError,
+from util.permissions import (
+    IsCompanyOwner,
+    IsCompanyFound
 )
-from util.error_exceptions import (
-    IsFieldsEmpty,
-    IsFieldsAlreadyExists
-)
-from util.permissions import IsEmployer
-from util.success_resp_data import UpdateSuccess
-from util.error_validation import ErrorValidation
+from util import success_resp_data
 
 
 class EditCompanyInfo(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [
         IsAuthenticated,
-        IsEmployer
+        IsCompanyFound,
+        IsCompanyOwner
     ]
 
     def put(
             self,
             request,
+            company_id
     ):
         serializer = EditCompanyInfoSerializer(data=request.data)
 
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
 
-        error_validation = ErrorValidation(serializer.errors)
-        try:
-            error_validation.is_fields_empty()
-            error_validation.is_fields_already_exists()
-        except IsFieldsEmpty:
-            return Response(
-                status=FieldsEmptyError().get_status(),
-                data=FieldsEmptyError().get_data()
-            )
-        except IsFieldsAlreadyExists:
-            return Response(
-                status=NameAlreadyExistsError().get_status(),
-                data=NameAlreadyExistsError().get_data()
-            )
-
-        user_id = request.user.id
         company = Company.objects.filter(
-            author__id=user_id,
+            pk=company_id,
             is_delete=False
         ).first()
-
-        if not company:
-            return Response(
-                status=CompanyNotFoundError().get_status(),
-                data=CompanyNotFoundError().get_data()
-            )
 
         serializer_data = serializer.validated_data
 
@@ -68,6 +41,6 @@ class EditCompanyInfo(APIView):
         company.save()
 
         return Response(
-            status=UpdateSuccess().get_status(),
-            data=UpdateSuccess().get_data()
+            status=success_resp_data.update["status_code"],
+            data=success_resp_data.update["data"]
         )

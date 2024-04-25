@@ -5,8 +5,9 @@ from rest_framework.response import Response
 
 from user.models import User
 
-from util.success_resp_data import UpdateSuccess
-from util.error_resp_data import TwoFactorAuthAlreadyDisabledError
+from util import error_resp_data
+from util import success_resp_data
+from util.exceptions import AlreadyEnableOrDisableException
 
 
 class DisableTwoFactorAuth(APIView):
@@ -25,15 +26,14 @@ class DisableTwoFactorAuth(APIView):
         ).first()
 
         if not user:
-            return Response(
-                status=TwoFactorAuthAlreadyDisabledError().get_status(),
-                data=TwoFactorAuthAlreadyDisabledError().get_data()
+            raise AlreadyEnableOrDisableException(
+                error_resp_data.already_disable
             )
 
         user.is_two_factor_auth = False
         user.save()
 
         return Response(
-            status=UpdateSuccess().get_status(),
-            data=UpdateSuccess().get_data()
+            status=success_resp_data.update["status_code"],
+            data=success_resp_data.update["data"]
         )

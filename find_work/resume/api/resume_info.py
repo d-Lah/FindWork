@@ -6,13 +6,16 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from resume.models import Resume
 from resume.serializer import ResumeInfoSerializer
 
-from util.success_resp_data import GetSuccess
-from util.error_resp_data import ResumeNotFoundError
+from util import success_resp_data
+from util.permissions import IsResumeFound
 
 
 class ResumeInfo(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [
+        IsAuthenticated,
+        IsResumeFound
+    ]
 
     def get(
             self,
@@ -24,17 +27,14 @@ class ResumeInfo(APIView):
             is_delete=False
         ).first()
 
-        if not resume:
-            return Response(
-                status=ResumeNotFoundError().get_status(),
-                data=ResumeNotFoundError().get_data()
-            )
-
         serializer = ResumeInfoSerializer(resume)
 
         serializer_data = serializer.data
 
+        resp_data = success_resp_data.get["data"]
+        resp_data["request_data"] = serializer_data
+
         return Response(
-            status=GetSuccess().get_status(),
-            data=GetSuccess().get_data(serializer_data)
+            status=success_resp_data.get["status_code"],
+            data=resp_data
         )

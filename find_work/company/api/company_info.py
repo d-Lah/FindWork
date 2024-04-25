@@ -6,13 +6,16 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from company.models import Company
 from company.serializer import CompanyInfoSerializer
 
-from util.success_resp_data import GetSuccess
-from util.error_resp_data import CompanyNotFoundError
+from util import success_resp_data
+from util.permissions import IsCompanyFound
 
 
 class CompanyInfo(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [
+        IsAuthenticated,
+        IsCompanyFound
+    ]
 
     def get(
             self,
@@ -24,17 +27,14 @@ class CompanyInfo(APIView):
             is_delete=False
         ).first()
 
-        if not company:
-            return Response(
-                status=CompanyNotFoundError().get_status(),
-                data=CompanyNotFoundError().get_data()
-            )
-
         serializer = CompanyInfoSerializer(company)
 
         serializer_data = serializer.data
 
+        resp_data = success_resp_data.get["data"]
+        resp_data["request_data"] = serializer_data
+
         return Response(
-            status=GetSuccess().get_status(),
-            data=GetSuccess().get_data(serializer_data)
+            status=success_resp_data.get["status_code"],
+            data=resp_data
         )

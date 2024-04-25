@@ -9,17 +9,8 @@ from company.serializer import CreateCompanySerializer
 
 from user.models import User
 
-from util.error_resp_data import (
-    FieldsEmptyError,
-    NameAlreadyExistsError,
-)
-from util.error_exceptions import (
-    IsFieldsEmpty,
-    IsFieldsAlreadyExists
-)
+from util import success_resp_data
 from util.permissions import IsEmployer
-from util.success_resp_data import CreateSuccess
-from util.error_validation import ErrorValidation
 
 
 class CreateCompany(APIView):
@@ -35,22 +26,7 @@ class CreateCompany(APIView):
     ):
         serializer = CreateCompanySerializer(data=request.data)
 
-        serializer.is_valid()
-
-        error_validation = ErrorValidation(serializer.errors)
-        try:
-            error_validation.is_fields_empty()
-            error_validation.is_fields_already_exists()
-        except IsFieldsEmpty:
-            return Response(
-                status=FieldsEmptyError().get_status(),
-                data=FieldsEmptyError().get_data()
-            )
-        except IsFieldsAlreadyExists:
-            return Response(
-                status=NameAlreadyExistsError().get_status(),
-                data=NameAlreadyExistsError().get_data()
-            )
+        serializer.is_valid(raise_exception=True)
 
         user_id = request.user.id
         author = User.objects.filter(pk=user_id).first()
@@ -63,6 +39,6 @@ class CreateCompany(APIView):
         )
 
         return Response(
-            status=CreateSuccess().get_status(),
-            data=CreateSuccess().get_data()
+            status=success_resp_data.create["status_code"],
+            data=success_resp_data.create["data"]
         )

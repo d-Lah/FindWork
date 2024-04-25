@@ -21,14 +21,17 @@ def data_to_create_resume(
 
 
 @pytest.fixture()
-def data_to_create_resume_wo_data():
+def data_to_create_resume_wo_data(
+        create_specialization,
+        create_work_experience
+):
 
     data = {
         "about": "",
-        "specialization": "",
-        "work_experience": "",
-        "skill": "",
-        "type_of_employment": ""
+        "specialization": 1,
+        "work_experience": 1,
+        "skill": [],
+        "type_of_employment": []
     }
 
     return data

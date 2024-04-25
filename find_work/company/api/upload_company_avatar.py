@@ -10,19 +10,11 @@ from company.models import (
 )
 from company.serializer import UploadCompanyAvatarSerializer
 
-from util.error_resp_data import (
-    FieldsEmptyError,
-    InvalidFileExtError,
-    FileSizeTooLargeError,
+from util.permissions import (
+    IsCompanyOwner,
+    IsCompanyFound
 )
-from util.error_exceptions import (
-    IsFileFieldsEmpty,
-    IsFileFieldsInvalid,
-    IsFileFieldsSizeTooLarge
-)
-from util.permissions import IsEmployer
-from util.success_resp_data import UploadSuccess
-from util.error_validation import ErrorValidation
+from util import success_resp_data
 
 
 class UploadCompanyAvatar(APIView):
@@ -31,42 +23,25 @@ class UploadCompanyAvatar(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [
         IsAuthenticated,
-        IsEmployer
+        IsCompanyFound,
+        IsCompanyOwner
     ]
 
     def post(
             self,
-            request
+            request,
+            company_id
     ):
         serializer = UploadCompanyAvatarSerializer(data=request.FILES)
 
-        serializer.is_valid()
-
-        error_validation = ErrorValidation(serializer.errors)
-        try:
-            error_validation.is_file_fields_empty()
-            error_validation.is_file_fields_invalid()
-            error_validation.is_file_fields_size_too_large()
-        except IsFileFieldsEmpty:
-            return Response(
-                status=FieldsEmptyError().get_status(),
-                data=FieldsEmptyError().get_data()
-            )
-        except IsFileFieldsInvalid:
-            return Response(
-                status=InvalidFileExtError().get_status(),
-                data=InvalidFileExtError().get_data()
-            )
-        except IsFileFieldsSizeTooLarge:
-            return Response(
-                status=FileSizeTooLargeError().get_status(),
-                data=FileSizeTooLargeError().get_data()
-            )
+        serializer.is_valid(raise_exception=True)
 
         serializer_data = serializer.validated_data
 
-        user_id = request.user.id
-        company = Company.objects.filter(author__id=user_id).first()
+        company = Company.objects.filter(
+            pk=company_id,
+            is_delete=False
+        ).first()
 
         new_company_avatar = CompanyAvatar.objects.create(
             for_company=company,
@@ -77,6 +52,6 @@ class UploadCompanyAvatar(APIView):
         company.save()
 
         return Response(
-            status=UploadSuccess().get_status(),
-            data=UploadSuccess().get_data()
+            status=success_resp_data.upload["status_code"],
+            data=success_resp_data.upload["data"]
         )
