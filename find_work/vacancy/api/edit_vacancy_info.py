@@ -15,22 +15,12 @@ from type_of_employment.models import TypeOfEmployment
 
 from vacancy.serializer import EditVacancyInfoSerializer
 
-from util.error_resp_data import (
-    VacancyNotFound,
-    FieldsEmptyError,
-    FieldsNotFoundError,
-)
-from util.error_exceptions import (
-    IsFieldsEmpty,
-    IsFieldsNotFound
-)
 from util.permissions import (
     IsCompanyOwner,
     IsVacancyFound,
     IsVacancyCreator,
 )
-from util.success_resp_data import UpdateSuccess
-from util.error_validation import ErrorValidation
+from util import success_resp_data
 
 
 class EditVacancyInfo(APIView):
@@ -96,6 +86,6 @@ class EditVacancyInfo(APIView):
             vacancy.rqd_type_of_employment.add(rqd_type_of_employment)
 
         return Response(
-            status=UpdateSuccess().get_status(),
-            data=UpdateSuccess().get_data()
+            status=success_resp_data.update["status_code"],
+            data=success_resp_data.update["data"]
         )

@@ -2,15 +2,12 @@ import pytest
 
 from django.urls import reverse
 
+from rest_framework import status
+
 from vacancy.models import Vacancy
 
-from util.error_resp_data import (
-    VacancyNotFound,
-    AuthHeadersError,
-    UserNotCompanyOwner,
-    CompanyNotVacancyCreator,
-)
-from util.success_resp_data import DeleteSuccess
+from util import error_resp_data
+from util import success_resp_data
 
 
 @pytest.mark.django_db
@@ -29,8 +26,10 @@ class TestDeleteVacancy:
             headers=user_auth_headers
         )
 
-        assert request.status_code == DeleteSuccess().get_status()
-        assert request.data["success"] == DeleteSuccess().get_data()["success"]
+        assert request.status_code == success_resp_data.delete["status_code"]
+        assert request.data["detail"] == (
+            success_resp_data.delete["data"]["detail"]
+        )
         resume = Vacancy.objects.filter(pk=1).first()
         assert resume.is_delete
 
@@ -47,25 +46,9 @@ class TestDeleteVacancy:
             ),
         )
 
-        assert request.status_code == AuthHeadersError().get_status()
+        assert request.status_code == status.HTTP_401_UNAUTHORIZED
         assert request.data["detail"] == (
-            AuthHeadersError().get_data()["detail"]
-        )
-
-    def test_should_responce_auth_headers_error(
-            self,
-            client,
-            get_vacancy_id
-    ):
-        request = client.put(
-            reverse(
-                "vacancy_api:delete_vacancy",
-                kwargs=get_vacancy_id
-            ),
-        )
-        assert request.status_code == AuthHeadersError().get_status()
-        assert request.data["detail"] == (
-            AuthHeadersError().get_data()["detail"]
+            error_resp_data.auth_headers
         )
 
     def test_should_response_vacancy_not_found_error(
@@ -85,9 +68,9 @@ class TestDeleteVacancy:
             data=data_to_edit_vacancy_info
         )
 
-        assert request.status_code == VacancyNotFound().get_status()
+        assert request.status_code == status.HTTP_404_NOT_FOUND
         assert request.data["detail"] == (
-            VacancyNotFound().get_data()["vacancy"]
+            error_resp_data.vacancy_not_found
         )
 
     def test_should_responce_user_not_company_owner(
@@ -104,9 +87,9 @@ class TestDeleteVacancy:
             headers=sec_user_auth_headers
         )
 
-        assert request.status_code == UserNotCompanyOwner().get_status()
+        assert request.status_code == status.HTTP_403_FORBIDDEN
         assert request.data["detail"] == (
-            UserNotCompanyOwner().get_data()["detail"]
+            error_resp_data.user_not_company_owner
         )
 
     def test_should_responce_company_not_vacancy_creator(
@@ -124,7 +107,7 @@ class TestDeleteVacancy:
             headers=sec_user_auth_headers
         )
 
-        assert request.status_code == CompanyNotVacancyCreator().get_status()
+        assert request.status_code == status.HTTP_403_FORBIDDEN
         assert request.data["detail"] == (
-            CompanyNotVacancyCreator().get_data()["detail"]
+            error_resp_data.company_not_vacancy_creator
         )

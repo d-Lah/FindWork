@@ -11,7 +11,7 @@ app_name = "vacancy_api"
 
 urlpatterns = [
     path(
-        "create-vacancy",
+        "create-vacancy/company/<int:company_id>",
         create_vacancy.CreateVacancy.as_view(),
         name="create_vacancy",
     ),

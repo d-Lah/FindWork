@@ -35,7 +35,7 @@ class IsEmployee(permissions.BasePermission):
 
 
 class IsVacancyFound(permissions.BasePermission):
-    message = "Vacancy not found"
+    message = "Vacancy not found."
 
     def has_permission(
             self,
@@ -48,7 +48,7 @@ class IsVacancyFound(permissions.BasePermission):
             is_delete=False
         )
         if not vacancy:
-            raise NotFoundException(error_resp_data.VacancyNotFound.detail)
+            raise NotFoundException(error_resp_data.vacancy_not_found)
 
         return True
 

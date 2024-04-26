@@ -2,18 +2,12 @@ import pytest
 
 from django.urls import reverse
 
+from rest_framework import status
+
 from vacancy.models import Vacancy
 
-from util.error_resp_data import (
-    AuthHeadersError,
-    FieldsEmptyError,
-    SkillNotFoundError,
-    UserNotCompanyOwner,
-    SpecializationNotFoundError,
-    WorkExperienceNotFoundError,
-    TypeOfEmploymentNotFoundError,
-)
-from util.success_resp_data import CreateSuccess
+from util import error_resp_data
+from util import success_resp_data
 
 
 @pytest.mark.django_db
@@ -21,143 +15,121 @@ class TestCreateVacancy:
     def test_should_create_vacancy(
             self,
             client,
-            create_company,
+            get_company_id,
             user_auth_headers,
             data_to_create_vacancy,
     ):
         request = client.post(
-            reverse("vacancy_api:create_vacancy"),
+            reverse(
+                "vacancy_api:create_vacancy",
+                kwargs=get_company_id
+            ),
             headers=user_auth_headers,
             data=data_to_create_vacancy
         )
 
-        assert request.status_code == CreateSuccess().get_status()
-        assert request.data["success"] == (
-            CreateSuccess().get_data()["success"]
+        assert request.status_code == success_resp_data.create["status_code"]
+        assert request.data["detail"] == (
+            success_resp_data.create["data"]["detail"]
         )
         assert Vacancy.objects.filter(pk=1).first()
 
     def test_should_responce_auth_headers_error(
             self,
             client,
+            get_company_id,
     ):
         request = client.post(
-            reverse("vacancy_api:create_vacancy"),
+            reverse(
+                "vacancy_api:create_vacancy",
+                kwargs=get_company_id
+            ),
         )
 
-        assert request.status_code == AuthHeadersError().get_status()
+        assert request.status_code == status.HTTP_401_UNAUTHORIZED
         assert request.data["detail"] == (
-            AuthHeadersError().get_data()["detail"]
+            error_resp_data.auth_headers
         )
+
+    def test_response_company_not_found(
+            self,
+            client,
+            user_auth_headers,
+            get_wrong_company_id,
+    ):
+        request = client.delete(
+            reverse(
+                "vacancy_api:create_vacancy",
+                kwargs=get_wrong_company_id
+            ),
+            headers=user_auth_headers
+        )
+
+        assert request.status_code == status.HTTP_404_NOT_FOUND
+        assert request.data["detail"] == error_resp_data.company_not_found
 
     def test_should_responce_user_not_company_owner(
             self,
             client,
-            user_auth_headers
+            get_company_id,
+            sec_user_auth_headers
     ):
         request = client.post(
-            reverse("vacancy_api:create_vacancy"),
-            headers=user_auth_headers
+            reverse(
+                "vacancy_api:create_vacancy",
+                kwargs=get_company_id
+            ),
+            headers=sec_user_auth_headers
         )
 
-        assert request.status_code == UserNotCompanyOwner().get_status()
+        assert request.status_code == status.HTTP_403_FORBIDDEN
         assert request.data["detail"] == (
-            UserNotCompanyOwner().get_data()["detail"]
+            error_resp_data.user_not_company_owner
         )
 
     def test_should_responce_fields_empty_error(
             self,
             client,
-            create_company,
+            get_company_id,
             user_auth_headers,
             data_to_create_vacancy_wo_data
     ):
         request = client.post(
-            reverse("vacancy_api:create_vacancy"),
+            reverse(
+                "vacancy_api:create_vacancy",
+                kwargs=get_company_id
+            ),
             headers=user_auth_headers,
             data=data_to_create_vacancy_wo_data
         )
 
-        assert request.status_code == FieldsEmptyError().get_status()
-        assert request.data["fields"] == (
-            FieldsEmptyError().get_data()["fields"]
-        )
+        assert request.status_code == status.HTTP_400_BAD_REQUEST
+        for field in request.data:
+            assert (
+                request.data[field][0] == error_resp_data.field_is_blank
+                or request.data[field][0] == error_resp_data.field_is_required
+            )
 
-    def test_should_response_wrong_rqd_specialization_error(
+    def test_should_response_fields_not_exists_error(
             self,
             client,
-            create_company,
+            get_company_id,
             user_auth_headers,
-            data_to_create_vacancy_w_wrong_rqd_specialization
+            data_to_create_vacancy_w_not_exists_fields
     ):
         request = client.post(
-            reverse("vacancy_api:create_vacancy"),
+            reverse(
+                "vacancy_api:create_vacancy",
+                kwargs=get_company_id
+            ),
             headers=user_auth_headers,
-            data=data_to_create_vacancy_w_wrong_rqd_specialization
+            data=data_to_create_vacancy_w_not_exists_fields
         )
 
-        assert request.status_code == (
-            SpecializationNotFoundError().get_status()
-        )
-        assert request.data["rqd_specialization"] == (
-            SpecializationNotFoundError().get_data()["specialization"]
-        )
-
-    def test_should_response_wrong_rqd_skill_error(
-            self,
-            client,
-            create_company,
-            user_auth_headers,
-            data_to_create_vacancy_w_wrong_rqd_skill
-
-    ):
-        request = client.post(
-            reverse("vacancy_api:create_vacancy"),
-            headers=user_auth_headers,
-            data=data_to_create_vacancy_w_wrong_rqd_skill
-        )
-
-        assert request.status_code == SkillNotFoundError().get_status()
-        assert request.data["rqd_skill"] == (
-            SkillNotFoundError().get_data()["skill"]
-        )
-
-    def test_should_response_wrong_rqd_work_experience_error(
-            self,
-            client,
-            create_company,
-            user_auth_headers,
-            data_to_create_vacancy_w_wrong_rqd_work_experience
-    ):
-        request = client.post(
-            reverse("vacancy_api:create_vacancy"),
-            headers=user_auth_headers,
-            data=data_to_create_vacancy_w_wrong_rqd_work_experience
-        )
-
-        assert request.status_code == (
-            WorkExperienceNotFoundError().get_status()
-        )
-        assert request.data["rqd_work_experience"] == (
-            WorkExperienceNotFoundError().get_data()["work_experience"]
-        )
-
-    def test_should_response_wrong_rqd_type_of_employment_error(
-            self,
-            client,
-            create_company,
-            user_auth_headers,
-            data_to_create_vacancy_w_wrong_rqd_type_of_employment
-    ):
-        request = client.post(
-            reverse("vacancy_api:create_vacancy"),
-            headers=user_auth_headers,
-            data=data_to_create_vacancy_w_wrong_rqd_type_of_employment
-        )
-
-        assert request.status_code == (
-            TypeOfEmploymentNotFoundError().get_status()
-        )
-        assert request.data["rqd_type_of_employment"] == (
-            TypeOfEmploymentNotFoundError().get_data()["type_of_employment"]
-        )
+        assert request.status_code == status.HTTP_400_BAD_REQUEST
+        for field in request.data:
+            assert (
+                request.data[field][0] == error_resp_data.field_not_exists
+                or request.data[field][0][0] == error_resp_data.
+                field_not_exists
+            )

@@ -51,7 +51,6 @@ def data_to_register_new_user_w_already_exists_email(
 ):
     data = {
         "email": create_user.email,
-        "phone_number": "12344321",
         "password": "password",
         "is_employer": False,
         "is_employee": True,

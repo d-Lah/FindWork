@@ -1,4 +1,7 @@
+from django.db import DataError
+
 from rest_framework import serializers
+from rest_framework.utils.representation import smart_repr
 
 from vacancy.models import Vacancy
 
@@ -18,67 +21,28 @@ from work_experience.serializer import WorkExperienceSerializer
 from type_of_employment.models import TypeOfEmployment
 from type_of_employment.serializer import TypeOfEmploymentSerializer
 
-from util.error_resp_data import (
-    SkillNotFoundError,
-    SpecializationNotFoundError,
-    WorkExperienceNotFoundError,
-    TypeOfEmploymentNotFoundError
-)
-from util.exceptions import NotFoundException
+from util.validator import FieldExistsValidator
 
 
 class CreateVacancySerializer(serializers.Serializer):
     title = serializers.CharField()
     body = serializers.CharField()
-    rqd_specialization = serializers.IntegerField()
-    rqd_work_experience = serializers.IntegerField()
+    rqd_specialization = serializers.IntegerField(
+        validators=[FieldExistsValidator(Specialization.objects.all())]
+    )
+    rqd_work_experience = serializers.IntegerField(
+        validators=[FieldExistsValidator(WorkExperience.objects.all())]
+    )
     rqd_skill = serializers.ListField(
-        child=serializers.IntegerField()
+        child=serializers.IntegerField(
+            validators=[FieldExistsValidator(Skill.objects.all())]
+        ),
     )
     rqd_type_of_employment = serializers.ListField(
-        child=serializers.IntegerField()
+        child=serializers.IntegerField(
+            validators=[FieldExistsValidator(TypeOfEmployment.objects.all())]
+        ),
     )
-
-    def validate_rqd_specialization(self, value):
-        specialization = Specialization.objects.filter(pk=value).first()
-
-        if not specialization:
-            raise serializers.ValidationError(
-                SpecializationNotFoundError().get_data()["specialization"]
-            )
-        return value
-
-    def validate_rqd_skill(self, value):
-        for id in value:
-            skill = Skill.objects.filter(pk=id).first()
-
-            if not skill:
-                raise serializers.ValidationError(
-                    SkillNotFoundError().get_data()["skill"]
-                )
-        return value
-
-    def validate_rqd_work_experience(self, value):
-        work_experience = WorkExperience.objects.filter(pk=value).first()
-
-        if not work_experience:
-            raise serializers.ValidationError(
-                WorkExperienceNotFoundError().get_data()["work_experience"]
-            )
-        return value
-
-    def validate_rqd_type_of_employment(self, value):
-        for id in value:
-            type_of_employment = TypeOfEmployment.objects.filter(
-                pk=id
-            ).first()
-
-            if not type_of_employment:
-                raise serializers.ValidationError(
-                    TypeOfEmploymentNotFoundError(
-                    ).get_data()["type_of_employment"]
-                )
-        return value
 
 
 class VacancyInfoSerializer(serializers.ModelSerializer):
@@ -110,43 +74,19 @@ class VacancyInfoSerializer(serializers.ModelSerializer):
 class EditVacancyInfoSerializer(serializers.Serializer):
     title = serializers.CharField()
     body = serializers.CharField()
-    rqd_specialization = serializers.IntegerField()
-    rqd_work_experience = serializers.IntegerField()
+    rqd_specialization = serializers.IntegerField(
+        validators=[FieldExistsValidator(Specialization.objects.all())]
+    )
+    rqd_work_experience = serializers.IntegerField(
+        validators=[FieldExistsValidator(WorkExperience.objects.all())]
+    )
     rqd_skill = serializers.ListField(
-        child=serializers.IntegerField()
+        child=serializers.IntegerField(
+            validators=[FieldExistsValidator(Skill.objects.all())]
+        ),
     )
     rqd_type_of_employment = serializers.ListField(
-        child=serializers.IntegerField()
+        child=serializers.IntegerField(
+            validators=[FieldExistsValidator(TypeOfEmployment.objects.all())]
+        ),
     )
-
-    def validate_rqd_specialization(self, value):
-        specialization = Specialization.objects.filter(pk=value).first()
-
-        if not specialization:
-            raise NotFoundException(SpecializationNotFoundError.detail)
-        return value
-
-    def validate_rqd_skill(self, value):
-        for id in value:
-            skill = Skill.objects.filter(pk=id).first()
-
-            if not skill:
-                raise NotFoundException(SkillNotFoundError.detail)
-        return value
-
-    def validate_rqd_work_experience(self, value):
-        work_experience = WorkExperience.objects.filter(pk=value).first()
-
-        if not work_experience:
-            raise NotFoundException(WorkExperienceNotFoundError.detail)
-        return value
-
-    def validate_rqd_type_of_employment(self, value):
-        for id in value:
-            type_of_employment = TypeOfEmployment.objects.filter(
-                pk=id
-            ).first()
-
-            if not type_of_employment:
-                raise NotFoundException(TypeOfEmploymentNotFoundError.detail)
-        return value

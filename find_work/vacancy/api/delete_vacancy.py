@@ -5,7 +5,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from vacancy.models import Vacancy
 
-from util.success_resp_data import DeleteSuccess
+from util import success_resp_data
 from util.permissions import (
     IsVacancyFound,
     IsCompanyOwner,
@@ -33,6 +33,6 @@ class DeleteVacancy(APIView):
         resume.save()
 
         return Response(
-            status=DeleteSuccess().get_status(),
-            data=DeleteSuccess().get_data()
+            status=success_resp_data.delete["status_code"],
+            data=success_resp_data.delete["data"]
         )

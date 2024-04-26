@@ -20,60 +20,36 @@ from type_of_employment.models import TypeOfEmployment
 
 from vacancy.serializer import CreateVacancySerializer
 
-from util.error_resp_data import (
-    FieldsEmptyError,
-    FieldsNotFoundError,
-)
-from util.error_exceptions import (
-    IsFieldsEmpty,
-    IsFieldsNotFound
-)
 from util.permissions import (
-    IsCompanyOwner
+    IsCompanyOwner,
+    IsCompanyFound
 )
-from util.success_resp_data import CreateSuccess
-from util.error_validation import ErrorValidation
+from util import success_resp_data
 
 
 class CreateVacancy(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [
         IsAuthenticated,
+        IsCompanyFound,
         IsCompanyOwner
     ]
 
     def post(
             self,
-            request
+            request,
+            company_id
     ):
         serializer = CreateVacancySerializer(data=request.data)
 
-        serializer.is_valid()
-
-        error_validation = ErrorValidation(serializer.errors)
-        try:
-            error_validation.is_fields_empty()
-            error_validation.is_fields_not_found()
-        except IsFieldsEmpty:
-            return Response(
-                status=FieldsEmptyError().get_status(),
-                data=FieldsEmptyError().get_data()
-            )
-        except IsFieldsNotFound:
-            errors = {}
-            for field in serializer.errors:
-                error_msg = str(serializer.errors[field][0])
-                errors[field] = error_msg
-
-            return Response(
-                status=FieldsNotFoundError().get_status(),
-                data=errors
-            )
+        serializer.is_valid(raise_exception=True)
 
         serializer_data = serializer.validated_data
 
-        user_id = request.user.id
-        company = Company.objects.filter(author__id=user_id).first()
+        company = Company.objects.filter(
+            pk=company_id,
+            is_delete=False
+        ).first()
 
         rqd_specialization = Specialization.objects.filter(
             pk=serializer_data["rqd_specialization"]
@@ -114,6 +90,6 @@ class CreateVacancy(APIView):
             )
 
         return Response(
-            status=CreateSuccess().get_status(),
-            data=CreateSuccess().get_data()
+            status=success_resp_data.create["status_code"],
+            data=success_resp_data.create["data"]
         )
