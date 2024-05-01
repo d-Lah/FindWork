@@ -7,8 +7,6 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from company.models import Company
 from company.serializer import CreateCompanySerializer
 
-from user.models import User
-
 from util import success_resp_data
 from util.permissions import IsEmployer
 
@@ -28,8 +26,7 @@ class CreateCompany(APIView):
 
         serializer.is_valid(raise_exception=True)
 
-        user_id = request.user.id
-        author = User.objects.filter(pk=user_id).first()
+        author = request.user
 
         serializer_data = serializer.validated_data
 

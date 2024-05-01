@@ -30,10 +30,7 @@ class EditCompanyInfo(APIView):
 
         serializer.is_valid(raise_exception=True)
 
-        company = Company.objects.filter(
-            pk=company_id,
-            is_delete=False
-        ).first()
+        company = Company.objects.filter(pk=company_id).first()
 
         serializer_data = serializer.validated_data
 

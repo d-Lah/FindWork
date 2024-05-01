@@ -38,17 +38,16 @@ class RegisterNewUser(APIView):
 
         serializer_data = serializer.validated_data
 
-        new_profile = Profile(
+        new_profile = Profile.objects.create(
             first_name=serializer_data["first_name"],
             last_name=serializer_data["last_name"],
         )
-        new_profile.save()
 
         fernet = Fernet(CRYPTOGRAPHY_FERNET_KEY.encode())
         user_otp_base32 = pyotp.random_base32()
         user_encrypted_opt_base32 = fernet.encrypt(user_otp_base32.encode())
 
-        new_user = User(
+        new_user = User.objects.create(
             email=serializer_data["email"],
             user_activation_uuid=uuid4(),
             profile=new_profile,

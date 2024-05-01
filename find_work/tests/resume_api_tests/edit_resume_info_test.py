@@ -50,26 +50,41 @@ class TestEditResumeInfo:
         assert request.status_code == status.HTTP_401_UNAUTHORIZED
         assert request.data["detail"] == error_resp_data.auth_headers
 
-    def test_should_response_user_not_employee_error(
+    def test_should_response_resume_not_found(
             self,
             client,
-            create_user,
+            user_auth_headers,
+            get_wrong_resume_id,
+    ):
+
+        request = client.put(
+            reverse(
+                "resume_api:edit_resume_info",
+                kwargs=get_wrong_resume_id
+            ),
+            headers=user_auth_headers,
+        )
+        assert request.status_code == status.HTTP_404_NOT_FOUND
+        assert request.data["detail"] == error_resp_data.resume_not_found
+
+    def test_should_response_user_not_resume_owner_error(
+            self,
+            client,
             get_resume_id,
             user_auth_headers,
+            sec_user_auth_headers
     ):
-        create_user.is_employee = False
-        create_user.save()
 
         request = client.post(
             reverse(
                 "resume_api:edit_resume_info",
                 kwargs=get_resume_id
             ),
-            headers=user_auth_headers
+            headers=sec_user_auth_headers
         )
 
         assert request.status_code == status.HTTP_403_FORBIDDEN
-        assert request.data["detail"] == error_resp_data.user_not_employee
+        assert request.data["detail"] == error_resp_data.user_not_resume_owner
 
     def test_should_response_fields_empty_error(
             self,
@@ -94,29 +109,12 @@ class TestEditResumeInfo:
                 or request.data[field][0] == error_resp_data.field_is_required
             )
 
-    def test_should_response_resume_not_found(
-            self,
-            client,
-            user_auth_headers,
-            get_wrong_resume_id,
-    ):
-
-        request = client.put(
-            reverse(
-                "resume_api:edit_resume_info",
-                kwargs=get_wrong_resume_id
-            ),
-            headers=user_auth_headers,
-        )
-        assert request.status_code == status.HTTP_404_NOT_FOUND
-        assert request.data["detail"] == error_resp_data.resume_not_found
-
-    def test_should_response_wrong_specialization_error(
+    def test_should_response_fields_not_exists_error(
             self,
             client,
             get_resume_id,
             user_auth_headers,
-            data_to_edit_resume_info_w_wrong_specialization
+            data_to_edit_resume_info_w_not_exists_field
     ):
         request = client.put(
             reverse(
@@ -124,73 +122,13 @@ class TestEditResumeInfo:
                 kwargs=get_resume_id
             ),
             headers=user_auth_headers,
-            data=data_to_edit_resume_info_w_wrong_specialization
+            data=data_to_edit_resume_info_w_not_exists_field
         )
 
-        assert request.status_code == status.HTTP_404_NOT_FOUND
-        assert request.data["detail"] == (
-            error_resp_data.specialization_not_found
-        )
-
-    def test_should_response_wrong_skill_error(
-            self,
-            client,
-            get_resume_id,
-            user_auth_headers,
-            data_to_edit_resume_info_w_wrong_skill
-    ):
-        request = client.put(
-            reverse(
-                "resume_api:edit_resume_info",
-                kwargs=get_resume_id
-            ),
-            headers=user_auth_headers,
-            data=data_to_edit_resume_info_w_wrong_skill
-        )
-
-        assert request.status_code == status.HTTP_404_NOT_FOUND
-        assert request.data["detail"] == (
-            error_resp_data.skill_not_found
-        )
-
-    def test_should_response_wrong_work_experience_error(
-            self,
-            client,
-            get_resume_id,
-            user_auth_headers,
-            data_to_edit_resume_info_w_wrong_work_experience
-    ):
-        request = client.put(
-            reverse(
-                "resume_api:edit_resume_info",
-                kwargs=get_resume_id
-            ),
-            headers=user_auth_headers,
-            data=data_to_edit_resume_info_w_wrong_work_experience
-        )
-
-        assert request.status_code == status.HTTP_404_NOT_FOUND
-        assert request.data["detail"] == (
-            error_resp_data.work_experience_not_found
-        )
-
-    def test_should_response_wrong_type_of_employment_error(
-            self,
-            client,
-            get_resume_id,
-            user_auth_headers,
-            data_to_edit_resume_info_w_wrong_type_of_employment
-    ):
-        request = client.put(
-            reverse(
-                "resume_api:edit_resume_info",
-                kwargs=get_resume_id
-            ),
-            headers=user_auth_headers,
-            data=data_to_edit_resume_info_w_wrong_type_of_employment
-        )
-
-        assert request.status_code == status.HTTP_404_NOT_FOUND
-        assert request.data["detail"] == (
-            error_resp_data.type_of_employment_not_found
-        )
+        assert request.status_code == status.HTTP_400_BAD_REQUEST
+        for field in request.data:
+            assert (
+                request.data[field][0] == error_resp_data.field_not_exists
+                or request.data[field][0][0] == error_resp_data.
+                field_not_exists
+            )

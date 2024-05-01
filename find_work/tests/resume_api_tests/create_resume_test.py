@@ -82,70 +82,24 @@ class TestCreateResume:
                 or request.data[field][0] == error_resp_data.field_is_required
             )
 
-    def test_should_response_wrong_specialization_error(
+    def test_should_response_fields_not_exists_error(
             self,
             client,
             user_auth_headers,
-            data_to_create_resume_w_wrong_specialization
+            data_to_create_resume_w_not_exists_fields
     ):
         request = client.post(
-            reverse("resume_api:create_resume"),
+            reverse(
+                "resume_api:create_resume",
+            ),
             headers=user_auth_headers,
-            data=data_to_create_resume_w_wrong_specialization
+            data=data_to_create_resume_w_not_exists_fields
         )
 
-        assert request.status_code == status.HTTP_404_NOT_FOUND
-        assert request.data["detail"] == (
-            error_resp_data.specialization_not_found
-        )
-
-    def test_should_response_wrong_skill_error(
-            self,
-            client,
-            user_auth_headers,
-            data_to_create_resume_w_wrong_skill
-    ):
-        request = client.post(
-            reverse("resume_api:create_resume"),
-            headers=user_auth_headers,
-            data=data_to_create_resume_w_wrong_skill
-        )
-
-        assert request.status_code == status.HTTP_404_NOT_FOUND
-        assert request.data["detail"] == (
-            error_resp_data.skill_not_found
-        )
-
-    def test_should_response_wrong_work_experience_error(
-            self,
-            client,
-            user_auth_headers,
-            data_to_create_resume_w_wrong_work_experience
-    ):
-        request = client.post(
-            reverse("resume_api:create_resume"),
-            headers=user_auth_headers,
-            data=data_to_create_resume_w_wrong_work_experience
-        )
-
-        assert request.status_code == status.HTTP_404_NOT_FOUND
-        assert request.data["detail"] == (
-            error_resp_data.work_experience_not_found
-        )
-
-    def test_should_response_wrong_type_of_employment_error(
-            self,
-            client,
-            user_auth_headers,
-            data_to_create_resume_w_wrong_type_of_employment
-    ):
-        request = client.post(
-            reverse("resume_api:create_resume"),
-            headers=user_auth_headers,
-            data=data_to_create_resume_w_wrong_type_of_employment
-        )
-
-        assert request.status_code == status.HTTP_404_NOT_FOUND
-        assert request.data["detail"] == (
-            error_resp_data.type_of_employment_not_found
-        )
+        assert request.status_code == status.HTTP_400_BAD_REQUEST
+        for field in request.data:
+            assert (
+                request.data[field][0] == error_resp_data.field_not_exists
+                or request.data[field][0][0] == error_resp_data.
+                field_not_exists
+            )
