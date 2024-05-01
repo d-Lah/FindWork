@@ -22,6 +22,8 @@ repos:
     hooks:
       - id: run-test
         name: run test
-        entry: ./pre_commit_run_tests.sh
+        entry: pytest find_work/tests
+        pass_filenames: false
+        always_run: true
         language: system
         stages: [commit]
