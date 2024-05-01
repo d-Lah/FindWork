@@ -2,11 +2,14 @@ import pytest
 
 from django.urls import reverse
 
+from rest_framework import status
+
 from util.error_resp_data import (
     AuthHeadersError,
     UserNotFoundError,
 )
-from util.success_resp_data import GetSuccess
+from util import error_resp_data
+from util import success_resp_data
 
 
 @pytest.mark.django_db
@@ -25,9 +28,9 @@ class TestProfileInfo:
             headers=user_auth_headers
         )
 
-        assert request.status_code == GetSuccess().get_status()
-        assert request.data["success"] == (
-            GetSuccess().get_data()["success"]
+        assert request.status_code == success_resp_data.get["status_code"]
+        assert request.data["detail"] == (
+            success_resp_data.get["data"]["detail"]
         )
 
     def test_should_response_auth_headers_error(
@@ -42,10 +45,8 @@ class TestProfileInfo:
             ),
         )
 
-        assert request.status_code == AuthHeadersError().get_status()
-        assert request.data["detail"] == (
-            AuthHeadersError().get_data()["detail"]
-        )
+        assert request.status_code == status.HTTP_401_UNAUTHORIZED
+        assert request.data["detail"] == error_resp_data.auth_headers
 
     def test_should_responce_user_not_found_error(
             self,
@@ -61,7 +62,5 @@ class TestProfileInfo:
             headers=user_auth_headers
         )
 
-        assert request.status_code == UserNotFoundError().get_status()
-        assert request.data["user"] == (
-            UserNotFoundError().get_data()["user"]
-        )
+        assert request.status_code == status.HTTP_404_NOT_FOUND
+        assert request.data["detail"] == error_resp_data.user_not_found

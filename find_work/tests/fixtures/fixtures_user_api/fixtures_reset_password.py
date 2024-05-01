@@ -2,9 +2,9 @@ import pytest
 
 
 @pytest.fixture()
-def data_to_reset_password(create_new_user):
+def data_to_reset_password(create_user):
     data = {
-        "email": create_new_user.email,
+        "email": create_user.email,
         "password": "new_password"
     }
     return data

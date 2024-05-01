@@ -1,5 +1,40 @@
 from rest_framework import status
 
+user_not_employee = "User not employee"
+user_not_employer = "User not employer"
+user_not_resume_owner = "User not resume owner"
+user_not_company_owner = "User not company owner"
+company_not_vacancy_creator = "Company not vacancy creator"
+auth_headers = "Authentication credentials were not provided."
+
+user_not_found = "User not found."
+skill_not_found = "Skill not found."
+resume_not_found = "Resume not found."
+company_not_found = "Company not found."
+vacancy_not_found = "Vacancy not found."
+specialization_not_found = "Specialization not found."
+work_experience_not_found = "Work experience not found."
+type_of_employment_not_found = "Type of employment not found."
+user_with_given_email_not_found = "User with given email not found."
+
+field_not_exists = "This field not exists."
+field_is_required = "This field is required."
+field_not_boolean = "Must be a valid boolean."
+field_not_unique = "This field must be unique."
+field_is_blank = "This field may not be blank."
+
+file_size_too_large = "File size to large."
+invalid_file_ext = "Invalid file extension."
+file_not_submitted = "No file was submitted."
+
+totp_incap = "TOTP incapacitated."
+wrong_password = "Wrong password."
+invalid_email = "Enter a valid email address."
+already_enable = "Two-factor authentication is already enabled."
+already_disable = "Two-factor authentication is already disabled."
+reset_password_totp_incap = "Reset password TOTP is incapacitated."
+user_activation_uuid_incap = "User activate uuid is incapacitated."
+
 
 class AuthHeadersError:
     def get_status(self):
@@ -26,6 +61,11 @@ class EmailAlreadyExistsError:
 
 
 class FieldsEmptyError:
+    detail = {
+        "opt1": "blank",
+        "opt2": "required"
+    }
+
     def get_status(self):
         return status.HTTP_400_BAD_REQUEST
 
@@ -50,6 +90,8 @@ class FieldsNotFoundError:
 
 
 class SpecializationNotFoundError:
+    detail = "Specialization not found"
+
     def get_status(self):
         return status.HTTP_404_NOT_FOUND
 
@@ -58,6 +100,8 @@ class SpecializationNotFoundError:
 
 
 class SkillNotFoundError:
+    detail = "Skill not found"
+
     def get_status(self):
         return status.HTTP_404_NOT_FOUND
 
@@ -66,6 +110,8 @@ class SkillNotFoundError:
 
 
 class WorkExperienceNotFoundError:
+    detail = "Work experience not found"
+
     def get_status(self):
         return status.HTTP_404_NOT_FOUND
 
@@ -74,6 +120,8 @@ class WorkExperienceNotFoundError:
 
 
 class TypeOfEmploymentNotFoundError:
+    detail = "Type of employment not found"
+
     def get_status(self):
         return status.HTTP_404_NOT_FOUND
 
@@ -188,3 +236,29 @@ class CompanyNotFoundError:
 
     def get_data(self):
         return {"company": "Company not found"}
+
+
+class UserNotCompanyOwner:
+    def get_status(self):
+        return status.HTTP_403_FORBIDDEN
+
+    def get_data(self):
+        return {"detail": "User not company owner"}
+
+
+class VacancyNotFound:
+    detail = "Vacancy not found"
+
+    def get_status(self):
+        return status.HTTP_404_NOT_FOUND
+
+    def get_data(self):
+        return {"vacancy": "Vacancy not found"}
+
+
+class CompanyNotVacancyCreator:
+    def get_status(self):
+        return status.HTTP_403_FORBIDDEN
+
+    def get_data(self):
+        return {"detail": "Company not vacancy creator"}

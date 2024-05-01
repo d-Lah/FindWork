@@ -2,11 +2,10 @@ import pytest
 
 from django.urls import reverse
 
-from util.error_resp_data import (
-    AuthHeadersError,
-    TwoFactorAuthAlreadyDisabledError
-)
-from util.success_resp_data import UpdateSuccess
+from rest_framework import status
+
+from util import error_resp_data
+from util import success_resp_data
 
 
 @pytest.mark.django_db
@@ -21,9 +20,9 @@ class TestDeactivateTwoFactorAuth:
             headers=data_to_disable_two_factor_auth
         )
 
-        assert request.status_code == UpdateSuccess().get_status()
-        assert request.data["success"] == (
-            UpdateSuccess().get_data()["success"]
+        assert request.status_code == success_resp_data.update["status_code"]
+        assert request.data["detail"] == (
+            success_resp_data.update["data"]["detail"]
         )
 
     def test_should_response_auth_headers_error(
@@ -34,10 +33,8 @@ class TestDeactivateTwoFactorAuth:
             reverse("user_api:disable_two_factor_auth"),
         )
 
-        assert request.status_code == AuthHeadersError().get_status()
-        assert request.data["detail"] == (
-            AuthHeadersError().get_data()["detail"]
-        )
+        assert request.status_code == status.HTTP_401_UNAUTHORIZED
+        assert request.data["detail"] == error_resp_data.auth_headers
 
     def test_should_response_two_factor_auth_is_already_disabled_error(
             self,
@@ -49,9 +46,5 @@ class TestDeactivateTwoFactorAuth:
             headers=data_to_disable_two_factor_auth_w_already_disabled_auth
         )
 
-        assert request.status_code == (
-            TwoFactorAuthAlreadyDisabledError().get_status()
-        )
-        assert request.data["user"] == (
-            TwoFactorAuthAlreadyDisabledError().get_data()["user"]
-        )
+        assert request.status_code == status.HTTP_409_CONFLICT
+        assert request.data["detail"] == error_resp_data.already_disable

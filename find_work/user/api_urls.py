@@ -8,14 +8,13 @@ from user.api import (
     user_info,
     update_email,
     profile_info,
+    validate_totp,
     reset_password,
     update_password,
     activate_new_user,
-    validate_password,
     edit_profile_info,
     register_new_user,
     upload_user_avatar,
-    validate_totp_token,
     enable_two_factor_auth,
     disable_two_factor_auth,
     get_two_factor_auth_qr_code,
@@ -47,9 +46,9 @@ urlpatterns = [
         name="get_two_factor_auth_qr_code"
     ),
     path(
-        "validation-totp-token",
-        validate_totp_token.ValidateTOTPToken.as_view(),
-        name="validation_totp_token"
+        "validation-totp",
+        validate_totp.ValidateTOTP.as_view(),
+        name="validation_totp"
     ),
     path(
         "enable-two-factor-auth",
@@ -65,11 +64,6 @@ urlpatterns = [
         "edit-profile-info",
         edit_profile_info.EditProfileInfo.as_view(),
         name="edit_profile_info"
-    ),
-    path(
-        "validate-password",
-        validate_password.ValidatePassword.as_view(),
-        name="validate_password"
     ),
     path(
         "update-password",

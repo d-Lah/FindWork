@@ -30,10 +30,10 @@ def data_to_update_email_w_invalid_email():
 
 @pytest.fixture()
 def data_to_update_email_w_already_exists_email(
-        create_new_user
+        create_user
 ):
     data = {
-        "email": create_new_user.email
+        "email": create_user.email
     }
 
     return data

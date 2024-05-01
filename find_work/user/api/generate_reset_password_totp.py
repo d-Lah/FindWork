@@ -10,53 +10,12 @@ from find_work.settings import CRYPTOGRAPHY_FERNET_KEY
 from user.models import User
 from user.serializer import GenerateResetPasswordTOTPSerializer
 
-from util.error_resp_data import (
-    FieldsEmptyError,
-    UserNotFoundError,
-    InvalidEmailAdressError,
-)
-from util.error_exceptions import (
-    IsFieldsEmpty,
-    IsFieldsInvalid,
-    IsFieldsNotFound,
-)
+from util import success_resp_data
 from util.mail_sender import MailSender
 from util.mail_data_manager import (
     MailSubjectInGenerateResetPasswordUuid,
     MailMessageInGenerateResetPasswordUuid,
 )
-from util.success_resp_data import CreateSuccess
-from util.error_validation import ErrorValidation
-
-
-def is_fields_empty(errors):
-    if not errors:
-        return False
-
-    if "blank" in errors["email"][0]:
-        return True
-
-    return False
-
-
-def is_invalid_email(errors):
-    if not errors.get("email"):
-        return False
-
-    if "valid email address" in errors["email"][0]:
-        return True
-
-    return False
-
-
-def is_user_not_found(errors):
-    if not errors.get("email"):
-        return False
-
-    if errors["email"][0] == "User with given email not found":
-        return True
-
-    return False
 
 
 class GenerateResetPasswordTOTP(APIView):
@@ -68,28 +27,7 @@ class GenerateResetPasswordTOTP(APIView):
             data=request.data
         )
 
-        serializer.is_valid()
-
-        error_validation = ErrorValidation(serializer.errors)
-        try:
-            error_validation.is_fields_empty()
-            error_validation.is_fields_invalid()
-            error_validation.is_fields_not_found()
-        except IsFieldsEmpty:
-            return Response(
-                status=FieldsEmptyError().get_status(),
-                data=FieldsEmptyError().get_data()
-            )
-        except IsFieldsInvalid:
-            return Response(
-                status=InvalidEmailAdressError().get_status(),
-                data=InvalidEmailAdressError().get_data()
-            )
-        except IsFieldsNotFound:
-            return Response(
-                status=UserNotFoundError().get_status(),
-                data=UserNotFoundError().get_data()
-            )
+        serializer.is_valid(raise_exception=True)
 
         serializer_data = serializer.validated_data
 
@@ -117,6 +55,6 @@ class GenerateResetPasswordTOTP(APIView):
         ).send_mail_to_user()
 
         return Response(
-            status=CreateSuccess().get_status(),
-            data=CreateSuccess().get_data()
+            status=success_resp_data.create["status_code"],
+            data=success_resp_data.create["data"]
         )

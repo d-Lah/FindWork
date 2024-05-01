@@ -10,9 +10,9 @@ from find_work.settings import CRYPTOGRAPHY_FERNET_KEY
 
 
 @pytest.fixture()
-def data_to_validate_reset_password_totp(create_new_user):
+def data_to_validate_reset_password_totp(create_user):
     fernet = Fernet(CRYPTOGRAPHY_FERNET_KEY.encode())
-    user_otp_base32 = fernet.decrypt(create_new_user.otp_base32.encode())
+    user_otp_base32 = fernet.decrypt(create_user.otp_base32.encode())
 
     totp = pyotp.TOTP(
         s=user_otp_base32,
@@ -21,7 +21,7 @@ def data_to_validate_reset_password_totp(create_new_user):
     reset_password_totp = totp.now()
 
     data = {
-        "email": create_new_user.email,
+        "email": create_user.email,
         "reset_password_totp": reset_password_totp
     }
 
@@ -41,10 +41,10 @@ def data_to_validate_reset_password_totp_wo_data():
 
 @pytest.fixture()
 def data_to_validate_reset_password_totp_w_invalid_email(
-        create_new_user
+        create_user
 ):
     fernet = Fernet(CRYPTOGRAPHY_FERNET_KEY.encode())
-    user_otp_base32 = fernet.decrypt(create_new_user.otp_base32.encode())
+    user_otp_base32 = fernet.decrypt(create_user.otp_base32.encode())
 
     totp = pyotp.TOTP(
         s=user_otp_base32,
@@ -62,10 +62,10 @@ def data_to_validate_reset_password_totp_w_invalid_email(
 
 @pytest.fixture()
 def data_to_validate_reset_password_totp_w_wrong_email(
-        create_new_user
+        create_user
 ):
     fernet = Fernet(CRYPTOGRAPHY_FERNET_KEY.encode())
-    user_otp_base32 = fernet.decrypt(create_new_user.otp_base32.encode())
+    user_otp_base32 = fernet.decrypt(create_user.otp_base32.encode())
 
     totp = pyotp.TOTP(
         s=user_otp_base32,
@@ -83,10 +83,10 @@ def data_to_validate_reset_password_totp_w_wrong_email(
 
 @pytest.fixture()
 def data_to_validate_reset_password_totp_w_incap_reset_password_totp(
-    create_new_user
+    create_user
 ):
     fernet = Fernet(CRYPTOGRAPHY_FERNET_KEY.encode())
-    user_otp_base32 = fernet.decrypt(create_new_user.otp_base32.encode())
+    user_otp_base32 = fernet.decrypt(create_user.otp_base32.encode())
 
     totp = pyotp.TOTP(
         s=user_otp_base32,
@@ -95,7 +95,7 @@ def data_to_validate_reset_password_totp_w_incap_reset_password_totp(
     reset_password_totp = totp.now()
 
     data = {
-        "email": create_new_user.email,
+        "email": create_user.email,
         "reset_password_totp": reset_password_totp
     }
 

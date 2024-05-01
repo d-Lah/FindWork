@@ -3,13 +3,13 @@ import pytest
 
 @pytest.fixture()
 def data_to_generate_reset_password_totp(
-    create_new_user
+    create_user
 ):
-    create_new_user.is_active = True
-    create_new_user.save()
+    create_user.is_active = True
+    create_user.save()
 
     data = {
-        "email": create_new_user.email
+        "email": create_user.email
     }
 
     return data
@@ -17,10 +17,10 @@ def data_to_generate_reset_password_totp(
 
 @pytest.fixture()
 def data_to_generate_reset_password_totp_wo_email(
-    create_new_user
+    create_user
 ):
-    create_new_user.is_active = True
-    create_new_user.save()
+    create_user.is_active = True
+    create_user.save()
 
     data = {
         "email": ""
@@ -31,10 +31,10 @@ def data_to_generate_reset_password_totp_wo_email(
 
 @pytest.fixture()
 def data_to_generate_reset_password_totp_w_invalid_email(
-    create_new_user
+    create_user
 ):
-    create_new_user.is_active = True
-    create_new_user.save()
+    create_user.is_active = True
+    create_user.save()
 
     data = {
         "email": "invalid_email_email_com"

@@ -2,19 +2,24 @@ from rest_framework import serializers
 
 from user.serializer import UserInfoSerializer
 
-from resume.models import (
-    Skill,
-    Resume,
-    Specialization,
-    WorkExperience,
-    TypeOfEmployment
+from resume.models import Resume
+
+from skill.models import Skill
+from skill.serializer import SkillSerializer
+
+from specialization.models import Specialization
+from specialization.serializer import SpecializationSerializer
+
+from work_experience.models import WorkExperience
+from work_experience.serializer import WorkExperienceSerializer
+
+from type_of_employment.models import TypeOfEmployment
+from type_of_employment.serializer import TypeOfEmploymentSerializer
+
+from util.exceptions import (
+    NotFoundException,
 )
-from util.error_resp_data import (
-    SkillNotFoundError,
-    SpecializationNotFoundError,
-    WorkExperienceNotFoundError,
-    TypeOfEmploymentNotFoundError
-)
+from util import error_resp_data
 
 
 class CreateResumeSerializer(serializers.Serializer):
@@ -32,9 +37,7 @@ class CreateResumeSerializer(serializers.Serializer):
         specialization = Specialization.objects.filter(pk=value).first()
 
         if not specialization:
-            raise serializers.ValidationError(
-                SpecializationNotFoundError().get_data()["specialization"]
-            )
+            raise NotFoundException(error_resp_data.specialization_not_found)
         return value
 
     def validate_skill(self, value):
@@ -42,18 +45,14 @@ class CreateResumeSerializer(serializers.Serializer):
             skill = Skill.objects.filter(pk=id).first()
 
             if not skill:
-                raise serializers.ValidationError(
-                    SkillNotFoundError().get_data()["skill"]
-                )
+                raise NotFoundException(error_resp_data.skill_not_found)
         return value
 
     def validate_work_experience(self, value):
         work_experience = WorkExperience.objects.filter(pk=value).first()
 
         if not work_experience:
-            raise serializers.ValidationError(
-                WorkExperienceNotFoundError().get_data()["work_experience"]
-            )
+            raise NotFoundException(error_resp_data.work_experience_not_found)
         return value
 
     def validate_type_of_employment(self, value):
@@ -63,14 +62,13 @@ class CreateResumeSerializer(serializers.Serializer):
             ).first()
 
             if not type_of_employment:
-                raise serializers.ValidationError(
-                    TypeOfEmploymentNotFoundError(
-                    ).get_data()["type_of_employment"]
+                raise NotFoundException(
+                    error_resp_data.type_of_employment_not_found
                 )
         return value
 
 
-class UpdateResumeInfoSerializer(serializers.Serializer):
+class EditResumeInfoSerializer(serializers.Serializer):
     about = serializers.CharField()
     specialization = serializers.IntegerField()
     work_experience = serializers.IntegerField()
@@ -85,9 +83,7 @@ class UpdateResumeInfoSerializer(serializers.Serializer):
         specialization = Specialization.objects.filter(pk=value).first()
 
         if not specialization:
-            raise serializers.ValidationError(
-                SpecializationNotFoundError().get_data()["specialization"]
-            )
+            raise NotFoundException(error_resp_data.specialization_not_found)
         return value
 
     def validate_skill(self, value):
@@ -95,18 +91,14 @@ class UpdateResumeInfoSerializer(serializers.Serializer):
             skill = Skill.objects.filter(pk=id).first()
 
             if not skill:
-                raise serializers.ValidationError(
-                    SkillNotFoundError().get_data()["skill"]
-                )
+                raise NotFoundException(error_resp_data.skill_not_found)
         return value
 
     def validate_work_experience(self, value):
         work_experience = WorkExperience.objects.filter(pk=value).first()
 
         if not work_experience:
-            raise serializers.ValidationError(
-                WorkExperienceNotFoundError().get_data()["work_experience"]
-            )
+            raise NotFoundException(error_resp_data.work_experience_not_found)
         return value
 
     def validate_type_of_employment(self, value):
@@ -116,47 +108,10 @@ class UpdateResumeInfoSerializer(serializers.Serializer):
             ).first()
 
             if not type_of_employment:
-                raise serializers.ValidationError(
-                    TypeOfEmploymentNotFoundError(
-                    ).get_data()["type_of_employment"]
+                raise NotFoundException(
+                    error_resp_data.type_of_employment_not_found
                 )
         return value
-
-
-class SpecializationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Specialization
-        fields = [
-            "id",
-            "specialization_name"
-        ]
-
-
-class SkillSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Skill
-        fields = [
-            "id",
-            "skill_name"
-        ]
-
-
-class WorkExperienceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = WorkExperience
-        fields = [
-            "id",
-            "work_experience_name"
-        ]
-
-
-class TypeOfEmploymentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TypeOfEmployment
-        fields = [
-            "id",
-            "type_of_employment_name"
-        ]
 
 
 class ResumeInfoSerializer(serializers.ModelSerializer):

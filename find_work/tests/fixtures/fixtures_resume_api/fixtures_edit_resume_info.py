@@ -4,7 +4,7 @@ import pytest
 @pytest.fixture()
 def data_to_update_resume_info(
         create_skill,
-        create_new_user,
+        create_user,
         create_specialization,
         create_work_experience,
         create_type_of_employment
@@ -26,10 +26,10 @@ def data_to_edit_resume_info_wo_data():
 
     data = {
         "about": "",
-        "specialization": "",
-        "work_experience": "",
-        "skill": "",
-        "type_of_employment": ""
+        "specialization": 1,
+        "work_experience": 1,
+        "skill": [],
+        "type_of_employment": []
     }
 
     return data
@@ -45,9 +45,9 @@ def data_to_edit_resume_info_w_wrong_specialization(
     data = {
         "about": "Test",
         "specialization": 0,
-        "work_experience": create_work_experience.pk,
-        "skill": [create_skill.pk],
-        "type_of_employment": [create_type_of_employment.pk]
+        "work_experience": 1,
+        "skill": [1],
+        "type_of_employment": [1]
     }
 
     return data

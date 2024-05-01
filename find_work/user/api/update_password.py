@@ -1,5 +1,5 @@
 from django.urls import reverse
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,15 +11,14 @@ from find_work.settings import HTTP_LOCALHOST
 from user.models import User
 from user.serializer import UpdatePasswordSerializer
 
+from util import error_resp_data
+from util import success_resp_data
 from util.mail_data_manager import (
     MailSubjectInUpdateUserPassword,
     MailMessageInUpdateUserPassword,
 )
 from util.mail_sender import MailSender
-from util.error_exceptions import IsFieldsEmpty
-from util.success_resp_data import UpdateSuccess
-from util.error_resp_data import FieldsEmptyError
-from util.error_validation import ErrorValidation
+from util.exceptions import WrongPasswordException
 
 
 class UpdatePassword(APIView):
@@ -31,23 +30,21 @@ class UpdatePassword(APIView):
             request
     ):
         serializer = UpdatePasswordSerializer(data=request.data)
-        serializer.is_valid()
-
-        error_validation = ErrorValidation(serializer.errors)
-        try:
-            error_validation.is_fields_empty()
-        except IsFieldsEmpty:
-            return Response(
-                status=FieldsEmptyError().get_status(),
-                data=FieldsEmptyError().get_data()
-            )
+        serializer.is_valid(raise_exception=True)
 
         user_id = request.user.id
         user = User.objects.filter(pk=user_id).first()
 
-        deserialized_data = serializer.validated_data
+        serialized_data = serializer.validated_data
 
-        user.password = make_password(deserialized_data["password"])
+        is_check_password = check_password(
+            serialized_data["old_password"],
+            user.password
+        )
+        if not is_check_password:
+            raise WrongPasswordException(error_resp_data.wrong_password)
+
+        user.password = make_password(serialized_data["new_password"])
         user.save()
 
         link_on_generate_reset_password_uuid = (
@@ -66,6 +63,6 @@ class UpdatePassword(APIView):
         ).send_mail_to_user()
 
         return Response(
-            status=UpdateSuccess().get_status(),
-            data=UpdateSuccess().get_data()
+            status=success_resp_data.update["status_code"],
+            data=success_resp_data.update["data"]
         )

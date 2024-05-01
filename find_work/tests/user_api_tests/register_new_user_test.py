@@ -2,12 +2,10 @@ import pytest
 
 from django.urls import reverse
 
-from util.error_resp_data import (
-    FieldsEmptyError,
-    InvalidEmailAdressError,
-    EmailAlreadyExistsError,
-)
-from util.success_resp_data import CreateSuccess
+from rest_framework import status
+
+from util import error_resp_data
+from util import success_resp_data
 
 
 @pytest.mark.django_db
@@ -22,13 +20,14 @@ class TestRegisterNewUser:
             "util.mail_sender.send_mail",
             return_value=True
         )
-        response = client.post(
+        request = client.post(
             reverse("user_api:register_new_user"),
             data=data_to_register_new_user
         )
-        assert response.status_code == CreateSuccess().get_status()
-        assert response.data["success"] == (
-            CreateSuccess().get_data()["success"]
+
+        assert request.status_code == success_resp_data.create["status_code"]
+        assert request.data["detail"] == (
+            success_resp_data.create["data"]["detail"]
         )
 
     def test_should_response_fields_empty_error(
@@ -36,39 +35,40 @@ class TestRegisterNewUser:
             client,
             data_to_register_new_user_wo_data
     ):
-        response = client.post(
+        request = client.post(
             reverse("user_api:register_new_user"),
             data=data_to_register_new_user_wo_data
         )
-        assert response.status_code == FieldsEmptyError().get_status()
-        assert response.data["fields"] == (
-            FieldsEmptyError().get_data()["fields"]
-        )
+
+        assert request.status_code == status.HTTP_400_BAD_REQUEST
+        for key in request.data:
+            assert (
+                request.data[key][0] == error_resp_data.field_is_blank
+                or request.data[key][0] == error_resp_data.field_not_boolean
+            )
 
     def test_should_response_invalid_email_error(
             self,
             client,
             data_to_register_new_user_w_invalid_email
     ):
-        response = client.post(
+        request = client.post(
             reverse("user_api:register_new_user"),
             data=data_to_register_new_user_w_invalid_email
         )
-        assert response.status_code == InvalidEmailAdressError().get_status()
-        assert response.data["email"] == (
-            InvalidEmailAdressError().get_data()["email"]
-        )
+
+        assert request.status_code == status.HTTP_400_BAD_REQUEST
+        assert request.data["email"][0] == error_resp_data.invalid_email
 
     def test_should_response_email_already_exists_error(
             self,
             client,
             data_to_register_new_user_w_already_exists_email
     ):
-        response = client.post(
+        request = client.post(
             reverse("user_api:register_new_user"),
             data=data_to_register_new_user_w_already_exists_email
         )
-        assert response.status_code == EmailAlreadyExistsError().get_status()
-        assert response.data["email"] == (
-            EmailAlreadyExistsError().get_data()["email"]
-        )
+
+        assert request.status_code == status.HTTP_400_BAD_REQUEST
+        assert request.data["email"][0] == error_resp_data.field_not_unique
