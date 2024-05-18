@@ -41,10 +41,6 @@ urlpatterns = [
         include("user.api_urls"),
     ),
     path(
-        "api/v1/user1/",
-        include("user.view_urls"),
-    ),
-    path(
         "api/v1/resume/",
         include("resume.api_urls"),
     ),
