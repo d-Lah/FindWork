@@ -1,0 +1,134 @@
+*,
+::after,
+::before {
+  box-sizing: border-box;
+}
+
+.navbar {
+  background-color: #1e1e1e;
+  left: 0px;
+  position: sticky;
+  top: 0px;
+  transform: translateZ(0px);
+  z-index: 1010;
+  border-radius: 0px;
+  min-height: 50px;
+  align-items: center;
+  padding: 0;
+}
+
+.navbar-container {
+  align-items: center;
+  justify-content: space-between;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  width: 100%;
+}
+
+.navbar-logo {
+  font-size: 1.5rem;
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+}
+
+.navbar-menu {
+  background-color: transparent;
+  border: 1px solid red;
+  border-color: rgb(70, 70, 70);
+  border-radius: 0.5rem;
+  align-items: center;
+  display: none;
+  padding: 0.25rem 0.75rem;
+}
+.navbar-menu span {
+  color: white;
+}
+
+.navbar-collapse {
+  position: relative;
+  align-items: center;
+  flex-grow: 1;
+  flex-basis: 100%;
+}
+
+.navbar-nav {
+  margin-bottom: 0px;
+  list-style: none;
+  flex-wrap: wrap;
+  padding-left: 0px;
+  margin-top: 0px;
+}
+
+.nav-link {
+  color: white;
+  display: block;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+}
+.nav-link:hover {
+  color: rgb(200, 200, 200);
+  transition: color 0.5s ease 0s;
+}
+
+.navbar-profile {
+  margin-left: auto;
+}
+
+@media screen and (min-width: 640px) {
+  .navbar-container {
+    max-width: 600px;
+  }
+}
+@media screen and (min-width: 451px) {
+  .navbar-collapse {
+    display: flex;
+    flex-basis: auto;
+  }
+  .navbar-nav {
+    flex-direction: row;
+  }
+  .navbar-container {
+    flex-wrap: nowrap;
+    max-width: 720px;
+  }
+  .navbar {
+    flex-flow: nowrap;
+    justify-content: flex-start;
+  }
+}
+@media screen and (max-width: 450px) {
+  .navbar-menu {
+    display: flex;
+  }
+  .collapse:not(.show) {
+    display: none;
+  }
+  .navbar-nav {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+  }
+  .navbar-header {
+    width: 100%;
+  }
+  .navbar-container {
+    flex-wrap: wrap;
+  }
+}
+@media screen and (min-width: 1000px) {
+  .navbar-container {
+    max-width: 960px;
+  }
+}
+@media screen and (min-width: 1080px) {
+  .navbar-container {
+    max-width: 1040px;
+  }
+}
+
+/*# sourceMappingURL=navbar.css.map */
