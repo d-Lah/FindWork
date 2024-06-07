@@ -22,3 +22,7 @@ body {
 .ml-auto {
   margin-left: auto;
 }
+
+.hidden {
+  display: none;
+}

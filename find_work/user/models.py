@@ -45,7 +45,7 @@ class UserManager(BaseUserManager):
 
         profile = Profile(
             first_name="Helper",
-            second_name="Helper",
+            last_name="Helper",
             employer_profile=None,
             employee_profile=None,
         )

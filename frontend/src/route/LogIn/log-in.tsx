@@ -12,7 +12,7 @@ function LogIn() {
         </a>
         <p>
           No account?{" "}
-          <a href="#" className="register">
+          <a href="/register" className="register">
             Register
           </a>
         </p>

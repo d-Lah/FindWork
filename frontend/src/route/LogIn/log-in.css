@@ -35,25 +35,33 @@
 }
 .login-box .forgot-password:hover,
 .login-box .register:hover {
-  color: #74b6fc;
+  color: #409cff;
 }
 .login-box p {
   margin: 20px 0;
   color: #888;
 }
 .login-box button {
-  width: 100%;
   padding: 10px;
   border: 1px solid #fff;
   border-radius: 5px;
-  background-color: #1e1e1e;
   color: #fff;
-  font-size: 16px;
+  border: none;
+  font-size: 1rem;
+  background-color: #4580a1;
   cursor: pointer;
   transition: background-color 0.3s;
+  width: 50%;
+  margin: 0.5rem auto 0;
 }
 .login-box button:hover {
-  background-color: #333;
+  background-color: #376680;
+}
+.login-box button:focus-visible {
+  outline: 3px solid #294c60;
+}
+.login-box button:focus {
+  background-color: #376680;
 }
 
 @media screen and (min-width: 320px) {

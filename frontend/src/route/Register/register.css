@@ -1,0 +1,141 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.register-box {
+  background-color: #1e1e1e;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+.register-box .form-section {
+  display: flex;
+  flex-direction: column;
+}
+.register-box .form-section .error {
+  display: flex;
+  padding-left: 3px;
+  color: red;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.register-box .form-section input:-webkit-autofill {
+  border: 1px solid #007bff;
+  -webkit-box-shadow: 0 0 0 1000px #2e2e2e inset;
+  -webkit-text-fill-color: #fff;
+}
+.register-box .form-section input:-webkit-autofill:focus, .register-box .form-section input:-webkit-autofill:hover {
+  border: 1px solid #007bff;
+  -webkit-box-shadow: 0 0 0px 1000px #2e2e2e inset;
+  -webkit-text-fill-color: #fff;
+}
+.register-box .form-section input,
+.register-box .form-section select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  background-color: #2e2e2e;
+  color: #fff;
+  font-size: 1rem;
+}
+.register-box .form-section input:placeholder,
+.register-box .form-section select:placeholder {
+  color: #888;
+}
+.register-box .form-section input:focus-visible,
+.register-box .form-section select:focus-visible {
+  outline: 3px solid #616161;
+}
+.register-box .form-section .error-field {
+  border: 1px solid red;
+}
+.register-box .form-section .success-msg {
+  color: #fff;
+}
+.register-box .form-section .activate-user {
+  color: #007bff;
+  text-decoration: none;
+}
+.register-box .form-section .activate-user:hover {
+  color: #409cff;
+}
+.register-box .form-section .pagination-button {
+  padding: 10px;
+  border: 1px solid #4580a1;
+  border-radius: 5px;
+  background-color: #1e1e1e;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 50%;
+  margin: 0.5rem auto 0;
+}
+.register-box .form-section .pagination-button:disabled {
+  cursor: not-allowed;
+}
+.register-box .form-section .pagination-button:disabled:hover {
+  background-color: #1e1e1e;
+}
+.register-box .form-section .pagination-button:focus-visible {
+  outline: 3px solid #616161;
+}
+.register-box .form-section .pagination-button:hover {
+  background-color: #333;
+}
+.register-box .form-section .register-button {
+  padding: 10px;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  background-color: #4580a1;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 50%;
+  margin: 0.5rem auto 0;
+}
+.register-box .form-section .register-button:disabled {
+  cursor: not-allowed;
+}
+.register-box .form-section .register-button:disabled:hover {
+  background-color: #4580a1;
+}
+.register-box .form-section .register-button:hover {
+  background-color: #376680;
+}
+.register-box .form-section .register-button:focus-visible {
+  outline: 3px solid #294c60;
+}
+.register-box .form-section .register-button:focus {
+  background-color: #376680;
+}
+
+@media screen and (min-width: 320px) {
+  .register-box {
+    width: 15rem;
+  }
+}
+@media screen and (min-width: 768px) {
+  .register-box {
+    width: 20rem;
+  }
+}
+@media screen and (min-width: 1024px) {
+  .register-box {
+    width: 25rem;
+  }
+}
+
+/*# sourceMappingURL=register.css.map */
