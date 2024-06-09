@@ -10,8 +10,7 @@ from rest_framework.response import Response
 
 from cryptography.fernet import Fernet
 
-from find_work.settings import HTTP_LOCALHOST
-from find_work.settings import CRYPTOGRAPHY_FERNET_KEY
+from find_work.settings import HTTP_LOCALHOST_REACT, CRYPTOGRAPHY_FERNET_KEY
 
 from user.models import (
     User,
@@ -29,8 +28,8 @@ from util.mail_sender import MailSender
 
 class RegisterNewUser(APIView):
     def post(
-            self,
-            request,
+        self,
+        request,
     ):
         serializer = RegisterNewUserSerializer(data=request.data)
 
@@ -54,20 +53,16 @@ class RegisterNewUser(APIView):
             is_employer=serializer_data["is_employer"],
             is_employee=serializer_data["is_employee"],
             password=make_password(serializer_data["password"]),
-            otp_base32=user_encrypted_opt_base32.decode()
+            otp_base32=user_encrypted_opt_base32.decode(),
         )
         new_user.save()
 
-        new_user_activation_uuid = new_user.user_activation_uuid
-        activate_user_kwargs = {
-            "user_activation_uuid": new_user_activation_uuid
-        }
-        activate_user_view_url = reverse(
-            "user_api:activate_new_user",
-            kwargs=activate_user_kwargs
-        )
+        activation_uuid = new_user.user_activation_uuid
+        activate_user_view_url = f"/activate-user/{activation_uuid}"
 
-        link_on_activate_new_user = HTTP_LOCALHOST + activate_user_view_url
+        link_on_activate_new_user = (
+            HTTP_LOCALHOST_REACT + activate_user_view_url
+        )
         mail_subject = MailSubjectInRegisterNewUser().get_mail_subject()
         mail_message = MailMessageInRegisterNewUser(
             link_on_activate_new_user
@@ -76,10 +71,10 @@ class RegisterNewUser(APIView):
         MailSender(
             mail_subject=mail_subject,
             mail_message=mail_message,
-            for_user=new_user.email
+            for_user=new_user.email,
         ).send_mail_to_user()
 
         return Response(
             status=success_resp_data.create["status_code"],
-            data=success_resp_data.create["data"]
+            data=success_resp_data.create["data"],
         )

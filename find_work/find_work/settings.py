@@ -39,6 +39,7 @@ EMAIL_USE_SSL = False
 
 ALLOWED_HOSTS = []
 HTTP_LOCALHOST = "http://localhost:8000"
+HTTP_LOCALHOST_REACT = "http://localhost:3000"
 
 # Application definition
 

@@ -39,10 +39,10 @@ function Register() {
         email: email,
         password: password,
       })
-      .then(function (response) {
+      .then(function(response) {
         setStep(4);
       })
-      .catch(function (error) {
+      .catch(function(error) {
         let errorData: object = error.response.data;
         let newErrors: Errors = { ...errors };
 
@@ -230,10 +230,7 @@ function Register() {
   let successMsg = (
     <div className="form-section">
       <p className="success-msg">
-        We sent code on your email, to activate account.{" "}
-        <a href="/activate-user" className="activate-user">
-          Activate user
-        </a>
+        We sent link on your email, to activate account.
       </p>
     </div>
   );

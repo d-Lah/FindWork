@@ -1,0 +1,46 @@
+.activate-user-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+}
+
+.activate-user-box {
+  background-color: #1e1e1e;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.log-in-link {
+  color: #007bff;
+  text-decoration: none;
+}
+.log-in-link:hover {
+  color: #409cff;
+}
+
+@media screen and (min-width: 320px) {
+  .activate-user-container {
+    width: 15rem;
+  }
+}
+@media screen and (min-width: 768px) {
+  .activate-user-container {
+    width: 20rem;
+  }
+}
+@media screen and (min-width: 1024px) {
+  .activate-user-container {
+    width: 30rem;
+  }
+}
+
+
+/*# sourceMappingURL=activate-user.css.map */

@@ -46,20 +46,13 @@ class UserManager(BaseUserManager):
         profile = Profile(
             first_name="Helper",
             last_name="Helper",
-            employer_profile=None,
-            employee_profile=None,
         )
 
         profile.save()
 
-        last_digits = str(random.random())[-10:]
-
-        phone_number = f"000{last_digits}"
-
         user = self.model(
             email=self.normalize_email(email),
             profile=profile,
-            phone_number=phone_number,
             is_employer=False,
             is_employee=False,
         )
